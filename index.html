@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slurp — token-budget-aware graph navigation for AI agents</title>
+  <meta name="description" content="slurp selects only the relevant nodes from your knowledge graph within a token budget. 93.3% mean savings. No LLM calls. Pure math." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --border: #21262d;
+      --orange: #f97316;
+      --orange-dim: rgba(249, 115, 22, 0.12);
+      --orange-glow: rgba(249, 115, 22, 0.25);
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --text-dim: #4d5966;
+      --nav-h: 60px;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-top: var(--nav-h);
+    }
+
+    /* ── Fade-in on scroll ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── Layout ── */
+    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+    section { padding: 96px 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    p { color: var(--text-muted); margin-bottom: 16px; }
+    p:last-child { margin-bottom: 0; }
+
+    /* ─────────────────────────────
+       NAVBAR
+    ───────────────────────────── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      background: rgba(13, 17, 23, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-brand img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .nav-brand span {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-links a {
+      font-size: 0.835rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+    /* Language selector */
+    .lang-selector {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .lang-btn:hover { border-color: var(--orange); color: var(--text); }
+
+    .lang-btn .chevron {
+      width: 12px; height: 12px;
+      transition: transform 0.2s;
+      opacity: 0.5;
+    }
+
+    .lang-selector.open .lang-btn .chevron { transform: rotate(180deg); }
+
+    .lang-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 120px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 200;
+    }
+
+    .lang-selector.open .lang-dropdown {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .lang-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+      white-space: nowrap;
+    }
+
+    .lang-option:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .lang-option.active { color: var(--orange); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: transparent;
+      border: none;
+      margin-left: auto;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: rgba(13, 17, 23, 0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+      padding: 16px 24px 20px;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 7px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .mobile-menu a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+    .mobile-lang {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 12px 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .mobile-lang-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .mobile-lang-btn:hover,
+    .mobile-lang-btn.active { border-color: var(--orange); color: var(--orange); }
+
+    /* ─────────────────────────────
+       HERO
+    ───────────────────────────── */
+    #hero {
+      padding: 120px 0 96px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 460px;
+      height: 460px;
+      object-fit: contain;
+      opacity: 0.09;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-family: var(--mono);
+      font-size: clamp(2.8rem, 8vw, 4.5rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+
+    .hero-tagline {
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      color: var(--text-muted);
+      font-style: italic;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    .hero-tagline .emoji { font-style: normal; }
+
+    .install-block {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 36px;
+      max-width: 100%;
+    }
+
+    .install-cmd {
+      font-family: var(--mono);
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      color: var(--text);
+      padding: 14px 20px;
+      user-select: all;
+      white-space: nowrap;
+    }
+
+    .install-cmd .prompt { color: var(--text-dim); margin-right: 8px; }
+    .install-cmd .pkg { color: var(--orange); }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      border-left: 1px solid var(--border);
+      padding: 14px 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { background: var(--orange-dim); color: var(--orange); }
+    .copy-btn svg { width: 16px; height: 16px; display: block; }
+    .copy-btn .check { display: none; }
+    .copy-btn.copied .icon { display: none; }
+    .copy-btn.copied .check { display: block; color: #3fb950; }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      border: none;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-primary:hover { box-shadow: 0 4px 20px var(--orange-glow); }
+
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ─────────────────────────────
+       PROBLEMA
+    ───────────────────────────── */
+    .token-viz {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+
+    .token-num { text-align: center; }
+
+    .token-num .num {
+      font-family: var(--mono);
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 600;
+      line-height: 1;
+      display: block;
+    }
+
+    .token-num .label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .token-num.before .num { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(249,115,22,0.5); }
+    .token-num.after .num { color: var(--orange); }
+
+    .token-arrow { font-size: 1.5rem; color: var(--orange); flex-shrink: 0; }
+
+    .token-saving {
+      background: var(--orange-dim);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--orange);
+      white-space: nowrap;
+    }
+
+    /* ─────────────────────────────
+       BENCHMARK
+    ───────────────────────────── */
+    .bench-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.875rem;
+      margin: 32px 0;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .bench-table th {
+      background: var(--bg-card);
+      color: var(--text-dim);
+      font-weight: 500;
+      text-align: left;
+      padding: 12px 16px;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bench-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .bench-table tr:last-child td { border-bottom: none; }
+    .bench-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .bench-table td.query { color: var(--text); font-weight: 500; }
+    .bench-table td.saving { color: var(--orange); font-weight: 600; }
+
+    .bench-summary { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 8px; }
+
+    .bench-stat { text-align: center; }
+
+    .bench-stat .val {
+      font-family: var(--mono);
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      font-weight: 700;
+      color: var(--orange);
+      display: block;
+      line-height: 1;
+    }
+
+    .bench-stat .desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* ─────────────────────────────
+       DEMO
+    ───────────────────────────── */
+    .demo-wrapper {
+      margin-top: 36px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+
+    .demo-bar {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-dot:nth-child(1) { background: #ff5f56; }
+    .demo-dot:nth-child(2) { background: #ffbd2e; }
+    .demo-dot:nth-child(3) { background: #27c93f; }
+
+    .demo-gif { width: 100%; display: block; }
+
+    .demo-caption {
+      padding: 14px 20px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .demo-caption .highlight { color: var(--orange); }
+
+    /* ─────────────────────────────
+       HOW IT WORKS
+    ───────────────────────────── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 36px 0 40px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      bottom: 40px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .step { display: flex; gap: 20px; padding: 8px 0 32px; }
+    .step:last-child { padding-bottom: 0; }
+
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-body h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; padding-top: 8px; }
+    .step-body p { font-size: 0.9rem; margin-bottom: 8px; }
+
+    .code-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+
+    .code-block .k { color: #ff7b72; }
+    .code-block .s { color: #a5d6ff; }
+    .code-block .c { color: var(--text-dim); font-style: italic; }
+
+    .mcp-note {
+      background: var(--orange-dim);
+      border-left: 3px solid var(--orange);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin-top: 24px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .mcp-note strong { color: var(--text); }
+
+    /* ─────────────────────────────
+       FEATURES
+    ───────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover { border-color: rgba(249, 115, 22, 0.4); }
+
+    .feature-icon { font-size: 1.3rem; margin-bottom: 10px; display: block; }
+
+    .feature-card h3 {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+
+    .feature-card p { font-size: 0.82rem; line-height: 1.5; margin: 0; }
+
+    /* ─────────────────────────────
+       FOOTER
+    ───────────────────────────── */
+    footer { padding: 48px 0; border-top: 1px solid var(--border); text-align: center; }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a { font-size: 0.875rem; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--orange); }
+
+    .footer-sep { color: var(--text-dim); }
+
+    .footer-credit { font-size: 0.8rem; color: var(--text-dim); }
+    .footer-credit a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+    .footer-credit a:hover { color: var(--text-muted); }
+
+    /* ─────────────────────────────
+       RESPONSIVE
+    ───────────────────────────── */
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .lang-selector { display: none; }
+
+      #hero { padding: 80px 0 72px; }
+      section { padding: 72px 0; }
+
+      .hero-bg-logo { width: 280px; height: 280px; }
+
+      .install-block { flex-direction: column; align-items: stretch; }
+      .install-cmd { text-align: center; }
+      .copy-btn { border-left: none; border-top: 1px solid var(--border); justify-content: center; padding: 12px; }
+
+      .token-viz { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .token-arrow { transform: rotate(90deg); }
+
+      .bench-table th:nth-child(3),
+      .bench-table td:nth-child(3) { display: none; }
+
+      .bench-summary { gap: 20px; }
+      .steps::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════
+       NAVBAR
+  ══════════════════════════════ -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="#hero" class="nav-brand">
+        <img src="assets/SlurpLogo_SinFondo.png" alt="slurp" />
+        <span>slurp</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#problem" data-i18n="nav.problem">Problem</a>
+        <a href="#benchmark" data-i18n="nav.benchmark">Benchmark</a>
+        <a href="#demo" data-i18n="nav.demo">Demo</a>
+        <a href="#how" data-i18n="nav.how">How it works</a>
+        <a href="#features" data-i18n="nav.features">Features</a>
+      </div>
+
+      <div class="lang-selector" id="langSelector">
+        <button class="lang-btn" id="langBtn" aria-label="Select language">
+          <span id="langFlag">🇬🇧</span>
+          <span id="langCode">EN</span>
+          <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+          <div class="lang-option active" data-lang="en">🇬🇧 EN</div>
+          <div class="lang-option" data-lang="es">🇪🇸 ES</div>
+          <div class="lang-option" data-lang="it">🇮🇹 IT</div>
+          <div class="lang-option" data-lang="fr">🇫🇷 FR</div>
+          <div class="lang-option" data-lang="de">🇩🇪 DE</div>
+        </div>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#problem" data-i18n="nav.problem" class="mobile-link">Problem</a>
+    <a href="#benchmark" data-i18n="nav.benchmark" class="mobile-link">Benchmark</a>
+    <a href="#demo" data-i18n="nav.demo" class="mobile-link">Demo</a>
+    <a href="#how" data-i18n="nav.how" class="mobile-link">How it works</a>
+    <a href="#features" data-i18n="nav.features" class="mobile-link">Features</a>
+    <div class="mobile-lang">
+      <button class="mobile-lang-btn active" data-lang="en">🇬🇧 EN</button>
+      <button class="mobile-lang-btn" data-lang="es">🇪🇸 ES</button>
+      <button class="mobile-lang-btn" data-lang="it">🇮🇹 IT</button>
+      <button class="mobile-lang-btn" data-lang="fr">🇫🇷 FR</button>
+      <button class="mobile-lang-btn" data-lang="de">🇩🇪 DE</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       HERO
+  ══════════════════════════════ -->
+  <section id="hero">
+    <img src="assets/SlurpLogo_SinFondo.png" alt="" class="hero-bg-logo" aria-hidden="true" />
+    <div class="container hero-content">
+      <h1 class="hero-title">slurp</h1>
+      <p class="hero-tagline" data-i18n-html="hero.tagline">
+        graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
+      </p>
+
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="install-block">
+          <span class="install-cmd">
+            <span class="prompt">$</span>pip install <span class="pkg">slurp-graph</span>
+          </span>
+          <button class="copy-btn" onclick="copyInstall(this)" aria-label="Copy install command">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="https://github.com/CarlosVallejoRuiz/slurp" target="_blank" rel="noopener" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub →
+        </a>
+        <a href="https://pypi.org/project/slurp-graph/" target="_blank" rel="noopener" class="btn btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px">
+            <path d="M11.654 0C5.717 0 6.079 2.59 6.079 2.59l.007 2.683h5.673v.806H3.994S0 5.637 0 11.654c0 6.017 3.527 5.806 3.527 5.806h2.105v-2.793s-.113-3.527 3.47-3.527h5.98s3.354.054 3.354-3.245V3.245S18.944 0 11.654 0zM8.716 1.873a1.04 1.04 0 1 1 0 2.08 1.04 1.04 0 0 1 0-2.08z"/>
+            <path d="M12.346 24c5.937 0 5.575-2.59 5.575-2.59l-.007-2.683h-5.673v-.806h7.765S24 18.363 24 12.346c0-6.017-3.527-5.806-3.527-5.806h-2.105v2.793s.113 3.527-3.47 3.527h-5.98s-3.354-.054-3.354 3.245v5.45S5.056 24 12.346 24zm2.938-1.873a1.04 1.04 0 1 1 0-2.08 1.04 1.04 0 0 1 0 2.08z"/>
+          </svg>
+          PyPI →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       PROBLEMA
+  ══════════════════════════════ -->
+  <section id="problem">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="problem.label">// the problem</p>
+      <h2 data-i18n="problem.h2">Your LLM doesn't need the whole bowl</h2>
+      <p data-i18n-html="problem.p1">graphify maps your entire codebase into a knowledge graph. Great. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.</p>
+      <p data-i18n="problem.p2">slurp scores each node against your query using PageRank + TF-IDF — zero LLM calls, zero extra tokens spent — and serves only what fits inside your budget.</p>
+
+      <div class="token-viz">
+        <div class="token-num before">
+          <span class="num">69,418</span>
+          <span class="label" data-i18n="problem.before.label">full graph (tokens)</span>
+        </div>
+        <span class="token-arrow">→</span>
+        <div class="token-num after">
+          <span class="num">4,000</span>
+          <span class="label" data-i18n="problem.after.label">slurp budget (tokens)</span>
+        </div>
+        <span class="token-saving" data-i18n="problem.saving">94.2% saved</span>
+      </div>
+
+      <p style="font-size:0.85rem;color:var(--text-dim);font-family:var(--mono);" data-i18n="problem.benchmark">Benchmark: PrismaStats codebase · 2,111 nodes · "player stats" query</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       BENCHMARK
+  ══════════════════════════════ -->
+  <section id="benchmark">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="benchmark.label">// benchmark</p>
+      <h2 data-i18n="benchmark.h2">Real numbers on a real codebase</h2>
+      <p data-i18n="benchmark.p">PrismaStats: 2,111 nodes, 69,418 tokens. No mocks.</p>
+
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th data-i18n="benchmark.th.query">Query</th>
+            <th data-i18n="benchmark.th.budget">Budget</th>
+            <th data-i18n="benchmark.th.tokens">Tokens used</th>
+            <th data-i18n="benchmark.th.graph">Full graph</th>
+            <th data-i18n="benchmark.th.saved">Saved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="query">"auth flow"</td>
+            <td>2,000</td>
+            <td>2,000</td>
+            <td>69,418</td>
+            <td class="saving">97.1%</td>
+          </tr>
+          <tr>
+            <td class="query">"player stats"</td>
+            <td>4,000</td>
+            <td>4,000</td>
+            <td>69,418</td>
+            <td class="saving">94.2%</td>
+          </tr>
+          <tr>
+            <td class="query">"database schema"</td>
+            <td>8,000</td>
+            <td>8,000</td>
+            <td>69,418</td>
+            <td class="saving">88.5%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bench-summary">
+        <div class="bench-stat">
+          <span class="val">93.3%</span>
+          <span class="desc" data-i18n="benchmark.stat.mean">mean savings</span>
+        </div>
+        <div class="bench-stat">
+          <span class="val">97.1%</span>
+          <span class="desc" data-i18n="benchmark.stat.best">best case</span>
+        </div>
+        <div class="bench-stat">
+          <span class="val">0</span>
+          <span class="desc" data-i18n="benchmark.stat.llm">extra LLM calls</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       DEMO
+  ══════════════════════════════ -->
+  <section id="demo">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="demo.label">// demo</p>
+      <h2 data-i18n="demo.h2">See it in action</h2>
+      <p data-i18n="demo.p">The interactive visualizer shows the subgraph slurp selected — and how much you saved.</p>
+
+      <div class="demo-wrapper">
+        <div class="demo-bar">
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+        </div>
+        <img src="assets/Slurp_Linkedin.gif" alt="slurp --viz demo" class="demo-gif" loading="lazy" />
+        <p class="demo-caption">
+          <span class="highlight">slurp "auth flow" --graph graphify-out/graph.json --budget 4000 --viz</span><br/>
+          <span data-i18n="demo.caption">Opens an interactive subgraph explorer with a live token-savings badge.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       HOW IT WORKS
+  ══════════════════════════════ -->
+  <section id="how">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="how.label">// how it works</p>
+      <h2 data-i18n="how.h2">Three steps to zero wasted tokens</h2>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3 data-i18n="how.step1.h3">Install slurp</h3>
+            <p data-i18n="how.step1.p">One command, no dependencies beyond Python.</p>
+            <div class="code-block"><span class="c"># install</span>
+pip install slurp-graph</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3 data-i18n="how.step2.h3">Generate the graph with graphify</h3>
+            <p data-i18n="how.step2.p">graphify maps your codebase into a JSON knowledge graph.</p>
+            <div class="code-block">graphify extract . --backend claude</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3 data-i18n="how.step3.h3">Add slurp as an MCP server</h3>
+            <p data-i18n-html="how.step3.p">Drop this into your project's <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code does the rest automatically.</p>
+            <div class="code-block">{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"slurp"</span>: {
+      <span class="k">"command"</span>: <span class="s">"slurp"</span>,
+      <span class="k">"args"</span>: [<span class="s">"serve"</span>, <span class="s">"--graph"</span>, <span class="s">"graphify-out/graph.json"</span>]
+    }
+  }
+}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mcp-note" data-i18n-html="how.mcp">
+        <strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       FEATURES
+  ══════════════════════════════ -->
+  <section id="features">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="features.label">// features</p>
+      <h2 data-i18n="features.h2">Everything you need, nothing you don't</h2>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🗺️</span>
+          <h3>--viz</h3>
+          <p data-i18n="features.viz.p">Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💉</span>
+          <h3>--inject-code</h3>
+          <p data-i18n="features.inject.p">Attach raw source code to graph nodes. slurp includes the actual functions, not just metadata.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔀</span>
+          <h3>slurp diff</h3>
+          <p data-i18n="features.diff.p">Compare two graph snapshots to see what changed between versions or refactors.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <h3>slurp benchmark</h3>
+          <p data-i18n="features.benchmark.p">Run a batch of queries and measure token savings across your real codebase.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📤</span>
+          <h3>slurp export</h3>
+          <p data-i18n="features.export.p">Export selected subgraphs to JSON, markdown, or plain text for use in any tool.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤖</span>
+          <h3>MCP server</h3>
+          <p data-i18n="features.mcp.p">Plug directly into Claude Code via Model Context Protocol. Zero config after setup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       FOOTER
+  ══════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/CarlosVallejoRuiz/slurp" target="_blank" rel="noopener">GitHub</a>
+        <span class="footer-sep">·</span>
+        <a href="https://pypi.org/project/slurp-graph/" target="_blank" rel="noopener">PyPI</a>
+        <span class="footer-sep">·</span>
+        <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </div>
+      <p class="footer-credit" data-i18n-html="footer.credit">
+        Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Juank</a> · Terrassa, Barcelona
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /* ─── TRANSLATIONS ─── */
+    const LANGS = {
+      en: {
+        flag: '🇬🇧', code: 'EN',
+        'nav.problem': 'Problem',
+        'nav.benchmark': 'Benchmark',
+        'nav.demo': 'Demo',
+        'nav.how': 'How it works',
+        'nav.features': 'Features',
+        'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
+        'problem.label': '// the problem',
+        'problem.h2': "Your LLM doesn't need the whole bowl",
+        'problem.p1': "graphify maps your entire codebase into a knowledge graph. Great. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.",
+        'problem.p2': "slurp scores each node against your query using PageRank + TF-IDF — zero LLM calls, zero extra tokens spent — and serves only what fits inside your budget.",
+        'problem.before.label': 'full graph (tokens)',
+        'problem.after.label': 'slurp budget (tokens)',
+        'problem.saving': '94.2% saved',
+        'problem.benchmark': 'Benchmark: PrismaStats codebase · 2,111 nodes · "player stats" query',
+        'benchmark.label': '// benchmark',
+        'benchmark.h2': 'Real numbers on a real codebase',
+        'benchmark.p': 'PrismaStats: 2,111 nodes, 69,418 tokens. No mocks.',
+        'benchmark.th.query': 'Query',
+        'benchmark.th.budget': 'Budget',
+        'benchmark.th.tokens': 'Tokens used',
+        'benchmark.th.graph': 'Full graph',
+        'benchmark.th.saved': 'Saved',
+        'benchmark.stat.mean': 'mean savings',
+        'benchmark.stat.best': 'best case',
+        'benchmark.stat.llm': 'extra LLM calls',
+        'demo.label': '// demo',
+        'demo.h2': 'See it in action',
+        'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
+        'demo.caption': 'Opens an interactive subgraph explorer with a live token-savings badge.',
+        'how.label': '// how it works',
+        'how.h2': 'Three steps to zero wasted tokens',
+        'how.step1.h3': 'Install slurp',
+        'how.step1.p': 'One command, no dependencies beyond Python.',
+        'how.step2.h3': 'Generate the graph with graphify',
+        'how.step2.p': 'graphify maps your codebase into a JSON knowledge graph.',
+        'how.step3.h3': 'Add slurp as an MCP server',
+        'how.step3.p': 'Drop this into your project\'s <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code does the rest automatically.',
+        'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
+        'features.label': '// features',
+        'features.h2': "Everything you need, nothing you don't",
+        'features.viz.p': 'Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.',
+        'features.inject.p': 'Attach raw source code to graph nodes. slurp includes the actual functions, not just metadata.',
+        'features.diff.p': 'Compare two graph snapshots to see what changed between versions or refactors.',
+        'features.benchmark.p': 'Run a batch of queries and measure token savings across your real codebase.',
+        'features.export.p': 'Export selected subgraphs to JSON, markdown, or plain text for use in any tool.',
+        'features.mcp.p': 'Plug directly into Claude Code via Model Context Protocol. Zero config after setup.',
+        'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+      },
+      es: {
+        flag: '🇪🇸', code: 'ES',
+        'nav.problem': 'Problema',
+        'nav.benchmark': 'Benchmark',
+        'nav.demo': 'Demo',
+        'nav.how': 'Cómo funciona',
+        'nav.features': 'Funcionalidades',
+        'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
+        'problem.label': '// el problema',
+        'problem.h2': 'Tu LLM no necesita el bol entero',
+        'problem.p1': 'graphify mapea todo tu codebase en un grafo de conocimiento. Genial. Pero inyectar <em>cada nodo</em> en cada consulta es ineficiente — tu LLM gasta la mayor parte de su presupuesto de contexto en nodos que nunca usará.',
+        'problem.p2': 'slurp puntúa cada nodo frente a tu consulta usando PageRank + TF-IDF — sin llamadas a ningún LLM, sin tokens extra gastados — y sirve solo lo que cabe dentro de tu presupuesto.',
+        'problem.before.label': 'grafo completo (tokens)',
+        'problem.after.label': 'presupuesto slurp (tokens)',
+        'problem.saving': '94,2% ahorrado',
+        'problem.benchmark': 'Benchmark: codebase PrismaStats · 2.111 nodos · consulta "player stats"',
+        'benchmark.label': '// benchmark',
+        'benchmark.h2': 'Números reales sobre un codebase real',
+        'benchmark.p': 'PrismaStats: 2.111 nodos, 69.418 tokens. Sin mocks.',
+        'benchmark.th.query': 'Consulta',
+        'benchmark.th.budget': 'Presupuesto',
+        'benchmark.th.tokens': 'Tokens usados',
+        'benchmark.th.graph': 'Grafo completo',
+        'benchmark.th.saved': 'Ahorro',
+        'benchmark.stat.mean': 'ahorro medio',
+        'benchmark.stat.best': 'mejor caso',
+        'benchmark.stat.llm': 'llamadas LLM extra',
+        'demo.label': '// demo',
+        'demo.h2': 'Vélo en acción',
+        'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
+        'demo.caption': 'Abre un explorador interactivo de subgrafos con un badge en tiempo real de tokens ahorrados.',
+        'how.label': '// cómo funciona',
+        'how.h2': 'Tres pasos para cero tokens desperdiciados',
+        'how.step1.h3': 'Instala slurp',
+        'how.step1.p': 'Un comando, sin dependencias más allá de Python.',
+        'how.step2.h3': 'Genera el grafo con graphify',
+        'how.step2.p': 'graphify mapea tu codebase en un grafo de conocimiento JSON.',
+        'how.step3.h3': 'Añade slurp como servidor MCP',
+        'how.step3.p': 'Copia esto en el <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> de tu proyecto. Claude Code hace el resto automáticamente.',
+        'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a slurp en cada consulta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
+        'features.label': '// funcionalidades',
+        'features.h2': 'Todo lo que necesitas, nada más',
+        'features.viz.p': 'Explorador interactivo de subgrafos en el navegador. Ve exactamente qué nodos se seleccionaron y por qué.',
+        'features.inject.p': 'Adjunta código fuente a los nodos del grafo. slurp incluye las funciones reales, no solo metadatos.',
+        'features.diff.p': 'Compara dos snapshots del grafo para ver qué cambió entre versiones o refactors.',
+        'features.benchmark.p': 'Ejecuta un lote de consultas y mide el ahorro de tokens sobre tu codebase real.',
+        'features.export.p': 'Exporta subgrafos seleccionados a JSON, markdown o texto plano para cualquier herramienta.',
+        'features.mcp.p': 'Conéctate directamente a Claude Code vía Model Context Protocol. Cero configuración tras la instalación.',
+        'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+      },
+      it: {
+        flag: '🇮🇹', code: 'IT',
+        'nav.problem': 'Problema',
+        'nav.benchmark': 'Benchmark',
+        'nav.demo': 'Demo',
+        'nav.how': 'Come funziona',
+        'nav.features': 'Funzionalità',
+        'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
+        'problem.label': '// il problema',
+        'problem.h2': "Il tuo LLM non ha bisogno dell'intera ciotola",
+        'problem.p1': "graphify mappa l'intero codebase in un knowledge graph. Ottimo. Ma iniettare <em>ogni nodo</em> in ogni query è dispendioso — il tuo LLM spende la maggior parte del suo budget di contesto su nodi che non userà mai.",
+        'problem.p2': 'slurp valuta ogni nodo rispetto alla tua query usando PageRank + TF-IDF — zero chiamate LLM, zero token extra spesi — e serve solo ciò che rientra nel tuo budget.',
+        'problem.before.label': 'grafo completo (token)',
+        'problem.after.label': 'budget slurp (token)',
+        'problem.saving': '94,2% risparmiato',
+        'problem.benchmark': 'Benchmark: codebase PrismaStats · 2.111 nodi · query "player stats"',
+        'benchmark.label': '// benchmark',
+        'benchmark.h2': 'Numeri reali su un codebase reale',
+        'benchmark.p': 'PrismaStats: 2.111 nodi, 69.418 token. Senza mock.',
+        'benchmark.th.query': 'Query',
+        'benchmark.th.budget': 'Budget',
+        'benchmark.th.tokens': 'Token usati',
+        'benchmark.th.graph': 'Grafo completo',
+        'benchmark.th.saved': 'Risparmio',
+        'benchmark.stat.mean': 'risparmio medio',
+        'benchmark.stat.best': 'caso migliore',
+        'benchmark.stat.llm': 'chiamate LLM extra',
+        'demo.label': '// demo',
+        'demo.h2': 'Guardalo in azione',
+        'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
+        'demo.caption': 'Apre un esploratore interattivo di sottografi con un badge in tempo reale del risparmio di token.',
+        'how.label': '// come funziona',
+        'how.h2': 'Tre passi per zero token sprecati',
+        'how.step1.h3': 'Installa slurp',
+        'how.step1.p': 'Un solo comando, nessuna dipendenza oltre Python.',
+        'how.step2.h3': 'Genera il grafo con graphify',
+        'how.step2.p': 'graphify mappa il tuo codebase in un knowledge graph JSON.',
+        'how.step3.h3': 'Aggiungi slurp come server MCP',
+        'how.step3.p': 'Inserisci questo nel <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> del tuo progetto. Claude Code fa il resto automaticamente.',
+        'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama slurp ad ogni query — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
+        'features.label': '// funzionalità',
+        'features.h2': 'Tutto il necessario, nulla di più',
+        'features.viz.p': 'Esploratore interattivo di sottografi nel browser. Scopri esattamente quali nodi sono stati selezionati e perché.',
+        'features.inject.p': 'Allega il codice sorgente ai nodi del grafo. slurp include le funzioni reali, non solo i metadati.',
+        'features.diff.p': 'Confronta due snapshot del grafo per vedere cosa è cambiato tra versioni o refactoring.',
+        'features.benchmark.p': 'Esegui un batch di query e misura il risparmio di token sul tuo codebase reale.',
+        'features.export.p': 'Esporta i sottografi selezionati in JSON, markdown o testo semplice per qualsiasi strumento.',
+        'features.mcp.p': 'Collegati direttamente a Claude Code tramite Model Context Protocol. Zero configurazione dopo l\'installazione.',
+        'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+      },
+      fr: {
+        flag: '🇫🇷', code: 'FR',
+        'nav.problem': 'Problème',
+        'nav.benchmark': 'Benchmark',
+        'nav.demo': 'Démo',
+        'nav.how': 'Comment ça marche',
+        'nav.features': 'Fonctionnalités',
+        'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
+        'problem.label': '// le problème',
+        'problem.h2': "Votre LLM n'a pas besoin du bol entier",
+        'problem.p1': "graphify cartographie l'intégralité de votre codebase en un graphe de connaissances. Parfait. Mais injecter <em>chaque nœud</em> dans chaque requête est inefficace — votre LLM dépense la majeure partie de son budget de contexte sur des nœuds qu'il n'utilisera jamais.",
+        'problem.p2': "slurp évalue chaque nœud par rapport à votre requête en utilisant PageRank + TF-IDF — zéro appel LLM, zéro token supplémentaire dépensé — et ne sert que ce qui rentre dans votre budget.",
+        'problem.before.label': 'graphe complet (tokens)',
+        'problem.after.label': 'budget slurp (tokens)',
+        'problem.saving': '94,2% économisé',
+        'problem.benchmark': 'Benchmark : codebase PrismaStats · 2 111 nœuds · requête "player stats"',
+        'benchmark.label': '// benchmark',
+        'benchmark.h2': 'De vrais chiffres sur un vrai codebase',
+        'benchmark.p': 'PrismaStats : 2 111 nœuds, 69 418 tokens. Sans mocks.',
+        'benchmark.th.query': 'Requête',
+        'benchmark.th.budget': 'Budget',
+        'benchmark.th.tokens': 'Tokens utilisés',
+        'benchmark.th.graph': 'Graphe complet',
+        'benchmark.th.saved': 'Économie',
+        'benchmark.stat.mean': 'économie moyenne',
+        'benchmark.stat.best': 'meilleur cas',
+        'benchmark.stat.llm': 'appels LLM supplémentaires',
+        'demo.label': '// démo',
+        'demo.h2': 'Voir en action',
+        'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
+        'demo.caption': 'Ouvre un explorateur interactif de sous-graphes avec un badge en temps réel des tokens économisés.',
+        'how.label': "// comment ça marche",
+        'how.h2': 'Trois étapes pour zéro token gaspillé',
+        'how.step1.h3': 'Installer slurp',
+        'how.step1.p': 'Une seule commande, aucune dépendance au-delà de Python.',
+        'how.step2.h3': 'Générer le graphe avec graphify',
+        'how.step2.p': 'graphify cartographie votre codebase en un graphe de connaissances JSON.',
+        'how.step3.h3': 'Ajouter slurp comme serveur MCP',
+        'how.step3.p': 'Copiez ceci dans le <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> de votre projet. Claude Code fait le reste automatiquement.',
+        'how.mcp': "<strong>Entièrement automatique après l'étape 3.</strong> Claude Code appelle slurp à chaque requête — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.",
+        'features.label': '// fonctionnalités',
+        'features.h2': "Tout ce dont vous avez besoin, rien de plus",
+        'features.viz.p': 'Explorateur interactif de sous-graphes dans le navigateur. Voyez exactement quels nœuds ont été sélectionnés et pourquoi.',
+        'features.inject.p': 'Attachez le code source brut aux nœuds du graphe. slurp inclut les vraies fonctions, pas seulement les métadonnées.',
+        'features.diff.p': 'Comparez deux instantanés du graphe pour voir ce qui a changé entre les versions ou les refactorisations.',
+        'features.benchmark.p': 'Exécutez un lot de requêtes et mesurez les économies de tokens sur votre vrai codebase.',
+        'features.export.p': 'Exportez les sous-graphes sélectionnés en JSON, markdown ou texte brut pour tout outil.',
+        'features.mcp.p': 'Connectez-vous directement à Claude Code via le Model Context Protocol. Zéro configuration après l\'installation.',
+        'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+      },
+      de: {
+        flag: '🇩🇪', code: 'DE',
+        'nav.problem': 'Problem',
+        'nav.benchmark': 'Benchmark',
+        'nav.demo': 'Demo',
+        'nav.how': "So funktioniert's",
+        'nav.features': 'Funktionen',
+        'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
+        'problem.label': '// das Problem',
+        'problem.h2': 'Dein LLM braucht nicht die ganze Schüssel',
+        'problem.p1': "graphify bildet dein gesamtes Codebase in einem Wissensgraphen ab. Prima. Aber <em>jeden Knoten</em> in jede Anfrage zu injizieren ist verschwenderisch — dein LLM gibt den Großteil seines Kontextbudgets für Knoten aus, die es nie verwenden wird.",
+        'problem.p2': 'slurp bewertet jeden Knoten anhand deiner Anfrage mit PageRank + TF-IDF — null LLM-Aufrufe, null zusätzliche Token verbraucht — und liefert nur das, was in dein Budget passt.',
+        'problem.before.label': 'Gesamtgraph (Token)',
+        'problem.after.label': 'slurp-Budget (Token)',
+        'problem.saving': '94,2% gespart',
+        'problem.benchmark': 'Benchmark: PrismaStats-Codebase · 2.111 Knoten · Anfrage „player stats"',
+        'benchmark.label': '// benchmark',
+        'benchmark.h2': 'Echte Zahlen auf einem echten Codebase',
+        'benchmark.p': 'PrismaStats: 2.111 Knoten, 69.418 Token. Keine Mocks.',
+        'benchmark.th.query': 'Anfrage',
+        'benchmark.th.budget': 'Budget',
+        'benchmark.th.tokens': 'Verwendete Token',
+        'benchmark.th.graph': 'Gesamtgraph',
+        'benchmark.th.saved': 'Gespart',
+        'benchmark.stat.mean': 'durchschn. Ersparnis',
+        'benchmark.stat.best': 'bester Fall',
+        'benchmark.stat.llm': 'zusätzl. LLM-Aufrufe',
+        'demo.label': '// demo',
+        'demo.h2': 'In Aktion sehen',
+        'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
+        'demo.caption': 'Öffnet einen interaktiven Teilgraph-Explorer mit einem Live-Badge für Token-Einsparungen.',
+        'how.label': "// so funktioniert's",
+        'how.h2': 'Drei Schritte zu null verschwendeten Token',
+        'how.step1.h3': 'slurp installieren',
+        'how.step1.p': 'Ein Befehl, keine Abhängigkeiten außer Python.',
+        'how.step2.h3': 'Graphen mit graphify generieren',
+        'how.step2.p': 'graphify bildet dein Codebase in einem JSON-Wissensgraphen ab.',
+        'how.step3.h3': 'slurp als MCP-Server hinzufügen',
+        'how.step3.p': 'Füge dies in die <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> deines Projekts ein. Claude Code erledigt den Rest automatisch.',
+        'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft slurp bei jeder Anfrage auf — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
+        'features.label': '// funktionen',
+        'features.h2': 'Alles was du brauchst, nichts was du nicht brauchst',
+        'features.viz.p': 'Interaktiver browser-basierter Teilgraph-Explorer. Sieh genau, welche Knoten ausgewählt wurden und warum.',
+        'features.inject.p': 'Füge Quellcode an Graphknoten an. slurp enthält die eigentlichen Funktionen, nicht nur Metadaten.',
+        'features.diff.p': 'Vergleiche zwei Graphen-Snapshots, um zu sehen, was sich zwischen Versionen oder Refactorings geändert hat.',
+        'features.benchmark.p': 'Führe eine Reihe von Anfragen durch und messe Token-Einsparungen auf deinem echten Codebase.',
+        'features.export.p': 'Exportiere ausgewählte Teilgraphen als JSON, Markdown oder Klartext für jedes Tool.',
+        'features.mcp.p': 'Verbinde dich direkt mit Claude Code über das Model Context Protocol. Null Konfiguration nach der Einrichtung.',
+        'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+      },
+    };
+
+    /* ─── i18n engine ─── */
+    let currentLang = localStorage.getItem('slurp-lang') || 'en';
+
+    function applyLang(lang) {
+      if (!LANGS[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('slurp-lang', lang);
+
+      const t = LANGS[lang];
+
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key] !== undefined) el.textContent = t[key];
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.dataset.i18nHtml;
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+
+      document.getElementById('langFlag').textContent = t.flag;
+      document.getElementById('langCode').textContent = t.code;
+
+      document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.lang === lang);
+      });
+
+      document.querySelectorAll('.mobile-lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+
+    /* ─── Dropdown toggle ─── */
+    const langSelector = document.getElementById('langSelector');
+    const langBtn = document.getElementById('langBtn');
+
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langSelector.classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => langSelector.classList.remove('open'));
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyLang(opt.dataset.lang);
+        langSelector.classList.remove('open');
+      });
+    });
+
+    /* ─── Mobile menu ─── */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    document.querySelectorAll('.mobile-lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyLang(btn.dataset.lang);
+      });
+    });
+
+    /* ─── Copy install command ─── */
+    function copyInstall(btn) {
+      navigator.clipboard.writeText('pip install slurp-graph').then(() => {
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2000);
+      });
+    }
+
+    /* ─── Fade-in on scroll ─── */
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ─── Init ─── */
+    applyLang(currentLang);
+  </script>
+</body>
+</html>
