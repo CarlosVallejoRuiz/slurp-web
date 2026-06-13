@@ -326,10 +326,17 @@
       color: var(--text-muted);
       font-style: italic;
       max-width: 520px;
-      margin: 0 auto 48px;
+      margin: 0 auto 12px;
     }
 
     .hero-tagline .emoji { font-style: normal; }
+
+    .hero-subtagline {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      font-style: normal;
+      margin: 0 auto 40px;
+    }
 
     .install-block {
       display: inline-flex;
@@ -618,6 +625,14 @@
 
     .mcp-note strong { color: var(--text); }
 
+    .graphify-compat-note {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      padding-left: 4px;
+    }
+
     /* ─────────────────────────────
        FEATURES
     ───────────────────────────── */
@@ -767,6 +782,7 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
+      <p class="hero-subtagline" data-i18n="hero.subtagline">Works standalone or as a companion to graphify.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="install-block">
@@ -892,6 +908,23 @@
   </section>
 
   <!-- ══════════════════════════════
+       ZERO DEPS
+  ══════════════════════════════ -->
+  <section id="zero-deps">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="zerodeps.label">// zero dependencies</p>
+      <h2 data-i18n="zerodeps.h2">No external tools required</h2>
+      <p data-i18n="zerodeps.p1">slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.</p>
+      <p data-i18n="zerodeps.p2">Run it once and start querying immediately. No accounts, no API keys, no cloud.</p>
+
+      <div class="code-block"><span class="c"># Index your project locally</span>
+slurp index .
+<span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span>
+<span class="c"># Next: slurp 'your query' --graph graphify-out/graph.json</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
        DEMO
   ══════════════════════════════ -->
   <section id="demo">
@@ -937,17 +970,19 @@ pip install slurp-graph</div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
-            <h3 data-i18n="how.step2.h3">Generate the graph with graphify</h3>
-            <p data-i18n="how.step2.p">graphify maps your codebase into a JSON knowledge graph.</p>
-            <div class="code-block">graphify extract . --backend claude</div>
+            <h3 data-i18n="how.step2.h3">Index your project locally</h3>
+            <p data-i18n="how.step2.p">slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.</p>
+            <div class="code-block"><span class="c"># generates the graph locally</span>
+slurp index .
+<span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span></div>
           </div>
         </div>
 
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-body">
-            <h3 data-i18n="how.step3.h3">Add slurp as an MCP server</h3>
-            <p data-i18n-html="how.step3.p">Drop this into your project's <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code does the rest automatically.</p>
+            <h3 data-i18n="how.step3.h3">Configure MCP once, done forever</h3>
+            <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.</p>
             <div class="code-block">{
   <span class="k">"mcpServers"</span>: {
     <span class="k">"slurp"</span>: {
@@ -963,6 +998,7 @@ pip install slurp-graph</div>
       <div class="mcp-note" data-i18n-html="how.mcp">
         <strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.
       </div>
+      <p class="graphify-compat-note" data-i18n="how.graphify.note">Already using graphify? slurp works with your existing graph.json out of the box.</p>
     </div>
   </section>
 
@@ -981,9 +1017,9 @@ pip install slurp-graph</div>
           <p data-i18n="features.viz.p">Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">💉</span>
-          <h3>--inject-code</h3>
-          <p data-i18n="features.inject.p">Attach raw source code to graph nodes. slurp includes the actual functions, not just metadata.</p>
+          <span class="feature-icon">⚡</span>
+          <h3>slurp index</h3>
+          <p data-i18n="features.standalone.p">Standalone or graphify-compatible — use slurp index for zero-dependency indexing, or drop in your existing graph.json.</p>
         </div>
         <div class="feature-card">
           <span class="feature-icon">🔀</span>
@@ -1005,6 +1041,11 @@ pip install slurp-graph</div>
           <h3>MCP server</h3>
           <p data-i18n="features.mcp.p">Plug directly into Claude Code via Model Context Protocol. Zero config after setup.</p>
         </div>
+        <div class="feature-card">
+          <span class="feature-icon">👁️</span>
+          <h3>--watch</h3>
+          <p data-i18n="features.watch.p">Auto re-indexes your files as you code, keeping the graph fresh without manual runs.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -1020,6 +1061,8 @@ pip install slurp-graph</div>
         <a href="https://pypi.org/project/slurp-graph/" target="_blank" rel="noopener">PyPI</a>
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+        <span class="footer-sep">·</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.6.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Juank</a> · Terrassa, Barcelona
@@ -1038,6 +1081,7 @@ pip install slurp-graph</div>
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
+        'hero.subtagline': 'Works standalone or as a companion to graphify.',
         'problem.label': '// the problem',
         'problem.h2': "Your LLM doesn't need the whole bowl",
         'problem.p1': "graphify maps your entire codebase into a knowledge graph. Great. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.",
@@ -1065,19 +1109,25 @@ pip install slurp-graph</div>
         'how.h2': 'Three steps to zero wasted tokens',
         'how.step1.h3': 'Install slurp',
         'how.step1.p': 'One command, no dependencies beyond Python.',
-        'how.step2.h3': 'Generate the graph with graphify',
-        'how.step2.p': 'graphify maps your codebase into a JSON knowledge graph.',
-        'how.step3.h3': 'Add slurp as an MCP server',
-        'how.step3.p': 'Drop this into your project\'s <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code does the rest automatically.',
+        'how.step2.h3': 'Index your project locally',
+        'how.step2.p': 'slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.',
+        'how.step3.h3': 'Configure MCP once, done forever',
+        'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.',
         'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
+        'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box.',
+        'zerodeps.label': '// zero dependencies',
+        'zerodeps.h2': 'No external tools required',
+        'zerodeps.p1': 'slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.',
+        'zerodeps.p2': 'Run it once and start querying immediately. No accounts, no API keys, no cloud.',
         'features.label': '// features',
         'features.h2': "Everything you need, nothing you don't",
         'features.viz.p': 'Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.',
-        'features.inject.p': 'Attach raw source code to graph nodes. slurp includes the actual functions, not just metadata.',
+        'features.standalone.p': 'Standalone or graphify-compatible — use slurp index for zero-dependency indexing, or drop in your existing graph.json.',
         'features.diff.p': 'Compare two graph snapshots to see what changed between versions or refactors.',
         'features.benchmark.p': 'Run a batch of queries and measure token savings across your real codebase.',
         'features.export.p': 'Export selected subgraphs to JSON, markdown, or plain text for use in any tool.',
         'features.mcp.p': 'Plug directly into Claude Code via Model Context Protocol. Zero config after setup.',
+        'features.watch.p': 'Auto re-indexes your files as you code, keeping the graph fresh without manual runs.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       es: {
@@ -1088,6 +1138,7 @@ pip install slurp-graph</div>
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
+        'hero.subtagline': 'Funciona de forma autónoma o como complemento de graphify.',
         'problem.label': '// el problema',
         'problem.h2': 'Tu LLM no necesita el bol entero',
         'problem.p1': 'graphify mapea todo tu codebase en un grafo de conocimiento. Genial. Pero inyectar <em>cada nodo</em> en cada consulta es ineficiente — tu LLM gasta la mayor parte de su presupuesto de contexto en nodos que nunca usará.',
@@ -1115,19 +1166,25 @@ pip install slurp-graph</div>
         'how.h2': 'Tres pasos para cero tokens desperdiciados',
         'how.step1.h3': 'Instala slurp',
         'how.step1.p': 'Un comando, sin dependencias más allá de Python.',
-        'how.step2.h3': 'Genera el grafo con graphify',
-        'how.step2.p': 'graphify mapea tu codebase en un grafo de conocimiento JSON.',
-        'how.step3.h3': 'Añade slurp como servidor MCP',
-        'how.step3.p': 'Copia esto en el <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> de tu proyecto. Claude Code hace el resto automáticamente.',
+        'how.step2.h3': 'Indexa tu proyecto localmente',
+        'how.step2.p': 'slurp index . analiza tu código con análisis estático puro — sin LLMs, sin APIs, sin coste.',
+        'how.step3.h3': 'Configura el MCP una vez, listo para siempre',
+        'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente en cada consulta.',
         'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a slurp en cada consulta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
+        'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional.',
+        'zerodeps.label': '// sin dependencias',
+        'zerodeps.h2': 'No se necesitan herramientas externas',
+        'zerodeps.p1': 'slurp index analiza tu codebase con análisis estático puro — sin LLMs, sin APIs externas, coste cero. Python usa el ast stdlib, TypeScript/JS usa tree-sitter, Go usa un parser de regex.',
+        'zerodeps.p2': 'Ejecútalo una vez y empieza a consultar de inmediato. Sin cuentas, sin API keys, sin nube.',
         'features.label': '// funcionalidades',
         'features.h2': 'Todo lo que necesitas, nada más',
         'features.viz.p': 'Explorador interactivo de subgrafos en el navegador. Ve exactamente qué nodos se seleccionaron y por qué.',
-        'features.inject.p': 'Adjunta código fuente a los nodos del grafo. slurp incluye las funciones reales, no solo metadatos.',
+        'features.standalone.p': 'Autónomo o compatible con graphify — usa slurp index para indexar sin dependencias, o usa tu graph.json existente.',
         'features.diff.p': 'Compara dos snapshots del grafo para ver qué cambió entre versiones o refactors.',
         'features.benchmark.p': 'Ejecuta un lote de consultas y mide el ahorro de tokens sobre tu codebase real.',
         'features.export.p': 'Exporta subgrafos seleccionados a JSON, markdown o texto plano para cualquier herramienta.',
         'features.mcp.p': 'Conéctate directamente a Claude Code vía Model Context Protocol. Cero configuración tras la instalación.',
+        'features.watch.p': 'Re-indexa automáticamente tus archivos mientras programas, manteniendo el grafo actualizado sin ejecuciones manuales.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       it: {
@@ -1138,6 +1195,7 @@ pip install slurp-graph</div>
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
+        'hero.subtagline': 'Funziona in autonomia o come complemento di graphify.',
         'problem.label': '// il problema',
         'problem.h2': "Il tuo LLM non ha bisogno dell'intera ciotola",
         'problem.p1': "graphify mappa l'intero codebase in un knowledge graph. Ottimo. Ma iniettare <em>ogni nodo</em> in ogni query è dispendioso — il tuo LLM spende la maggior parte del suo budget di contesto su nodi che non userà mai.",
@@ -1165,19 +1223,25 @@ pip install slurp-graph</div>
         'how.h2': 'Tre passi per zero token sprecati',
         'how.step1.h3': 'Installa slurp',
         'how.step1.p': 'Un solo comando, nessuna dipendenza oltre Python.',
-        'how.step2.h3': 'Genera il grafo con graphify',
-        'how.step2.p': 'graphify mappa il tuo codebase in un knowledge graph JSON.',
-        'how.step3.h3': 'Aggiungi slurp come server MCP',
-        'how.step3.p': 'Inserisci questo nel <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> del tuo progetto. Claude Code fa il resto automaticamente.',
+        'how.step2.h3': 'Indicizza il tuo progetto localmente',
+        'how.step2.p': 'slurp index . analizza il tuo codice con static analysis pura — nessun LLM, nessuna API, nessun costo.',
+        'how.step3.h3': 'Configura MCP una volta, per sempre',
+        'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente ad ogni query.',
         'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama slurp ad ogni query — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
+        'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive.',
+        'zerodeps.label': '// zero dipendenze',
+        'zerodeps.h2': 'Nessuno strumento esterno richiesto',
+        'zerodeps.p1': 'slurp index analizza il tuo codebase con static analysis pura — nessun LLM, nessuna API esterna, costo zero. Python usa ast stdlib, TypeScript/JS usa tree-sitter, Go usa un regex parser.',
+        'zerodeps.p2': 'Eseguilo una volta e inizia subito a fare query. Nessun account, nessuna API key, nessun cloud.',
         'features.label': '// funzionalità',
         'features.h2': 'Tutto il necessario, nulla di più',
         'features.viz.p': 'Esploratore interattivo di sottografi nel browser. Scopri esattamente quali nodi sono stati selezionati e perché.',
-        'features.inject.p': 'Allega il codice sorgente ai nodi del grafo. slurp include le funzioni reali, non solo i metadati.',
+        'features.standalone.p': 'Standalone o compatibile con graphify — usa slurp index per l\'indicizzazione senza dipendenze, o usa il tuo graph.json esistente.',
         'features.diff.p': 'Confronta due snapshot del grafo per vedere cosa è cambiato tra versioni o refactoring.',
         'features.benchmark.p': 'Esegui un batch di query e misura il risparmio di token sul tuo codebase reale.',
         'features.export.p': 'Esporta i sottografi selezionati in JSON, markdown o testo semplice per qualsiasi strumento.',
         'features.mcp.p': 'Collegati direttamente a Claude Code tramite Model Context Protocol. Zero configurazione dopo l\'installazione.',
+        'features.watch.p': 'Re-indicizza automaticamente i file mentre programmi, mantenendo il grafo aggiornato senza esecuzioni manuali.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       fr: {
@@ -1188,6 +1252,7 @@ pip install slurp-graph</div>
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
+        'hero.subtagline': 'Fonctionne de manière autonome ou en complément de graphify.',
         'problem.label': '// le problème',
         'problem.h2': "Votre LLM n'a pas besoin du bol entier",
         'problem.p1': "graphify cartographie l'intégralité de votre codebase en un graphe de connaissances. Parfait. Mais injecter <em>chaque nœud</em> dans chaque requête est inefficace — votre LLM dépense la majeure partie de son budget de contexte sur des nœuds qu'il n'utilisera jamais.",
@@ -1215,19 +1280,25 @@ pip install slurp-graph</div>
         'how.h2': 'Trois étapes pour zéro token gaspillé',
         'how.step1.h3': 'Installer slurp',
         'how.step1.p': 'Une seule commande, aucune dépendance au-delà de Python.',
-        'how.step2.h3': 'Générer le graphe avec graphify',
-        'how.step2.p': 'graphify cartographie votre codebase en un graphe de connaissances JSON.',
-        'how.step3.h3': 'Ajouter slurp comme serveur MCP',
-        'how.step3.p': 'Copiez ceci dans le <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> de votre projet. Claude Code fait le reste automatiquement.',
+        'how.step2.h3': 'Indexer votre projet localement',
+        'how.step2.p': 'slurp index . analyse votre code avec de l\'analyse statique pure — sans LLM, sans API, sans coût.',
+        'how.step3.h3': 'Configurer MCP une fois, c\'est réglé',
+        'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement à chaque requête.',
         'how.mcp': "<strong>Entièrement automatique après l'étape 3.</strong> Claude Code appelle slurp à chaque requête — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.",
+        'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire.',
+        'zerodeps.label': '// zéro dépendances',
+        'zerodeps.h2': 'Aucun outil externe requis',
+        'zerodeps.p1': 'slurp index analyse votre codebase avec de l\'analyse statique pure — aucun LLM, aucune API externe, coût zéro. Python utilise ast stdlib, TypeScript/JS utilise tree-sitter, Go utilise un regex parser.',
+        'zerodeps.p2': 'Exécutez-le une fois et commencez à interroger immédiatement. Pas de compte, pas de clé API, pas de cloud.',
         'features.label': '// fonctionnalités',
         'features.h2': "Tout ce dont vous avez besoin, rien de plus",
         'features.viz.p': 'Explorateur interactif de sous-graphes dans le navigateur. Voyez exactement quels nœuds ont été sélectionnés et pourquoi.',
-        'features.inject.p': 'Attachez le code source brut aux nœuds du graphe. slurp inclut les vraies fonctions, pas seulement les métadonnées.',
+        'features.standalone.p': 'Autonome ou compatible graphify — utilisez slurp index pour une indexation sans dépendances, ou utilisez votre graph.json existant.',
         'features.diff.p': 'Comparez deux instantanés du graphe pour voir ce qui a changé entre les versions ou les refactorisations.',
         'features.benchmark.p': 'Exécutez un lot de requêtes et mesurez les économies de tokens sur votre vrai codebase.',
         'features.export.p': 'Exportez les sous-graphes sélectionnés en JSON, markdown ou texte brut pour tout outil.',
         'features.mcp.p': 'Connectez-vous directement à Claude Code via le Model Context Protocol. Zéro configuration après l\'installation.',
+        'features.watch.p': 'Ré-indexe automatiquement vos fichiers pendant que vous codez, gardant le graphe à jour sans relance manuelle.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       de: {
@@ -1238,6 +1309,7 @@ pip install slurp-graph</div>
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
+        'hero.subtagline': 'Funktioniert eigenständig oder als Ergänzung zu graphify.',
         'problem.label': '// das Problem',
         'problem.h2': 'Dein LLM braucht nicht die ganze Schüssel',
         'problem.p1': "graphify bildet dein gesamtes Codebase in einem Wissensgraphen ab. Prima. Aber <em>jeden Knoten</em> in jede Anfrage zu injizieren ist verschwenderisch — dein LLM gibt den Großteil seines Kontextbudgets für Knoten aus, die es nie verwenden wird.",
@@ -1265,19 +1337,25 @@ pip install slurp-graph</div>
         'how.h2': 'Drei Schritte zu null verschwendeten Token',
         'how.step1.h3': 'slurp installieren',
         'how.step1.p': 'Ein Befehl, keine Abhängigkeiten außer Python.',
-        'how.step2.h3': 'Graphen mit graphify generieren',
-        'how.step2.p': 'graphify bildet dein Codebase in einem JSON-Wissensgraphen ab.',
-        'how.step3.h3': 'slurp als MCP-Server hinzufügen',
-        'how.step3.p': 'Füge dies in die <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> deines Projekts ein. Claude Code erledigt den Rest automatisch.',
+        'how.step2.h3': 'Projekt lokal indizieren',
+        'how.step2.p': 'slurp index . analysiert deinen Code mit reiner statischer Analyse — keine LLMs, keine APIs, keine Kosten.',
+        'how.step3.h3': 'MCP einmal konfigurieren, fertig',
+        'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es bei jeder Anfrage automatisch auf.',
         'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft slurp bei jeder Anfrage auf — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
+        'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json.',
+        'zerodeps.label': '// null abhängigkeiten',
+        'zerodeps.h2': 'Keine externen Tools erforderlich',
+        'zerodeps.p1': 'slurp index analysiert dein Codebase mit reiner statischer Analyse — keine LLMs, keine externen APIs, null Kosten. Python nutzt ast stdlib, TypeScript/JS nutzt tree-sitter, Go nutzt einen Regex-Parser.',
+        'zerodeps.p2': 'Einmal ausführen und sofort mit Anfragen beginnen. Kein Account, kein API-Key, keine Cloud.',
         'features.label': '// funktionen',
         'features.h2': 'Alles was du brauchst, nichts was du nicht brauchst',
         'features.viz.p': 'Interaktiver browser-basierter Teilgraph-Explorer. Sieh genau, welche Knoten ausgewählt wurden und warum.',
-        'features.inject.p': 'Füge Quellcode an Graphknoten an. slurp enthält die eigentlichen Funktionen, nicht nur Metadaten.',
+        'features.standalone.p': 'Eigenständig oder graphify-kompatibel — nutze slurp index für abhängigkeitsfreie Indizierung oder dein bestehendes graph.json.',
         'features.diff.p': 'Vergleiche zwei Graphen-Snapshots, um zu sehen, was sich zwischen Versionen oder Refactorings geändert hat.',
         'features.benchmark.p': 'Führe eine Reihe von Anfragen durch und messe Token-Einsparungen auf deinem echten Codebase.',
         'features.export.p': 'Exportiere ausgewählte Teilgraphen als JSON, Markdown oder Klartext für jedes Tool.',
         'features.mcp.p': 'Verbinde dich direkt mit Claude Code über das Model Context Protocol. Null Konfiguration nach der Einrichtung.',
+        'features.watch.p': 'Indiziert deine Dateien beim Coden automatisch neu, hält den Graphen aktuell ohne manuelle Ausführung.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
     };
