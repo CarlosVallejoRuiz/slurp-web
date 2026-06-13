@@ -633,6 +633,25 @@
       padding-left: 4px;
     }
 
+    .update-note {
+      margin-top: 10px;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .update-note-icon {
+      color: var(--orange);
+      margin-right: 5px;
+      font-style: normal;
+    }
+
+    .update-note code {
+      font-family: var(--mono);
+      color: var(--orange);
+      font-size: 0.9em;
+    }
+
     /* ─────────────────────────────
        FEATURES BENTO
     ───────────────────────────── */
@@ -1069,6 +1088,7 @@ pip install slurp-graph</div>
             <div class="code-block"><span class="c"># generates the graph locally</span>
 slurp index .
 <span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span></div>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.</span></p>
           </div>
         </div>
 
@@ -1257,6 +1277,7 @@ slurp index .
         'how.step1.p': 'One command, no dependencies beyond Python.',
         'how.step2.h3': 'Index your project locally',
         'how.step2.p': 'slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.',
+        'how.update.note': 'Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.',
         'how.step3.h3': 'Configure MCP once, done forever',
         'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.',
         'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
@@ -1313,6 +1334,7 @@ slurp index .
         'how.step1.p': 'Un comando, sin dependencias más allá de Python.',
         'how.step2.h3': 'Indexa tu proyecto localmente',
         'how.step2.p': 'slurp index . analiza tu código con análisis estático puro — sin LLMs, sin APIs, sin coste.',
+        'how.update.note': 'Mantén el grafo actualizado: re-ejecuta <code>slurp index .</code> cuando haya cambios importantes · <code>slurp index . --watch</code> para re-indexado automático en segundo plano · añádelo como paso en GitHub Actions para CI/CD.',
         'how.step3.h3': 'Configura el MCP una vez, listo para siempre',
         'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente en cada consulta.',
         'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a slurp en cada consulta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
@@ -1369,6 +1391,7 @@ slurp index .
         'how.step1.p': 'Un solo comando, nessuna dipendenza oltre Python.',
         'how.step2.h3': 'Indicizza il tuo progetto localmente',
         'how.step2.p': 'slurp index . analizza il tuo codice con static analysis pura — nessun LLM, nessuna API, nessun costo.',
+        'how.update.note': 'Mantieni il grafo aggiornato: ri-esegui <code>slurp index .</code> dopo modifiche importanti · <code>slurp index . --watch</code> per il re-indicizzamento automatico in background · aggiungilo come step in GitHub Actions per CI/CD.',
         'how.step3.h3': 'Configura MCP una volta, per sempre',
         'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente ad ogni query.',
         'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama slurp ad ogni query — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
@@ -1425,6 +1448,7 @@ slurp index .
         'how.step1.p': 'Une seule commande, aucune dépendance au-delà de Python.',
         'how.step2.h3': 'Indexer votre projet localement',
         'how.step2.p': 'slurp index . analyse votre code avec de l\'analyse statique pure — sans LLM, sans API, sans coût.',
+        'how.update.note': 'Gardez le graphe à jour : ré-exécutez <code>slurp index .</code> après des changements importants · <code>slurp index . --watch</code> pour la ré-indexation automatique en arrière-plan · ajoutez-le comme étape dans GitHub Actions pour CI/CD.',
         'how.step3.h3': 'Configurer MCP une fois, c\'est réglé',
         'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement à chaque requête.',
         'how.mcp': "<strong>Entièrement automatique après l'étape 3.</strong> Claude Code appelle slurp à chaque requête — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.",
@@ -1481,6 +1505,7 @@ slurp index .
         'how.step1.p': 'Ein Befehl, keine Abhängigkeiten außer Python.',
         'how.step2.h3': 'Projekt lokal indizieren',
         'how.step2.p': 'slurp index . analysiert deinen Code mit reiner statischer Analyse — keine LLMs, keine APIs, keine Kosten.',
+        'how.update.note': 'Graph aktuell halten: <code>slurp index .</code> nach wichtigen Änderungen erneut ausführen · <code>slurp index . --watch</code> für automatisches Re-Indizieren im Hintergrund · als Schritt in GitHub Actions für CI/CD hinzufügen.',
         'how.step3.h3': 'MCP einmal konfigurieren, fertig',
         'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es bei jeder Anfrage automatisch auf.',
         'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft slurp bei jeder Anfrage auf — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
