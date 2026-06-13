@@ -634,36 +634,125 @@
     }
 
     /* ─────────────────────────────
-       FEATURES
+       FEATURES BENTO
     ───────────────────────────── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 36px;
+    .features-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0;
     }
 
-    .feature-card {
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 8px;
+      margin-top: 40px;
+    }
+
+    .bento-hero {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: 0;
+      padding: 36px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
       transition: border-color 0.2s;
     }
+    .bento-hero:hover { border-color: rgba(249,115,22,0.3); }
 
-    .feature-card:hover { border-color: rgba(249, 115, 22, 0.4); }
+    .bento-medium {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s;
+    }
+    .bento-medium:hover { border-color: rgba(249,115,22,0.3); }
 
-    .feature-icon { font-size: 1.3rem; margin-bottom: 10px; display: block; }
-
-    .feature-card h3 {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--orange);
-      margin-bottom: 6px;
+    .bento-smalls {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
     }
 
-    .feature-card p { font-size: 0.82rem; line-height: 1.5; margin: 0; }
+    .bento-small {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+    .bento-small:hover { border-color: rgba(249,115,22,0.3); }
+
+    .bento-icon { color: var(--orange); flex-shrink: 0; line-height: 0; }
+
+    .bento-hero-title {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .bento-hero-sub {
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .bento-medium-title {
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--orange);
+    }
+
+    .bento-medium-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin: 0;
+      flex: 1;
+    }
+
+    .bento-small-title {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--orange);
+    }
+
+    .bento-small-line {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    .bento-code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+    .bento-code .bc { color: var(--text-dim); font-style: italic; }
+    .bento-code .bo { color: var(--orange); }
 
     /* ─────────────────────────────
        FOOTER
@@ -712,6 +801,11 @@
 
       .bench-summary { gap: 20px; }
       .steps::before { display: none; }
+
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-hero { padding: 24px 20px; border-radius: 4px; }
+      .bento-medium { padding: 24px 20px; border-radius: 4px; }
+      .bento-smalls { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -1008,43 +1102,95 @@ slurp index .
   <section id="features">
     <div class="container reveal">
       <p class="section-label" data-i18n="features.label">// features</p>
-      <h2 data-i18n="features.h2">Everything you need, nothing you don't</h2>
+      <h2 class="features-title" data-i18n="features.h2">Built different.</h2>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <span class="feature-icon">🗺️</span>
-          <h3>--viz</h3>
-          <p data-i18n="features.viz.p">Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.</p>
+      <div class="bento-grid">
+
+        <!-- Hero card: slurp index -->
+        <div class="bento-hero">
+          <div class="bento-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="5" cy="12" r="2"/>
+              <circle cx="19" cy="5" r="2"/>
+              <circle cx="19" cy="19" r="2"/>
+              <circle cx="13" cy="12" r="2"/>
+              <line x1="7" y1="12" x2="11" y2="12"/>
+              <line x1="15" y1="11" x2="17.3" y2="7"/>
+              <line x1="15" y1="13" x2="17.3" y2="17"/>
+            </svg>
+          </div>
+          <p class="bento-hero-title">slurp index</p>
+          <p class="bento-hero-sub" data-i18n="features.hero.sub">Zero dependencies. No APIs. No cost.</p>
+          <div class="bento-code">
+            <span class="bc"># index your project locally</span><br>
+            slurp index .<br>
+            <span class="bc"># </span><span class="bo">1473 nodes · 1443 edges · 30 files</span>
+          </div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">⚡</span>
-          <h3>slurp index</h3>
-          <p data-i18n="features.standalone.p">Standalone or graphify-compatible — use slurp index for zero-dependency indexing, or drop in your existing graph.json.</p>
+
+        <!-- Medium card: MCP server -->
+        <div class="bento-medium">
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22v-5"/>
+              <path d="M9 8V3"/>
+              <path d="M15 8V3"/>
+              <path d="M18 8H6a1 1 0 0 0-1 1v4a5 5 0 0 0 10 0V9a1 1 0 0 0-1-1z"/>
+            </svg>
+          </div>
+          <p class="bento-medium-title">MCP server</p>
+          <p class="bento-medium-sub" data-i18n="features.mcp.sub">Configure once. Claude Code handles the rest.</p>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">🔀</span>
-          <h3>slurp diff</h3>
-          <p data-i18n="features.diff.p">Compare two graph snapshots to see what changed between versions or refactors.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📊</span>
-          <h3>slurp benchmark</h3>
-          <p data-i18n="features.benchmark.p">Run a batch of queries and measure token savings across your real codebase.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📤</span>
-          <h3>slurp export</h3>
-          <p data-i18n="features.export.p">Export selected subgraphs to JSON, markdown, or plain text for use in any tool.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🤖</span>
-          <h3>MCP server</h3>
-          <p data-i18n="features.mcp.p">Plug directly into Claude Code via Model Context Protocol. Zero config after setup.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">👁️</span>
-          <h3>--watch</h3>
-          <p data-i18n="features.watch.p">Auto re-indexes your files as you code, keeping the graph fresh without manual runs.</p>
+
+        <!-- Small cards row -->
+        <div class="bento-smalls">
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">--viz</p>
+            <p class="bento-small-line" data-i18n="features.viz.line">Interactive subgraph explorer</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="9" height="14" rx="1"/>
+                <rect x="13" y="7" width="9" height="14" rx="1"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp diff</p>
+            <p class="bento-small-line" data-i18n="features.diff.line">Compare graph snapshots</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="3" y1="20" x2="21" y2="20"/>
+                <rect x="4" y="13" width="4" height="7"/>
+                <rect x="10" y="8" width="4" height="12"/>
+                <rect x="16" y="4" width="4" height="16"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp benchmark</p>
+            <p class="bento-small-line" data-i18n="features.benchmark.line">Measure token savings</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">--inject-code</p>
+            <p class="bento-small-line" data-i18n="features.inject.line">Attach source code to nodes</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1120,14 +1266,13 @@ slurp index .
         'zerodeps.p1': 'slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.',
         'zerodeps.p2': 'Run it once and start querying immediately. No accounts, no API keys, no cloud.',
         'features.label': '// features',
-        'features.h2': "Everything you need, nothing you don't",
-        'features.viz.p': 'Interactive browser-based subgraph explorer. See exactly which nodes were selected and why.',
-        'features.standalone.p': 'Standalone or graphify-compatible — use slurp index for zero-dependency indexing, or drop in your existing graph.json.',
-        'features.diff.p': 'Compare two graph snapshots to see what changed between versions or refactors.',
-        'features.benchmark.p': 'Run a batch of queries and measure token savings across your real codebase.',
-        'features.export.p': 'Export selected subgraphs to JSON, markdown, or plain text for use in any tool.',
-        'features.mcp.p': 'Plug directly into Claude Code via Model Context Protocol. Zero config after setup.',
-        'features.watch.p': 'Auto re-indexes your files as you code, keeping the graph fresh without manual runs.',
+        'features.h2': 'Built different.',
+        'features.hero.sub': 'Zero dependencies. No APIs. No cost.',
+        'features.mcp.sub': 'Configure once. Claude Code handles the rest.',
+        'features.viz.line': 'Interactive subgraph explorer',
+        'features.diff.line': 'Compare graph snapshots',
+        'features.benchmark.line': 'Measure token savings',
+        'features.inject.line': 'Attach source code to nodes',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       es: {
@@ -1177,14 +1322,13 @@ slurp index .
         'zerodeps.p1': 'slurp index analiza tu codebase con análisis estático puro — sin LLMs, sin APIs externas, coste cero. Python usa el ast stdlib, TypeScript/JS usa tree-sitter, Go usa un parser de regex.',
         'zerodeps.p2': 'Ejecútalo una vez y empieza a consultar de inmediato. Sin cuentas, sin API keys, sin nube.',
         'features.label': '// funcionalidades',
-        'features.h2': 'Todo lo que necesitas, nada más',
-        'features.viz.p': 'Explorador interactivo de subgrafos en el navegador. Ve exactamente qué nodos se seleccionaron y por qué.',
-        'features.standalone.p': 'Autónomo o compatible con graphify — usa slurp index para indexar sin dependencias, o usa tu graph.json existente.',
-        'features.diff.p': 'Compara dos snapshots del grafo para ver qué cambió entre versiones o refactors.',
-        'features.benchmark.p': 'Ejecuta un lote de consultas y mide el ahorro de tokens sobre tu codebase real.',
-        'features.export.p': 'Exporta subgrafos seleccionados a JSON, markdown o texto plano para cualquier herramienta.',
-        'features.mcp.p': 'Conéctate directamente a Claude Code vía Model Context Protocol. Cero configuración tras la instalación.',
-        'features.watch.p': 'Re-indexa automáticamente tus archivos mientras programas, manteniendo el grafo actualizado sin ejecuciones manuales.',
+        'features.h2': 'Construido diferente.',
+        'features.hero.sub': 'Sin dependencias. Sin APIs. Sin coste.',
+        'features.mcp.sub': 'Configura una vez. Claude Code hace el resto.',
+        'features.viz.line': 'Explorador interactivo de subgrafos',
+        'features.diff.line': 'Compara snapshots del grafo',
+        'features.benchmark.line': 'Mide el ahorro de tokens',
+        'features.inject.line': 'Adjunta código fuente a los nodos',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       it: {
@@ -1234,14 +1378,13 @@ slurp index .
         'zerodeps.p1': 'slurp index analizza il tuo codebase con static analysis pura — nessun LLM, nessuna API esterna, costo zero. Python usa ast stdlib, TypeScript/JS usa tree-sitter, Go usa un regex parser.',
         'zerodeps.p2': 'Eseguilo una volta e inizia subito a fare query. Nessun account, nessuna API key, nessun cloud.',
         'features.label': '// funzionalità',
-        'features.h2': 'Tutto il necessario, nulla di più',
-        'features.viz.p': 'Esploratore interattivo di sottografi nel browser. Scopri esattamente quali nodi sono stati selezionati e perché.',
-        'features.standalone.p': 'Standalone o compatibile con graphify — usa slurp index per l\'indicizzazione senza dipendenze, o usa il tuo graph.json esistente.',
-        'features.diff.p': 'Confronta due snapshot del grafo per vedere cosa è cambiato tra versioni o refactoring.',
-        'features.benchmark.p': 'Esegui un batch di query e misura il risparmio di token sul tuo codebase reale.',
-        'features.export.p': 'Esporta i sottografi selezionati in JSON, markdown o testo semplice per qualsiasi strumento.',
-        'features.mcp.p': 'Collegati direttamente a Claude Code tramite Model Context Protocol. Zero configurazione dopo l\'installazione.',
-        'features.watch.p': 'Re-indicizza automaticamente i file mentre programmi, mantenendo il grafo aggiornato senza esecuzioni manuali.',
+        'features.h2': 'Costruito diversamente.',
+        'features.hero.sub': 'Zero dipendenze. Nessuna API. Nessun costo.',
+        'features.mcp.sub': 'Configura una volta. Claude Code fa il resto.',
+        'features.viz.line': 'Esploratore interattivo di sottografi',
+        'features.diff.line': 'Confronta snapshot del grafo',
+        'features.benchmark.line': 'Misura il risparmio di token',
+        'features.inject.line': 'Allega codice sorgente ai nodi',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       fr: {
@@ -1291,14 +1434,13 @@ slurp index .
         'zerodeps.p1': 'slurp index analyse votre codebase avec de l\'analyse statique pure — aucun LLM, aucune API externe, coût zéro. Python utilise ast stdlib, TypeScript/JS utilise tree-sitter, Go utilise un regex parser.',
         'zerodeps.p2': 'Exécutez-le une fois et commencez à interroger immédiatement. Pas de compte, pas de clé API, pas de cloud.',
         'features.label': '// fonctionnalités',
-        'features.h2': "Tout ce dont vous avez besoin, rien de plus",
-        'features.viz.p': 'Explorateur interactif de sous-graphes dans le navigateur. Voyez exactement quels nœuds ont été sélectionnés et pourquoi.',
-        'features.standalone.p': 'Autonome ou compatible graphify — utilisez slurp index pour une indexation sans dépendances, ou utilisez votre graph.json existant.',
-        'features.diff.p': 'Comparez deux instantanés du graphe pour voir ce qui a changé entre les versions ou les refactorisations.',
-        'features.benchmark.p': 'Exécutez un lot de requêtes et mesurez les économies de tokens sur votre vrai codebase.',
-        'features.export.p': 'Exportez les sous-graphes sélectionnés en JSON, markdown ou texte brut pour tout outil.',
-        'features.mcp.p': 'Connectez-vous directement à Claude Code via le Model Context Protocol. Zéro configuration après l\'installation.',
-        'features.watch.p': 'Ré-indexe automatiquement vos fichiers pendant que vous codez, gardant le graphe à jour sans relance manuelle.',
+        'features.h2': 'Conçu différemment.',
+        'features.hero.sub': 'Zéro dépendance. Aucune API. Aucun coût.',
+        'features.mcp.sub': 'Configurez une fois. Claude Code fait le reste.',
+        'features.viz.line': 'Explorateur interactif de sous-graphes',
+        'features.diff.line': 'Comparer les instantanés du graphe',
+        'features.benchmark.line': 'Mesurer les économies de tokens',
+        'features.inject.line': 'Attacher le code source aux nœuds',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       de: {
@@ -1348,14 +1490,13 @@ slurp index .
         'zerodeps.p1': 'slurp index analysiert dein Codebase mit reiner statischer Analyse — keine LLMs, keine externen APIs, null Kosten. Python nutzt ast stdlib, TypeScript/JS nutzt tree-sitter, Go nutzt einen Regex-Parser.',
         'zerodeps.p2': 'Einmal ausführen und sofort mit Anfragen beginnen. Kein Account, kein API-Key, keine Cloud.',
         'features.label': '// funktionen',
-        'features.h2': 'Alles was du brauchst, nichts was du nicht brauchst',
-        'features.viz.p': 'Interaktiver browser-basierter Teilgraph-Explorer. Sieh genau, welche Knoten ausgewählt wurden und warum.',
-        'features.standalone.p': 'Eigenständig oder graphify-kompatibel — nutze slurp index für abhängigkeitsfreie Indizierung oder dein bestehendes graph.json.',
-        'features.diff.p': 'Vergleiche zwei Graphen-Snapshots, um zu sehen, was sich zwischen Versionen oder Refactorings geändert hat.',
-        'features.benchmark.p': 'Führe eine Reihe von Anfragen durch und messe Token-Einsparungen auf deinem echten Codebase.',
-        'features.export.p': 'Exportiere ausgewählte Teilgraphen als JSON, Markdown oder Klartext für jedes Tool.',
-        'features.mcp.p': 'Verbinde dich direkt mit Claude Code über das Model Context Protocol. Null Konfiguration nach der Einrichtung.',
-        'features.watch.p': 'Indiziert deine Dateien beim Coden automatisch neu, hält den Graphen aktuell ohne manuelle Ausführung.',
+        'features.h2': 'Anders gebaut.',
+        'features.hero.sub': 'Null Abhängigkeiten. Keine APIs. Keine Kosten.',
+        'features.mcp.sub': 'Einmal konfigurieren. Claude Code erledigt den Rest.',
+        'features.viz.line': 'Interaktiver Teilgraph-Explorer',
+        'features.diff.line': 'Graphen-Snapshots vergleichen',
+        'features.benchmark.line': 'Token-Einsparungen messen',
+        'features.inject.line': 'Quellcode an Knoten anhängen',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
     };
