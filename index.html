@@ -653,6 +653,96 @@
     }
 
     /* ─────────────────────────────
+       INSTALL TABLE
+    ───────────────────────────── */
+    .install-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 28px 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 0.875rem;
+    }
+
+    .install-table th {
+      background: var(--bg-card);
+      color: var(--text-dim);
+      font-weight: 500;
+      text-align: left;
+      padding: 10px 16px;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+    }
+
+    .install-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: middle;
+    }
+
+    .install-table tr:last-child td { border-bottom: none; }
+    .install-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .install-table td:first-child { color: var(--text); }
+
+    .install-table td code {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      color: var(--orange);
+      background: var(--bg);
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .badge-rec {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--orange);
+      background: var(--orange-dim);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      letter-spacing: 0.04em;
+    }
+
+    .install-note {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin: 0;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--mono);
+      line-height: 1.65;
+    }
+
+    .install-note code { color: var(--orange); font-size: 0.95em; }
+
+    .mcp-variant-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+
+    .gh-stars {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+
+    /* ─────────────────────────────
        FEATURES BENTO
     ───────────────────────────── */
     .features-title {
@@ -841,6 +931,7 @@
       </a>
 
       <div class="nav-links">
+        <a href="#install" data-i18n="nav.install">Install</a>
         <a href="#problem" data-i18n="nav.problem">Problem</a>
         <a href="#benchmark" data-i18n="nav.benchmark">Benchmark</a>
         <a href="#demo" data-i18n="nav.demo">Demo</a>
@@ -871,6 +962,7 @@
 
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
+    <a href="#install" data-i18n="nav.install" class="mobile-link">Install</a>
     <a href="#problem" data-i18n="nav.problem" class="mobile-link">Problem</a>
     <a href="#benchmark" data-i18n="nav.benchmark" class="mobile-link">Benchmark</a>
     <a href="#demo" data-i18n="nav.demo" class="mobile-link">Demo</a>
@@ -919,7 +1011,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          GitHub →
+          GitHub →<span id="gh-stars" class="gh-stars"></span>
         </a>
         <a href="https://pypi.org/project/slurp-graph/" target="_blank" rel="noopener" class="btn btn-ghost">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px">
@@ -929,6 +1021,41 @@
           PyPI →
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       INSTALL
+  ══════════════════════════════ -->
+  <section id="install">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="install.label">// install</p>
+      <h2 data-i18n="install.h2">Quick install reference</h2>
+
+      <table class="install-table">
+        <thead>
+          <tr>
+            <th data-i18n="install.th.case">Use case</th>
+            <th data-i18n="install.th.cmd">Command</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-i18n-html="install.row1.case">Any project <span class="badge-rec">rec</span></td>
+            <td><code>uv tool install slurp-graph</code></td>
+          </tr>
+          <tr>
+            <td data-i18n="install.row2.case">Python project with uv</td>
+            <td><code>uv add slurp-graph</code></td>
+          </tr>
+          <tr>
+            <td data-i18n="install.row3.case">With pip</td>
+            <td><code>pip install slurp-graph</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="install-note" data-i18n-html="install.note">Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.</p>
     </div>
   </section>
 
@@ -1097,11 +1224,21 @@ slurp index .
           <div class="step-body">
             <h3 data-i18n="how.step3.h3">Configure MCP once, done forever</h3>
             <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.</p>
+            <p class="mcp-variant-label" data-i18n="how.mcp.global">Global install:</p>
             <div class="code-block">{
   <span class="k">"mcpServers"</span>: {
     <span class="k">"slurp"</span>: {
       <span class="k">"command"</span>: <span class="s">"slurp"</span>,
       <span class="k">"args"</span>: [<span class="s">"serve"</span>, <span class="s">"--graph"</span>, <span class="s">"graphify-out/graph.json"</span>]
+    }
+  }
+}</div>
+            <p class="mcp-variant-label" data-i18n="how.mcp.uv">Python project with uv:</p>
+            <div class="code-block">{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"slurp"</span>: {
+      <span class="k">"command"</span>: <span class="s">"uv"</span>,
+      <span class="k">"args"</span>: [<span class="s">"run"</span>, <span class="s">"slurp"</span>, <span class="s">"serve"</span>, <span class="s">"--graph"</span>, <span class="s">"graphify-out/graph.json"</span>]
     }
   }
 }</div>
@@ -1241,6 +1378,7 @@ slurp index .
     const LANGS = {
       en: {
         flag: '🇬🇧', code: 'EN',
+        'nav.install': 'Install',
         'nav.problem': 'Problem',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
@@ -1282,10 +1420,20 @@ slurp index .
         'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.',
         'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
         'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box.',
+        'how.mcp.global': 'Global install:',
+        'how.mcp.uv': 'Python project with uv:',
         'zerodeps.label': '// zero dependencies',
         'zerodeps.h2': 'No external tools required',
         'zerodeps.p1': 'slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.',
         'zerodeps.p2': 'Run it once and start querying immediately. No accounts, no API keys, no cloud.',
+        'install.label': '// install',
+        'install.h2': 'Quick install reference',
+        'install.th.case': 'Use case',
+        'install.th.cmd': 'Command',
+        'install.row1.case': 'Any project <span class="badge-rec">rec</span>',
+        'install.row2.case': 'Python project with uv',
+        'install.row3.case': 'With pip',
+        'install.note': 'Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.',
         'features.label': '// features',
         'features.h2': 'Built different.',
         'features.hero.sub': 'Zero dependencies. No APIs. No cost.',
@@ -1298,6 +1446,7 @@ slurp index .
       },
       es: {
         flag: '🇪🇸', code: 'ES',
+        'nav.install': 'Instalar',
         'nav.problem': 'Problema',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
@@ -1339,10 +1488,20 @@ slurp index .
         'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente en cada consulta.',
         'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a slurp en cada consulta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
         'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional.',
+        'how.mcp.global': 'Instalación global:',
+        'how.mcp.uv': 'Proyecto Python con uv:',
         'zerodeps.label': '// sin dependencias',
         'zerodeps.h2': 'No se necesitan herramientas externas',
         'zerodeps.p1': 'slurp index analiza tu codebase con análisis estático puro — sin LLMs, sin APIs externas, coste cero. Python usa el ast stdlib, TypeScript/JS usa tree-sitter, Go usa un parser de regex.',
         'zerodeps.p2': 'Ejecútalo una vez y empieza a consultar de inmediato. Sin cuentas, sin API keys, sin nube.',
+        'install.label': '// instalar',
+        'install.h2': 'Referencia rápida de instalación',
+        'install.th.case': 'Caso de uso',
+        'install.th.cmd': 'Comando',
+        'install.row1.case': 'Cualquier proyecto <span class="badge-rec">rec</span>',
+        'install.row2.case': 'Proyecto Python con uv',
+        'install.row3.case': 'Con pip',
+        'install.note': '¿Proyecto no Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — no <code>uv add</code>.',
         'features.label': '// funcionalidades',
         'features.h2': 'Construido diferente.',
         'features.hero.sub': 'Sin dependencias. Sin APIs. Sin coste.',
@@ -1355,6 +1514,7 @@ slurp index .
       },
       it: {
         flag: '🇮🇹', code: 'IT',
+        'nav.install': 'Installare',
         'nav.problem': 'Problema',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
@@ -1396,10 +1556,20 @@ slurp index .
         'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente ad ogni query.',
         'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama slurp ad ogni query — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
         'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive.',
+        'how.mcp.global': 'Installazione globale:',
+        'how.mcp.uv': 'Progetto Python con uv:',
         'zerodeps.label': '// zero dipendenze',
         'zerodeps.h2': 'Nessuno strumento esterno richiesto',
         'zerodeps.p1': 'slurp index analizza il tuo codebase con static analysis pura — nessun LLM, nessuna API esterna, costo zero. Python usa ast stdlib, TypeScript/JS usa tree-sitter, Go usa un regex parser.',
         'zerodeps.p2': 'Eseguilo una volta e inizia subito a fare query. Nessun account, nessuna API key, nessun cloud.',
+        'install.label': '// installazione',
+        'install.h2': 'Riferimento rapido installazione',
+        'install.th.case': 'Caso d\'uso',
+        'install.th.cmd': 'Comando',
+        'install.row1.case': 'Qualsiasi progetto <span class="badge-rec">rec</span>',
+        'install.row2.case': 'Progetto Python con uv',
+        'install.row3.case': 'Con pip',
+        'install.note': 'Progetto non Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — non <code>uv add</code>.',
         'features.label': '// funzionalità',
         'features.h2': 'Costruito diversamente.',
         'features.hero.sub': 'Zero dipendenze. Nessuna API. Nessun costo.',
@@ -1412,6 +1582,7 @@ slurp index .
       },
       fr: {
         flag: '🇫🇷', code: 'FR',
+        'nav.install': 'Installer',
         'nav.problem': 'Problème',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Démo',
@@ -1453,10 +1624,20 @@ slurp index .
         'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement à chaque requête.',
         'how.mcp': "<strong>Entièrement automatique après l'étape 3.</strong> Claude Code appelle slurp à chaque requête — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.",
         'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire.',
+        'how.mcp.global': 'Installation globale :',
+        'how.mcp.uv': 'Projet Python avec uv :',
         'zerodeps.label': '// zéro dépendances',
         'zerodeps.h2': 'Aucun outil externe requis',
         'zerodeps.p1': 'slurp index analyse votre codebase avec de l\'analyse statique pure — aucun LLM, aucune API externe, coût zéro. Python utilise ast stdlib, TypeScript/JS utilise tree-sitter, Go utilise un regex parser.',
         'zerodeps.p2': 'Exécutez-le une fois et commencez à interroger immédiatement. Pas de compte, pas de clé API, pas de cloud.',
+        'install.label': '// installer',
+        'install.h2': 'Référence rapide d\'installation',
+        'install.th.case': 'Cas d\'utilisation',
+        'install.th.cmd': 'Commande',
+        'install.row1.case': 'Tout projet <span class="badge-rec">rec</span>',
+        'install.row2.case': 'Projet Python avec uv',
+        'install.row3.case': 'Avec pip',
+        'install.note': 'Projet non Python (JS, Go, TypeScript...) ? Utilisez <code>uv tool install</code> ou <code>pip install</code> — pas <code>uv add</code>.',
         'features.label': '// fonctionnalités',
         'features.h2': 'Conçu différemment.',
         'features.hero.sub': 'Zéro dépendance. Aucune API. Aucun coût.',
@@ -1469,6 +1650,7 @@ slurp index .
       },
       de: {
         flag: '🇩🇪', code: 'DE',
+        'nav.install': 'Installieren',
         'nav.problem': 'Problem',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
@@ -1510,10 +1692,20 @@ slurp index .
         'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es bei jeder Anfrage automatisch auf.',
         'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft slurp bei jeder Anfrage auf — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
         'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json.',
+        'how.mcp.global': 'Globale Installation:',
+        'how.mcp.uv': 'Python-Projekt mit uv:',
         'zerodeps.label': '// null abhängigkeiten',
         'zerodeps.h2': 'Keine externen Tools erforderlich',
         'zerodeps.p1': 'slurp index analysiert dein Codebase mit reiner statischer Analyse — keine LLMs, keine externen APIs, null Kosten. Python nutzt ast stdlib, TypeScript/JS nutzt tree-sitter, Go nutzt einen Regex-Parser.',
         'zerodeps.p2': 'Einmal ausführen und sofort mit Anfragen beginnen. Kein Account, kein API-Key, keine Cloud.',
+        'install.label': '// installieren',
+        'install.h2': 'Schnellreferenz Installation',
+        'install.th.case': 'Anwendungsfall',
+        'install.th.cmd': 'Befehl',
+        'install.row1.case': 'Jedes Projekt <span class="badge-rec">emp</span>',
+        'install.row2.case': 'Python-Projekt mit uv',
+        'install.row3.case': 'Mit pip',
+        'install.note': 'Kein Python-Projekt (JS, Go, TypeScript...)? Nutze <code>uv tool install</code> oder <code>pip install</code> — nicht <code>uv add</code>.',
         'features.label': '// funktionen',
         'features.h2': 'Anders gebaut.',
         'features.hero.sub': 'Null Abhängigkeiten. Keine APIs. Keine Kosten.',
@@ -1615,6 +1807,18 @@ slurp index .
       { threshold: 0.1 }
     );
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ─── GitHub stars ─── */
+    fetch('https://api.github.com/repos/CarlosVallejoRuiz/slurp')
+      .then(r => r.json())
+      .then(data => {
+        const n = data.stargazers_count;
+        if (typeof n === 'number') {
+          const el = document.getElementById('gh-stars');
+          if (el) el.textContent = ' · ★ ' + (n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n);
+        }
+      })
+      .catch(() => {});
 
     /* ─── Init ─── */
     applyLang(currentLang);
