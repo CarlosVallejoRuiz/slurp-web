@@ -516,6 +516,32 @@
       display: block;
     }
 
+    .bench-cost {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 20px;
+      margin: -8px 0 32px;
+      font-family: var(--mono);
+      font-size: 0.875rem;
+    }
+
+    .bench-cost-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .bench-cost-row:last-child { border-bottom: none; }
+
+    .bench-cost-row .label { color: var(--text-muted); }
+    .bench-cost-row .amount { color: var(--text); font-weight: 500; }
+
+    .bench-cost-row.saved .label { color: var(--text); font-weight: 500; }
+    .bench-cost-row.saved .amount { color: var(--orange); font-weight: 700; font-size: 1.05rem; }
+
     /* ─────────────────────────────
        DEMO
     ───────────────────────────── */
@@ -840,13 +866,14 @@
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--orange);
+      overflow-wrap: anywhere;
     }
 
     .bento-small-line {
       font-size: 0.78rem;
       color: var(--text-dim);
       line-height: 1.4;
-      margin: 0;
+      margin: auto 0 0;
     }
 
     .bento-code {
@@ -1130,6 +1157,21 @@
         </tbody>
       </table>
 
+      <div class="bench-cost">
+        <div class="bench-cost-row">
+          <span class="label" data-i18n="benchmark.cost.with">Cost with slurp</span>
+          <span class="amount">$0.13</span>
+        </div>
+        <div class="bench-cost-row">
+          <span class="label" data-i18n="benchmark.cost.without">Cost without slurp</span>
+          <span class="amount">$1.87</span>
+        </div>
+        <div class="bench-cost-row saved">
+          <span class="label" data-i18n="benchmark.cost.saved">Money saved</span>
+          <span class="amount">$1.74 (93.3%)</span>
+        </div>
+      </div>
+
       <div class="bench-summary">
         <div class="bench-stat">
           <span class="val">93.3%</span>
@@ -1348,6 +1390,51 @@ slurp index .
             <p class="bento-small-line" data-i18n="features.inject.line">Attach source code to nodes</p>
           </div>
 
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2 4 14h7l-1 8 9-12h-7z"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp init</p>
+            <p class="bento-small-line" data-i18n="features.init.line">One command setup. Detects your language, indexes, configures MCP.</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <polyline points="12 7 12 12 15.5 14"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp session</p>
+            <p class="bento-small-line" data-i18n="features.session.line">See every query slurp processed in real time.</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">--viz-output PATH</p>
+            <p class="bento-small-line" data-i18n="features.vizoutput.line">Save the visualization HTML to share or review later.</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M14.8 9.3a2.6 2.6 0 0 0-2.4-1.3c-1.5 0-2.6.8-2.6 2s1 1.7 2.6 2 2.6.8 2.6 2-1.1 2-2.6 2a2.6 2.6 0 0 1-2.4-1.3"/>
+                <line x1="12" y1="6" x2="12" y2="18"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp benchmark --price-model</p>
+            <p class="bento-small-line" data-i18n="features.pricemodel.line">Real USD cost, not just percentages.</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1365,10 +1452,10 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.6.0</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.6.5</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
-        Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Juank</a> · Terrassa, Barcelona
+        Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
       </p>
     </div>
   </footer>
@@ -1405,6 +1492,9 @@ slurp index .
         'benchmark.stat.mean': 'mean savings',
         'benchmark.stat.best': 'best case',
         'benchmark.stat.llm': 'extra LLM calls',
+        'benchmark.cost.with': 'Cost with slurp',
+        'benchmark.cost.without': 'Cost without slurp',
+        'benchmark.cost.saved': 'Money saved',
         'demo.label': '// demo',
         'demo.h2': 'See it in action',
         'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
@@ -1442,6 +1532,10 @@ slurp index .
         'features.diff.line': 'Compare graph snapshots',
         'features.benchmark.line': 'Measure token savings',
         'features.inject.line': 'Attach source code to nodes',
+        'features.init.line': 'One command setup. Detects your language, indexes, configures MCP.',
+        'features.session.line': 'See every query slurp processed in real time.',
+        'features.vizoutput.line': 'Save the visualization HTML to share or review later.',
+        'features.pricemodel.line': 'Real USD cost, not just percentages.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       es: {
@@ -1473,6 +1567,9 @@ slurp index .
         'benchmark.stat.mean': 'ahorro medio',
         'benchmark.stat.best': 'mejor caso',
         'benchmark.stat.llm': 'llamadas LLM extra',
+        'benchmark.cost.with': 'Coste con slurp',
+        'benchmark.cost.without': 'Coste sin slurp',
+        'benchmark.cost.saved': 'Dinero ahorrado',
         'demo.label': '// demo',
         'demo.h2': 'Vélo en acción',
         'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
@@ -1510,6 +1607,10 @@ slurp index .
         'features.diff.line': 'Compara snapshots del grafo',
         'features.benchmark.line': 'Mide el ahorro de tokens',
         'features.inject.line': 'Adjunta código fuente a los nodos',
+        'features.init.line': 'Setup en un solo comando. Detecta tu lenguaje, indexa y configura el MCP.',
+        'features.session.line': 'Mira en tiempo real cada query que slurp ha procesado.',
+        'features.vizoutput.line': 'Guarda el HTML de la visualización para compartir o revisar después.',
+        'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       it: {
@@ -1541,6 +1642,9 @@ slurp index .
         'benchmark.stat.mean': 'risparmio medio',
         'benchmark.stat.best': 'caso migliore',
         'benchmark.stat.llm': 'chiamate LLM extra',
+        'benchmark.cost.with': 'Costo con slurp',
+        'benchmark.cost.without': 'Costo senza slurp',
+        'benchmark.cost.saved': 'Denaro risparmiato',
         'demo.label': '// demo',
         'demo.h2': 'Guardalo in azione',
         'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
@@ -1578,6 +1682,10 @@ slurp index .
         'features.diff.line': 'Confronta snapshot del grafo',
         'features.benchmark.line': 'Misura il risparmio di token',
         'features.inject.line': 'Allega codice sorgente ai nodi',
+        'features.init.line': 'Setup con un solo comando. Rileva il linguaggio, indicizza, configura MCP.',
+        'features.session.line': 'Vedi in tempo reale ogni query elaborata da slurp.',
+        'features.vizoutput.line': 'Salva l\'HTML della visualizzazione per condividerlo o rivederlo.',
+        'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       fr: {
@@ -1609,6 +1717,9 @@ slurp index .
         'benchmark.stat.mean': 'économie moyenne',
         'benchmark.stat.best': 'meilleur cas',
         'benchmark.stat.llm': 'appels LLM supplémentaires',
+        'benchmark.cost.with': 'Coût avec slurp',
+        'benchmark.cost.without': 'Coût sans slurp',
+        'benchmark.cost.saved': 'Argent économisé',
         'demo.label': '// démo',
         'demo.h2': 'Voir en action',
         'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
@@ -1646,6 +1757,10 @@ slurp index .
         'features.diff.line': 'Comparer les instantanés du graphe',
         'features.benchmark.line': 'Mesurer les économies de tokens',
         'features.inject.line': 'Attacher le code source aux nœuds',
+        'features.init.line': 'Installation en une commande. Détecte le langage, indexe, configure MCP.',
+        'features.session.line': 'Voir en temps réel chaque requête traitée par slurp.',
+        'features.vizoutput.line': 'Enregistrer le HTML de la visualisation pour le partager ou le revoir.',
+        'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       de: {
@@ -1677,6 +1792,9 @@ slurp index .
         'benchmark.stat.mean': 'durchschn. Ersparnis',
         'benchmark.stat.best': 'bester Fall',
         'benchmark.stat.llm': 'zusätzl. LLM-Aufrufe',
+        'benchmark.cost.with': 'Kosten mit slurp',
+        'benchmark.cost.without': 'Kosten ohne slurp',
+        'benchmark.cost.saved': 'Gespartes Geld',
         'demo.label': '// demo',
         'demo.h2': 'In Aktion sehen',
         'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
@@ -1714,6 +1832,10 @@ slurp index .
         'features.diff.line': 'Graphen-Snapshots vergleichen',
         'features.benchmark.line': 'Token-Einsparungen messen',
         'features.inject.line': 'Quellcode an Knoten anhängen',
+        'features.init.line': 'Setup mit einem Befehl. Erkennt die Sprache, indiziert, konfiguriert MCP.',
+        'features.session.line': 'Jede von slurp verarbeitete Query in Echtzeit sehen.',
+        'features.vizoutput.line': 'Das Visualisierungs-HTML zum Teilen oder späteren Prüfen speichern.',
+        'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
     };
