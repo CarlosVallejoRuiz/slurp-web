@@ -516,6 +516,18 @@
       display: block;
     }
 
+    .perf-table td.opt { color: var(--text); font-weight: 500; }
+    .perf-table td.before { color: var(--text-dim); }
+    .perf-table td.gain { color: var(--orange); font-weight: 600; }
+
+    .perf-note {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      padding-left: 4px;
+    }
+
     .bench-cost {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -932,8 +944,12 @@
       .token-viz { flex-direction: column; align-items: flex-start; gap: 12px; }
       .token-arrow { transform: rotate(90deg); }
 
-      .bench-table th:nth-child(3),
-      .bench-table td:nth-child(3) { display: none; }
+      .bench-table:not(.perf-table) th:nth-child(3),
+      .bench-table:not(.perf-table) td:nth-child(3) { display: none; }
+
+      /* perf table drops "Before" instead — the after/gain pair carries the story */
+      .perf-table th:nth-child(2),
+      .perf-table td:nth-child(2) { display: none; }
 
       .bench-summary { gap: 20px; }
       .steps::before { display: none; }
@@ -962,6 +978,7 @@
         <a href="#problem" data-i18n="nav.problem">Problem</a>
         <a href="#benchmark" data-i18n="nav.benchmark">Benchmark</a>
         <a href="#demo" data-i18n="nav.demo">Demo</a>
+        <a href="#performance" data-i18n="nav.performance">Performance</a>
         <a href="#how" data-i18n="nav.how">How it works</a>
         <a href="#features" data-i18n="nav.features">Features</a>
       </div>
@@ -993,6 +1010,7 @@
     <a href="#problem" data-i18n="nav.problem" class="mobile-link">Problem</a>
     <a href="#benchmark" data-i18n="nav.benchmark" class="mobile-link">Benchmark</a>
     <a href="#demo" data-i18n="nav.demo" class="mobile-link">Demo</a>
+    <a href="#performance" data-i18n="nav.performance" class="mobile-link">Performance</a>
     <a href="#how" data-i18n="nav.how" class="mobile-link">How it works</a>
     <a href="#features" data-i18n="nav.features" class="mobile-link">Features</a>
     <div class="mobile-lang">
@@ -1231,6 +1249,62 @@ slurp index .
   </section>
 
   <!-- ══════════════════════════════
+       PERFORMANCE
+  ══════════════════════════════ -->
+  <section id="performance">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="perf.label">// performance</p>
+      <h2 data-i18n="perf.h2">Built for speed.</h2>
+      <p data-i18n="perf.p">8.1× faster than v0.6.5. Measured on a real 2,111-node codebase.</p>
+
+      <table class="bench-table perf-table">
+        <thead>
+          <tr>
+            <th data-i18n="perf.th.opt">Optimization</th>
+            <th data-i18n="perf.th.before">Before</th>
+            <th data-i18n="perf.th.after">After</th>
+            <th data-i18n="perf.th.gain">Improvement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="opt" data-i18n="perf.row.pagerank">PageRank cache</td>
+            <td class="before">8.32 ms</td>
+            <td>0.002 ms</td>
+            <td class="gain">4000×</td>
+          </tr>
+          <tr>
+            <td class="opt" data-i18n="perf.row.tokencache">Token count cache</td>
+            <td class="before">~50 ms</td>
+            <td>0.174 ms</td>
+            <td class="gain">280×</td>
+          </tr>
+          <tr>
+            <td class="opt" data-i18n="perf.row.heap">Greedy heap (O(n log n))</td>
+            <td class="before">63.78 ms</td>
+            <td>10.69 ms</td>
+            <td class="gain">6×</td>
+          </tr>
+          <tr>
+            <td class="opt" data-i18n="perf.row.latency">End-to-end latency</td>
+            <td class="before">86.41 ms</td>
+            <td>10.69 ms</td>
+            <td class="gain">8.1×</td>
+          </tr>
+          <tr>
+            <td class="opt" data-i18n="perf.row.staleness">Graph staleness</td>
+            <td class="before" data-i18n="perf.silent">silent</td>
+            <td data-i18n="perf.autoreload">auto-reload</td>
+            <td class="gain">✓</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="perf-note" data-i18n="perf.note">Graph changes detected automatically — no server restart needed.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
        HOW IT WORKS
   ══════════════════════════════ -->
   <section id="how">
@@ -1432,7 +1506,7 @@ slurp index .
               </svg>
             </div>
             <p class="bento-small-title">slurp benchmark --price-model</p>
-            <p class="bento-small-line" data-i18n="features.pricemodel.line">Real USD cost, not just percentages.</p>
+            <p class="bento-small-line" data-i18n="features.pricemodel.line">Real USD cost, not just percentages — on queries now 8.1× faster.</p>
           </div>
 
         </div>
@@ -1452,7 +1526,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.6.5</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.7.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1469,6 +1543,7 @@ slurp index .
         'nav.problem': 'Problem',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
+        'nav.performance': 'Performance',
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
@@ -1499,6 +1574,21 @@ slurp index .
         'demo.h2': 'See it in action',
         'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
         'demo.caption': 'Opens an interactive subgraph explorer with a live token-savings badge.',
+        'perf.label': '// performance',
+        'perf.h2': 'Built for speed.',
+        'perf.p': '8.1× faster than v0.6.5. Measured on a real 2,111-node codebase.',
+        'perf.th.opt': 'Optimization',
+        'perf.th.before': 'Before',
+        'perf.th.after': 'After',
+        'perf.th.gain': 'Improvement',
+        'perf.row.pagerank': 'PageRank cache',
+        'perf.row.tokencache': 'Token count cache',
+        'perf.row.heap': 'Greedy heap (O(n log n))',
+        'perf.row.latency': 'End-to-end latency',
+        'perf.row.staleness': 'Graph staleness',
+        'perf.silent': 'silent',
+        'perf.autoreload': 'auto-reload',
+        'perf.note': 'Graph changes detected automatically — no server restart needed.',
         'how.label': '// how it works',
         'how.h2': 'Three steps to zero wasted tokens',
         'how.step1.h3': 'Install slurp',
@@ -1535,7 +1625,7 @@ slurp index .
         'features.init.line': 'One command setup. Detects your language, indexes, configures MCP.',
         'features.session.line': 'See every query slurp processed in real time.',
         'features.vizoutput.line': 'Save the visualization HTML to share or review later.',
-        'features.pricemodel.line': 'Real USD cost, not just percentages.',
+        'features.pricemodel.line': 'Real USD cost, not just percentages — on queries now 8.1× faster.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       es: {
@@ -1544,6 +1634,7 @@ slurp index .
         'nav.problem': 'Problema',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
+        'nav.performance': 'Rendimiento',
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
@@ -1574,6 +1665,21 @@ slurp index .
         'demo.h2': 'Vélo en acción',
         'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
         'demo.caption': 'Abre un explorador interactivo de subgrafos con un badge en tiempo real de tokens ahorrados.',
+        'perf.label': '// rendimiento',
+        'perf.h2': 'Hecho para ir rápido.',
+        'perf.p': '8,1× más rápido que la v0.6.5. Medido sobre un codebase real de 2.111 nodos.',
+        'perf.th.opt': 'Optimización',
+        'perf.th.before': 'Antes',
+        'perf.th.after': 'Después',
+        'perf.th.gain': 'Mejora',
+        'perf.row.pagerank': 'Caché de PageRank',
+        'perf.row.tokencache': 'Caché de conteo de tokens',
+        'perf.row.heap': 'Heap voraz (O(n log n))',
+        'perf.row.latency': 'Latencia de extremo a extremo',
+        'perf.row.staleness': 'Grafo desactualizado',
+        'perf.silent': 'silencioso',
+        'perf.autoreload': 'recarga automática',
+        'perf.note': 'Los cambios en el grafo se detectan automáticamente — sin reiniciar el servidor.',
         'how.label': '// cómo funciona',
         'how.h2': 'Tres pasos para cero tokens desperdiciados',
         'how.step1.h3': 'Instala slurp',
@@ -1610,7 +1716,7 @@ slurp index .
         'features.init.line': 'Setup en un solo comando. Detecta tu lenguaje, indexa y configura el MCP.',
         'features.session.line': 'Mira en tiempo real cada query que slurp ha procesado.',
         'features.vizoutput.line': 'Guarda el HTML de la visualización para compartir o revisar después.',
-        'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes.',
+        'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes — sobre queries ahora 8,1× más rápidas.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       it: {
@@ -1619,6 +1725,7 @@ slurp index .
         'nav.problem': 'Problema',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
+        'nav.performance': 'Prestazioni',
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
@@ -1649,6 +1756,21 @@ slurp index .
         'demo.h2': 'Guardalo in azione',
         'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
         'demo.caption': 'Apre un esploratore interattivo di sottografi con un badge in tempo reale del risparmio di token.',
+        'perf.label': '// prestazioni',
+        'perf.h2': 'Costruito per la velocità.',
+        'perf.p': '8,1× più veloce della v0.6.5. Misurato su un codebase reale di 2.111 nodi.',
+        'perf.th.opt': 'Ottimizzazione',
+        'perf.th.before': 'Prima',
+        'perf.th.after': 'Dopo',
+        'perf.th.gain': 'Miglioramento',
+        'perf.row.pagerank': 'Cache di PageRank',
+        'perf.row.tokencache': 'Cache del conteggio token',
+        'perf.row.heap': 'Heap greedy (O(n log n))',
+        'perf.row.latency': 'Latenza end-to-end',
+        'perf.row.staleness': 'Grafo obsoleto',
+        'perf.silent': 'silenzioso',
+        'perf.autoreload': 'ricarica automatica',
+        'perf.note': 'Le modifiche al grafo vengono rilevate automaticamente — nessun riavvio del server.',
         'how.label': '// come funziona',
         'how.h2': 'Tre passi per zero token sprecati',
         'how.step1.h3': 'Installa slurp',
@@ -1685,7 +1807,7 @@ slurp index .
         'features.init.line': 'Setup con un solo comando. Rileva il linguaggio, indicizza, configura MCP.',
         'features.session.line': 'Vedi in tempo reale ogni query elaborata da slurp.',
         'features.vizoutput.line': 'Salva l\'HTML della visualizzazione per condividerlo o rivederlo.',
-        'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali.',
+        'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali — su query ora 8,1× più veloci.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       fr: {
@@ -1694,6 +1816,7 @@ slurp index .
         'nav.problem': 'Problème',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Démo',
+        'nav.performance': 'Performances',
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
@@ -1724,6 +1847,21 @@ slurp index .
         'demo.h2': 'Voir en action',
         'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
         'demo.caption': 'Ouvre un explorateur interactif de sous-graphes avec un badge en temps réel des tokens économisés.',
+        'perf.label': '// performances',
+        'perf.h2': 'Conçu pour la vitesse.',
+        'perf.p': '8,1× plus rapide que la v0.6.5. Mesuré sur un codebase réel de 2 111 nœuds.',
+        'perf.th.opt': 'Optimisation',
+        'perf.th.before': 'Avant',
+        'perf.th.after': 'Après',
+        'perf.th.gain': 'Amélioration',
+        'perf.row.pagerank': 'Cache PageRank',
+        'perf.row.tokencache': 'Cache du comptage de tokens',
+        'perf.row.heap': 'Tas glouton (O(n log n))',
+        'perf.row.latency': 'Latence de bout en bout',
+        'perf.row.staleness': 'Graphe obsolète',
+        'perf.silent': 'silencieux',
+        'perf.autoreload': 'rechargement auto',
+        'perf.note': 'Les changements du graphe sont détectés automatiquement — aucun redémarrage du serveur.',
         'how.label': "// comment ça marche",
         'how.h2': 'Trois étapes pour zéro token gaspillé',
         'how.step1.h3': 'Installer slurp',
@@ -1760,7 +1898,7 @@ slurp index .
         'features.init.line': 'Installation en une commande. Détecte le langage, indexe, configure MCP.',
         'features.session.line': 'Voir en temps réel chaque requête traitée par slurp.',
         'features.vizoutput.line': 'Enregistrer le HTML de la visualisation pour le partager ou le revoir.',
-        'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages.',
+        'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages — sur des requêtes 8,1× plus rapides.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       de: {
@@ -1769,6 +1907,7 @@ slurp index .
         'nav.problem': 'Problem',
         'nav.benchmark': 'Benchmark',
         'nav.demo': 'Demo',
+        'nav.performance': 'Performance',
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
@@ -1799,6 +1938,21 @@ slurp index .
         'demo.h2': 'In Aktion sehen',
         'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
         'demo.caption': 'Öffnet einen interaktiven Teilgraph-Explorer mit einem Live-Badge für Token-Einsparungen.',
+        'perf.label': '// performance',
+        'perf.h2': 'Auf Geschwindigkeit gebaut.',
+        'perf.p': '8,1× schneller als v0.6.5. Gemessen an einer echten Codebase mit 2.111 Knoten.',
+        'perf.th.opt': 'Optimierung',
+        'perf.th.before': 'Vorher',
+        'perf.th.after': 'Nachher',
+        'perf.th.gain': 'Verbesserung',
+        'perf.row.pagerank': 'PageRank-Cache',
+        'perf.row.tokencache': 'Token-Zähl-Cache',
+        'perf.row.heap': 'Greedy-Heap (O(n log n))',
+        'perf.row.latency': 'End-to-End-Latenz',
+        'perf.row.staleness': 'Veralteter Graph',
+        'perf.silent': 'stillschweigend',
+        'perf.autoreload': 'Auto-Reload',
+        'perf.note': 'Graph-Änderungen werden automatisch erkannt — kein Server-Neustart nötig.',
         'how.label': "// so funktioniert's",
         'how.h2': 'Drei Schritte zu null verschwendeten Token',
         'how.step1.h3': 'slurp installieren',
@@ -1835,7 +1989,7 @@ slurp index .
         'features.init.line': 'Setup mit einem Befehl. Erkennt die Sprache, indiziert, konfiguriert MCP.',
         'features.session.line': 'Jede von slurp verarbeitete Query in Echtzeit sehen.',
         'features.vizoutput.line': 'Das Visualisierungs-HTML zum Teilen oder späteren Prüfen speichern.',
-        'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte.',
+        'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte — bei jetzt 8,1× schnelleren Queries.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
     };
