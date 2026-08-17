@@ -516,6 +516,24 @@
       display: block;
     }
 
+    .extras-line {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      line-height: 1.9;
+      padding-left: 4px;
+    }
+    .extras-line code { color: var(--orange); font-family: var(--mono); white-space: nowrap; }
+
+    .bento-langs {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.85;
+      margin: 0;
+    }
+
     .perf-table td.opt { color: var(--text); font-weight: 500; }
     .perf-table td.before { color: var(--text-dim); }
     .perf-table td.gain { color: var(--orange); font-weight: 600; }
@@ -1032,7 +1050,7 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
-      <p class="hero-subtagline" data-i18n="hero.subtagline">Works standalone or as a companion to graphify.</p>
+      <p class="hero-subtagline" data-i18n="hero.subtagline">16 languages supported · Works standalone or as a companion to graphify.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="install-block">
@@ -1214,13 +1232,15 @@
     <div class="container reveal">
       <p class="section-label" data-i18n="zerodeps.label">// zero dependencies</p>
       <h2 data-i18n="zerodeps.h2">No external tools required</h2>
-      <p data-i18n="zerodeps.p1">slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.</p>
+      <p data-i18n="zerodeps.p1">slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. 16 languages supported: Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.</p>
       <p data-i18n="zerodeps.p2">Run it once and start querying immediately. No accounts, no API keys, no cloud.</p>
 
       <div class="code-block"><span class="c"># Index your project locally</span>
 slurp index .
 <span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span>
 <span class="c"># Next: slurp 'your query' --graph graphify-out/graph.json</span></div>
+
+      <p class="extras-line"><span data-i18n="zerodeps.extras.label">Install language extras:</span> <code>uv sync --extra java</code> · <code>uv sync --extra rust</code> · <code>uv sync --extra all-languages</code></p>
     </div>
   </section>
 
@@ -1393,7 +1413,8 @@ slurp index .
             </svg>
           </div>
           <p class="bento-hero-title">slurp index</p>
-          <p class="bento-hero-sub" data-i18n="features.hero.sub">Zero dependencies. No APIs. No cost.</p>
+          <p class="bento-hero-sub" data-i18n="features.hero.sub">16 languages. Zero dependencies. No APIs. No cost.</p>
+          <p class="bento-langs">Python · TS/JS · Java · Rust · C# · Ruby · PHP · Kotlin · Scala · Swift · C · C++ · Go · Lua · Elixir · PS</p>
           <div class="bento-code">
             <span class="bc"># index your project locally</span><br>
             slurp index .<br>
@@ -1526,7 +1547,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.7.0</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.8.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1547,7 +1568,7 @@ slurp index .
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Works standalone or as a companion to graphify.',
+        'hero.subtagline': '16 languages supported · Works standalone or as a companion to graphify.',
         'problem.label': '// the problem',
         'problem.h2': "Your LLM doesn't need the whole bowl",
         'problem.p1': "graphify maps your entire codebase into a knowledge graph. Great. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.",
@@ -1604,8 +1625,9 @@ slurp index .
         'how.mcp.uv': 'Python project with uv:',
         'zerodeps.label': '// zero dependencies',
         'zerodeps.h2': 'No external tools required',
-        'zerodeps.p1': 'slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. Python uses the ast stdlib, TypeScript/JS uses tree-sitter, Go uses a regex parser.',
+        'zerodeps.p1': 'slurp index analyzes your codebase using pure static analysis — no LLMs, no external APIs, zero cost. 16 languages supported: Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.',
         'zerodeps.p2': 'Run it once and start querying immediately. No accounts, no API keys, no cloud.',
+        'zerodeps.extras.label': 'Install language extras:',
         'install.label': '// install',
         'install.h2': 'Quick install reference',
         'install.th.case': 'Use case',
@@ -1616,7 +1638,7 @@ slurp index .
         'install.note': 'Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.',
         'features.label': '// features',
         'features.h2': 'Built different.',
-        'features.hero.sub': 'Zero dependencies. No APIs. No cost.',
+        'features.hero.sub': '16 languages. Zero dependencies. No APIs. No cost.',
         'features.mcp.sub': 'Configure once. Claude Code handles the rest.',
         'features.viz.line': 'Interactive subgraph explorer',
         'features.diff.line': 'Compare graph snapshots',
@@ -1638,7 +1660,7 @@ slurp index .
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Funciona de forma autónoma o como complemento de graphify.',
+        'hero.subtagline': '16 lenguajes soportados · Funciona de forma autónoma o como complemento de graphify.',
         'problem.label': '// el problema',
         'problem.h2': 'Tu LLM no necesita el bol entero',
         'problem.p1': 'graphify mapea todo tu codebase en un grafo de conocimiento. Genial. Pero inyectar <em>cada nodo</em> en cada consulta es ineficiente — tu LLM gasta la mayor parte de su presupuesto de contexto en nodos que nunca usará.',
@@ -1695,8 +1717,9 @@ slurp index .
         'how.mcp.uv': 'Proyecto Python con uv:',
         'zerodeps.label': '// sin dependencias',
         'zerodeps.h2': 'No se necesitan herramientas externas',
-        'zerodeps.p1': 'slurp index analiza tu codebase con análisis estático puro — sin LLMs, sin APIs externas, coste cero. Python usa el ast stdlib, TypeScript/JS usa tree-sitter, Go usa un parser de regex.',
+        'zerodeps.p1': 'slurp index analiza tu codebase con análisis estático puro — sin LLMs, sin APIs externas, coste cero. 16 lenguajes soportados: Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.',
         'zerodeps.p2': 'Ejecútalo una vez y empieza a consultar de inmediato. Sin cuentas, sin API keys, sin nube.',
+        'zerodeps.extras.label': 'Instalar extras de lenguajes:',
         'install.label': '// instalar',
         'install.h2': 'Referencia rápida de instalación',
         'install.th.case': 'Caso de uso',
@@ -1707,7 +1730,7 @@ slurp index .
         'install.note': '¿Proyecto no Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — no <code>uv add</code>.',
         'features.label': '// funcionalidades',
         'features.h2': 'Construido diferente.',
-        'features.hero.sub': 'Sin dependencias. Sin APIs. Sin coste.',
+        'features.hero.sub': '16 lenguajes. Sin dependencias. Sin APIs. Sin coste.',
         'features.mcp.sub': 'Configura una vez. Claude Code hace el resto.',
         'features.viz.line': 'Explorador interactivo de subgrafos',
         'features.diff.line': 'Compara snapshots del grafo',
@@ -1729,7 +1752,7 @@ slurp index .
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Funziona in autonomia o come complemento di graphify.',
+        'hero.subtagline': '16 linguaggi supportati · Funziona in autonomia o come complemento di graphify.',
         'problem.label': '// il problema',
         'problem.h2': "Il tuo LLM non ha bisogno dell'intera ciotola",
         'problem.p1': "graphify mappa l'intero codebase in un knowledge graph. Ottimo. Ma iniettare <em>ogni nodo</em> in ogni query è dispendioso — il tuo LLM spende la maggior parte del suo budget di contesto su nodi che non userà mai.",
@@ -1786,8 +1809,9 @@ slurp index .
         'how.mcp.uv': 'Progetto Python con uv:',
         'zerodeps.label': '// zero dipendenze',
         'zerodeps.h2': 'Nessuno strumento esterno richiesto',
-        'zerodeps.p1': 'slurp index analizza il tuo codebase con static analysis pura — nessun LLM, nessuna API esterna, costo zero. Python usa ast stdlib, TypeScript/JS usa tree-sitter, Go usa un regex parser.',
+        'zerodeps.p1': 'slurp index analizza il tuo codebase con static analysis pura — nessun LLM, nessuna API esterna, costo zero. 16 linguaggi supportati: Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.',
         'zerodeps.p2': 'Eseguilo una volta e inizia subito a fare query. Nessun account, nessuna API key, nessun cloud.',
+        'zerodeps.extras.label': 'Installa gli extra per i linguaggi:',
         'install.label': '// installazione',
         'install.h2': 'Riferimento rapido installazione',
         'install.th.case': 'Caso d\'uso',
@@ -1798,7 +1822,7 @@ slurp index .
         'install.note': 'Progetto non Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — non <code>uv add</code>.',
         'features.label': '// funzionalità',
         'features.h2': 'Costruito diversamente.',
-        'features.hero.sub': 'Zero dipendenze. Nessuna API. Nessun costo.',
+        'features.hero.sub': '16 linguaggi. Zero dipendenze. Nessuna API. Nessun costo.',
         'features.mcp.sub': 'Configura una volta. Claude Code fa il resto.',
         'features.viz.line': 'Esploratore interattivo di sottografi',
         'features.diff.line': 'Confronta snapshot del grafo',
@@ -1820,7 +1844,7 @@ slurp index .
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Fonctionne de manière autonome ou en complément de graphify.',
+        'hero.subtagline': '16 langages pris en charge · Fonctionne de manière autonome ou en complément de graphify.',
         'problem.label': '// le problème',
         'problem.h2': "Votre LLM n'a pas besoin du bol entier",
         'problem.p1': "graphify cartographie l'intégralité de votre codebase en un graphe de connaissances. Parfait. Mais injecter <em>chaque nœud</em> dans chaque requête est inefficace — votre LLM dépense la majeure partie de son budget de contexte sur des nœuds qu'il n'utilisera jamais.",
@@ -1877,8 +1901,9 @@ slurp index .
         'how.mcp.uv': 'Projet Python avec uv :',
         'zerodeps.label': '// zéro dépendances',
         'zerodeps.h2': 'Aucun outil externe requis',
-        'zerodeps.p1': 'slurp index analyse votre codebase avec de l\'analyse statique pure — aucun LLM, aucune API externe, coût zéro. Python utilise ast stdlib, TypeScript/JS utilise tree-sitter, Go utilise un regex parser.',
+        'zerodeps.p1': 'slurp index analyse votre codebase avec de l\'analyse statique pure — aucun LLM, aucune API externe, coût zéro. 16 langages pris en charge : Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.',
         'zerodeps.p2': 'Exécutez-le une fois et commencez à interroger immédiatement. Pas de compte, pas de clé API, pas de cloud.',
+        'zerodeps.extras.label': 'Installer les extras de langages :',
         'install.label': '// installer',
         'install.h2': 'Référence rapide d\'installation',
         'install.th.case': 'Cas d\'utilisation',
@@ -1889,7 +1914,7 @@ slurp index .
         'install.note': 'Projet non Python (JS, Go, TypeScript...) ? Utilisez <code>uv tool install</code> ou <code>pip install</code> — pas <code>uv add</code>.',
         'features.label': '// fonctionnalités',
         'features.h2': 'Conçu différemment.',
-        'features.hero.sub': 'Zéro dépendance. Aucune API. Aucun coût.',
+        'features.hero.sub': '16 langages. Zéro dépendance. Aucune API. Aucun coût.',
         'features.mcp.sub': 'Configurez une fois. Claude Code fait le reste.',
         'features.viz.line': 'Explorateur interactif de sous-graphes',
         'features.diff.line': 'Comparer les instantanés du graphe',
@@ -1911,7 +1936,7 @@ slurp index .
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Funktioniert eigenständig oder als Ergänzung zu graphify.',
+        'hero.subtagline': '16 Sprachen unterstützt · Funktioniert eigenständig oder als Ergänzung zu graphify.',
         'problem.label': '// das Problem',
         'problem.h2': 'Dein LLM braucht nicht die ganze Schüssel',
         'problem.p1': "graphify bildet dein gesamtes Codebase in einem Wissensgraphen ab. Prima. Aber <em>jeden Knoten</em> in jede Anfrage zu injizieren ist verschwenderisch — dein LLM gibt den Großteil seines Kontextbudgets für Knoten aus, die es nie verwenden wird.",
@@ -1968,8 +1993,9 @@ slurp index .
         'how.mcp.uv': 'Python-Projekt mit uv:',
         'zerodeps.label': '// null abhängigkeiten',
         'zerodeps.h2': 'Keine externen Tools erforderlich',
-        'zerodeps.p1': 'slurp index analysiert dein Codebase mit reiner statischer Analyse — keine LLMs, keine externen APIs, null Kosten. Python nutzt ast stdlib, TypeScript/JS nutzt tree-sitter, Go nutzt einen Regex-Parser.',
+        'zerodeps.p1': 'slurp index analysiert dein Codebase mit reiner statischer Analyse — keine LLMs, keine externen APIs, null Kosten. 16 Sprachen unterstützt: Python, TypeScript/JavaScript, Java, Rust, C#, Ruby, PHP, Kotlin, Scala, Swift, C, C++, Go, Lua, Elixir, PowerShell.',
         'zerodeps.p2': 'Einmal ausführen und sofort mit Anfragen beginnen. Kein Account, kein API-Key, keine Cloud.',
+        'zerodeps.extras.label': 'Sprach-Extras installieren:',
         'install.label': '// installieren',
         'install.h2': 'Schnellreferenz Installation',
         'install.th.case': 'Anwendungsfall',
@@ -1980,7 +2006,7 @@ slurp index .
         'install.note': 'Kein Python-Projekt (JS, Go, TypeScript...)? Nutze <code>uv tool install</code> oder <code>pip install</code> — nicht <code>uv add</code>.',
         'features.label': '// funktionen',
         'features.h2': 'Anders gebaut.',
-        'features.hero.sub': 'Null Abhängigkeiten. Keine APIs. Keine Kosten.',
+        'features.hero.sub': '16 Sprachen. Null Abhängigkeiten. Keine APIs. Keine Kosten.',
         'features.mcp.sub': 'Einmal konfigurieren. Claude Code erledigt den Rest.',
         'features.viz.line': 'Interaktiver Teilgraph-Explorer',
         'features.diff.line': 'Graphen-Snapshots vergleichen',
