@@ -575,38 +575,76 @@
     /* ─────────────────────────────
        DEMO
     ───────────────────────────── */
-    .demo-wrapper {
-      margin-top: 36px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-card);
+    /* Live-demo note above the window frame */
+    .demo-note {
+      margin-top: 28px;
+      margin-bottom: 18px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      padding-left: 4px;
     }
 
-    .demo-bar {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
+    /* macOS-style application window wrapping the live visualizer */
+    .demo-window {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0d1117;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .demo-titlebar {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 11px 16px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
     }
 
-    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .demo-dot:nth-child(1) { background: #ff5f56; }
-    .demo-dot:nth-child(2) { background: #ffbd2e; }
-    .demo-dot:nth-child(3) { background: #27c93f; }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .demo-dot.red { background: #ff5f57; }
+    .demo-dot.yellow { background: #febc2e; }
+    .demo-dot.green { background: #28c840; }
 
-    .demo-gif { width: 100%; display: block; }
-
-    .demo-caption {
-      padding: 14px 20px;
+    .demo-title {
+      position: absolute;
+      left: 0; right: 0;
+      text-align: center;
       font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      pointer-events: none;
+      /* keep the centered title clear of the traffic lights on narrow widths */
+      padding: 0 84px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .demo-caption .highlight { color: var(--orange); }
+    .demo-frame {
+      display: block;
+      width: 100%;
+      height: 520px;
+      border: none;
+    }
+
+    .demo-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 16px;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .demo-status .right { text-align: right; }
 
     /* ─────────────────────────────
        HOW IT WORKS
@@ -972,6 +1010,11 @@
       .bench-summary { gap: 20px; }
       .steps::before { display: none; }
 
+      .demo-frame { height: 380px; }
+      .demo-title { display: none; }
+      .demo-status { flex-direction: column; align-items: flex-start; gap: 3px; }
+      .demo-status .right { text-align: left; }
+
       .bento-grid { grid-template-columns: 1fr; }
       .bento-hero { padding: 24px 20px; border-radius: 4px; }
       .bento-medium { padding: 24px 20px; border-radius: 4px; }
@@ -1253,17 +1296,25 @@ slurp index .
       <h2 data-i18n="demo.h2">See it in action</h2>
       <p data-i18n="demo.p">The interactive visualizer shows the subgraph slurp selected — and how much you saved.</p>
 
-      <div class="demo-wrapper">
-        <div class="demo-bar">
-          <div class="demo-dot"></div>
-          <div class="demo-dot"></div>
-          <div class="demo-dot"></div>
+      <p class="demo-note" data-i18n="demo.note">Live demo — real PrismaStats codebase, real data. Orange = functions, Blue = classes, Purple = modules.</p>
+
+      <div class="demo-window">
+        <div class="demo-titlebar">
+          <span class="demo-dot red"></span>
+          <span class="demo-dot yellow"></span>
+          <span class="demo-dot green"></span>
+          <span class="demo-title">slurp — player stats calculation</span>
         </div>
-        <img src="assets/Slurp_Linkedin.gif" alt="slurp --viz demo" class="demo-gif" loading="lazy" />
-        <p class="demo-caption">
-          <span class="highlight">slurp "auth flow" --graph graphify-out/graph.json --budget 4000 --viz</span><br/>
-          <span data-i18n="demo.caption">Opens an interactive subgraph explorer with a live token-savings badge.</span>
-        </p>
+        <iframe
+          class="demo-frame"
+          src="assets/demo-graph.html"
+          title="slurp interactive graph visualizer"
+          scrolling="no"
+          loading="lazy"></iframe>
+        <div class="demo-status">
+          <span class="left">50 nodes shown · 4,000 token budget · 96% saved</span>
+          <span class="right" data-i18n="demo.status.hint">Click any node to inspect · Drag to explore</span>
+        </div>
       </div>
     </div>
   </section>
@@ -1594,7 +1645,8 @@ slurp index .
         'demo.label': '// demo',
         'demo.h2': 'See it in action',
         'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
-        'demo.caption': 'Opens an interactive subgraph explorer with a live token-savings badge.',
+        'demo.note': 'Live demo — real PrismaStats codebase, real data. Orange = functions, Blue = classes, Purple = modules.',
+        'demo.status.hint': 'Click any node to inspect · Drag to explore',
         'perf.label': '// performance',
         'perf.h2': 'Built for speed.',
         'perf.p': '8.1× faster than v0.6.5. Measured on a real 2,111-node codebase.',
@@ -1686,7 +1738,8 @@ slurp index .
         'demo.label': '// demo',
         'demo.h2': 'Vélo en acción',
         'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
-        'demo.caption': 'Abre un explorador interactivo de subgrafos con un badge en tiempo real de tokens ahorrados.',
+        'demo.note': 'Demo en vivo — codebase real de PrismaStats, datos reales. Naranja = funciones, Azul = clases, Morado = módulos.',
+        'demo.status.hint': 'Haz clic en un nodo para inspeccionarlo · Arrastra para explorar',
         'perf.label': '// rendimiento',
         'perf.h2': 'Hecho para ir rápido.',
         'perf.p': '8,1× más rápido que la v0.6.5. Medido sobre un codebase real de 2.111 nodos.',
@@ -1778,7 +1831,8 @@ slurp index .
         'demo.label': '// demo',
         'demo.h2': 'Guardalo in azione',
         'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
-        'demo.caption': 'Apre un esploratore interattivo di sottografi con un badge in tempo reale del risparmio di token.',
+        'demo.note': 'Demo dal vivo — codebase reale di PrismaStats, dati reali. Arancione = funzioni, Blu = classi, Viola = moduli.',
+        'demo.status.hint': 'Clicca un nodo per ispezionarlo · Trascina per esplorare',
         'perf.label': '// prestazioni',
         'perf.h2': 'Costruito per la velocità.',
         'perf.p': '8,1× più veloce della v0.6.5. Misurato su un codebase reale di 2.111 nodi.',
@@ -1870,7 +1924,8 @@ slurp index .
         'demo.label': '// démo',
         'demo.h2': 'Voir en action',
         'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
-        'demo.caption': 'Ouvre un explorateur interactif de sous-graphes avec un badge en temps réel des tokens économisés.',
+        'demo.note': 'Démo en direct — codebase réel de PrismaStats, données réelles. Orange = fonctions, Bleu = classes, Violet = modules.',
+        'demo.status.hint': 'Cliquez sur un nœud pour l\'inspecter · Faites glisser pour explorer',
         'perf.label': '// performances',
         'perf.h2': 'Conçu pour la vitesse.',
         'perf.p': '8,1× plus rapide que la v0.6.5. Mesuré sur un codebase réel de 2 111 nœuds.',
@@ -1962,7 +2017,8 @@ slurp index .
         'demo.label': '// demo',
         'demo.h2': 'In Aktion sehen',
         'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
-        'demo.caption': 'Öffnet einen interaktiven Teilgraph-Explorer mit einem Live-Badge für Token-Einsparungen.',
+        'demo.note': 'Live-Demo — echte PrismaStats-Codebase, echte Daten. Orange = Funktionen, Blau = Klassen, Lila = Module.',
+        'demo.status.hint': 'Auf einen Knoten klicken zum Inspizieren · Ziehen zum Erkunden',
         'perf.label': '// performance',
         'perf.h2': 'Auf Geschwindigkeit gebaut.',
         'perf.p': '8,1× schneller als v0.6.5. Gemessen an einer echten Codebase mit 2.111 Knoten.',

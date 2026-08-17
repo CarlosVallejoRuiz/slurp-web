@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slurp — player stats calculation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/dist/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg:        #0d1117;
+      --surface:   #0f172a;
+      --border:    #1e293b;
+      --ink:       #e2e8f0;
+      --ink-dim:   #94a3b8;
+      --ink-mute:  #475569;
+      --accent:    #f97316;
+      --accent-2:  #fbbf24;
+      --cyan:      #22d3ee;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- header ---- */
+    #hdr {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 11px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .brand {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .4px;
+    }
+    .qry { font-size: 12.5px; color: var(--ink-mute); }
+    .qry em {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 700;
+    }
+    .stats {
+      font-size: 11.5px;
+      color: var(--ink-dim);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .stats b { color: var(--ink); font-weight: 600; }
+    .sep { color: var(--ink-mute); }
+    .save {
+      margin-left: auto;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #1c1207;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 0 16px rgba(249, 115, 22, .25);
+    }
+
+    /* ---- layout ---- */
+    #wrap { display: flex; flex: 1; overflow: hidden; position: relative; }
+    #graph {
+      flex: 1;
+      min-width: 0;
+      background-color: var(--bg);
+      /* Subtle dot grid: gives the canvas depth without competing with edges. */
+      background-image: radial-gradient(rgba(30, 41, 59, .8) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* ---- legend ---- */
+    #legend {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      background: rgba(15, 23, 42, .92);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 10.5px;
+      backdrop-filter: blur(6px);
+      user-select: none;
+      max-width: 190px;
+    }
+    #legend-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-size: 9px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #legend-hd:hover { color: var(--ink-dim); }
+    #legend-items { margin-top: 7px; display: grid; gap: 4px; }
+    #legend-items.hidden { display: none; }
+    .lg-row { display: flex; align-items: center; gap: 7px; color: var(--ink-dim); }
+    .lg-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ---- panel ---- */
+    #panel {
+      width: 286px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #phdr {
+      padding: 13px 15px 11px;
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .9px;
+      color: var(--ink-mute);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #pbody { overflow-y: auto; padding: 15px; flex: 1; }
+    .hint { color: var(--ink-mute); font-size: 12px; text-align: center; padding-top: 36px; line-height: 1.7; }
+
+    .node-hd { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+    .node-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .node-label {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      word-break: break-word;
+      line-height: 1.25;
+    }
+    .type-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      color: #0b1220;
+      margin-bottom: 15px;
+    }
+
+    .pf { margin-bottom: 14px; }
+    .pf-lbl {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--ink-mute);
+      margin-bottom: 5px;
+    }
+    .pf-val { font-size: 12px; color: var(--ink); word-break: break-word; line-height: 1.5; }
+    .score-row { display: flex; align-items: baseline; justify-content: space-between; }
+    .score-num { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .bar-bg {
+      height: 5px;
+      background: #16202e;
+      border-radius: 3px;
+      margin-top: 7px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 10px rgba(249, 115, 22, .5);
+    }
+    .relevance { font-size: 11.5px; color: var(--ink-dim); line-height: 1.55; }
+    .src {
+      color: var(--cyan);
+      font-size: 11px;
+      word-break: break-all;
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(34, 211, 238, .4);
+    }
+    .src:hover { border-bottom-style: solid; }
+    .conn {
+      font-size: 11.5px;
+      color: var(--ink-dim);
+      margin-top: 6px;
+      display: flex;
+      gap: 7px;
+      align-items: baseline;
+    }
+    .conn .arrow { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .conn .peer { color: var(--ink); word-break: break-word; }
+    .conn .rel { color: var(--ink-mute); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+
+    /* Narrow viewports: the 286px side panel would leave the canvas a sliver,
+       so stack the panel under a full-width graph instead. */
+    @media (max-width: 700px) {
+      #hdr { gap: 6px 10px; padding: 9px 12px; }
+      .save { margin-left: 0; }
+      #wrap { flex-direction: column; }
+      #graph { flex: 1 1 auto; min-height: 0; }
+      #panel {
+        width: 100%;
+        flex: 0 0 auto;
+        max-height: 38%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+      /* anchor to the top so the legend sits over the canvas, not the panel */
+      #legend { top: 10px; bottom: auto; left: 10px; }
+    }
+  </style>
+</head>
+<body>
+<div id="hdr">
+  <span class="brand">&#9889; slurp</span>
+  <span class="qry">query: <em>player stats calculation</em></span>
+  <span class="stats">
+    <span><b>410</b>&thinsp;/&thinsp;2111 nodes &middot; showing top 50</span>
+    <span class="sep">&middot;</span>
+    <span><b>3,999</b>&thinsp;/&thinsp;4,000 tokens</span>
+    <span class="sep">&middot;</span>
+    <span><b>19.4%</b> coverage</span>
+  </span>
+  <span class="save">Saved ~101,551 tokens &middot; 96%</span>
+</div>
+<div id="wrap">
+  <div id="graph"></div>
+  <div id="legend">
+    <div id="legend-hd"><span>Node types</span><span id="legend-tog">&minus;</span></div>
+    <div id="legend-items"></div>
+  </div>
+  <div id="panel">
+    <div id="phdr">Node Details</div>
+    <div id="pbody"><div class="hint">Click a node<br>to inspect it</div></div>
+  </div>
+</div>
+<script>
+var PALETTE = {"function": {"fill": "#f97316", "border": "#d36112"}, "class": {"fill": "#3b82f6", "border": "#326ed1"}, "module": {"fill": "#8b5cf6", "border": "#764ed1"}, "interface": {"fill": "#06b6d4", "border": "#059ab4"}, "struct": {"fill": "#10b981", "border": "#0d9d6d"}, "macro": {"fill": "#f59e0b", "border": "#d08609"}, "property": {"fill": "#6366f1", "border": "#5456cc"}, "import": {"fill": "#64748b", "border": "#556276"}, "default": {"fill": "#94a3b8", "border": "#7d8a9c"}, "added": {"fill": "#22c55e", "border": "#1ca74f"}, "removed": {"fill": "#ef4444", "border": "#cb3939"}, "modified": {"fill": "#eab308", "border": "#c69806"}, "unchanged": {"fill": "#475569", "border": "#3c4859"}};
+var LEGEND  = [{"type": "class", "color": "#3b82f6"}, {"type": "default", "color": "#94a3b8"}, {"type": "function", "color": "#f97316"}, {"type": "module", "color": "#8b5cf6"}];
+var INLINE_MAX = 12;
+var IMPORT_SIZE = 10.0;
+var QUIET_SCORE = 0.3;
+
+function c(t){ return PALETTE[t] || PALETTE["default"]; }
+
+var RN = [{"id": "supabase_admin_actions_recalcularplayerstats", "label": "recalcularPlayerStats()", "size": 26.635574378309713, "score": 0.702, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "supabase_admin_createadminclient", "label": "createAdminClient()", "size": 26.6, "score": 0.7, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin.ts", "importance": null}, {"id": "supabase_admin_actions_updateplayerstatsadmin", "label": "updatePlayerStatsAdmin()", "size": 26.552250378875954, "score": 0.6973, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "supabase_admin_actions_getplayerstatsadmin", "label": "getPlayerStatsAdmin()", "size": 26.552250378875954, "score": 0.6973, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "types_database_playerstats", "label": "PlayerStats", "size": 26.552023490235452, "score": 0.6973, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "types_database_playerstatsinsert", "label": "PlayerStatsInsert", "size": 26.552023490235452, "score": 0.6973, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "supabase_dashboard_actions_playerscatterpoint", "label": "PlayerScatterPoint", "size": 24.985952157502584, "score": 0.6103, "node_type": "class", "isolated": false, "description": "", "file_path": "lib/supabase/dashboard-actions.ts", "importance": null}, {"id": "landing_entrenamiento_preview_player", "label": "Player()", "size": 24.820463650315283, "score": 0.6011, "node_type": "function", "isolated": true, "description": "", "file_path": "components/landing/entrenamiento-preview.tsx", "importance": null}, {"id": "comp_featured_player", "label": "featured-player.tsx", "size": 24.80796990656695, "score": 0.6004, "node_type": "module", "isolated": false, "description": "", "file_path": "all_tsx_exports.txt", "importance": null}, {"id": "dashboard_player_scatter_playerscatter", "label": "PlayerScatter()", "size": 24.805644207197158, "score": 0.6003, "node_type": "function", "isolated": false, "description": "", "file_path": "components/dashboard/player-scatter.tsx", "importance": null}, {"id": "rendimiento_client_playerscatter", "label": "PlayerScatter", "size": 24.80454064805315, "score": 0.6003, "node_type": "class", "isolated": true, "description": "", "file_path": "app/dashboard/rendimiento/client.tsx", "importance": null}, {"id": "video_client_trackingplayer", "label": "TrackingPlayer", "size": 24.80404459067082, "score": 0.6002, "node_type": "class", "isolated": true, "description": "", "file_path": "app/dashboard/video/client.tsx", "importance": null}, {"id": "supabase_admin_actions_insertplayer", "label": "insertPlayer()", "size": 24.803715019017293, "score": 0.6002, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "types_database_playerinsert", "label": "PlayerInsert", "size": 24.803488130376792, "score": 0.6002, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "types_database_player", "label": "Player", "size": 24.803488130376792, "score": 0.6002, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "types_database_playerposition", "label": "PlayerPosition", "size": 24.803488130376792, "score": 0.6002, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "datos_player_combobox_playeroption", "label": "PlayerOption", "size": 24.802448083169296, "score": 0.6001, "node_type": "class", "isolated": false, "description": "", "file_path": "app/admin/datos/player-combobox.tsx", "importance": null}, {"id": "pizarra_client_freeplayer", "label": "FreePlayer()", "size": 24.800931199962633, "score": 0.6001, "node_type": "function", "isolated": true, "description": "", "file_path": "app/dashboard/pizarra/client.tsx", "importance": null}, {"id": "datos_lineup_dialog_dbplayer", "label": "DbPlayer", "size": 24.80034544649952, "score": 0.6, "node_type": "class", "isolated": true, "description": "", "file_path": "app/admin/datos/lineup-dialog.tsx", "importance": null}, {"id": "datos_player_combobox", "label": "player-combobox.tsx", "size": 24.799950893976344, "score": 0.6, "node_type": "module", "isolated": false, "description": "", "file_path": "app/admin/datos/player-combobox.tsx", "importance": null}, {"id": "dashboard_player_scatter", "label": "player-scatter.tsx", "size": 24.797595844700584, "score": 0.5999, "node_type": "module", "isolated": false, "description": "", "file_path": "components/dashboard/player-scatter.tsx", "importance": null}, {"id": "supabase_admin_actions_getadminstats", "label": "getAdminStats()", "size": 24.181036736899443, "score": 0.5656, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "supabase_admin_actions_getusagestats", "label": "getUsageStats()", "size": 24.181036736899443, "score": 0.5656, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "scenes_statsscene_statsscene", "label": "StatsScene()", "size": 24.176896615352877, "score": 0.5654, "node_type": "function", "isolated": false, "description": "", "file_path": ".agents/skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/scenes/StatsScene.tsx", "importance": null}, {"id": "scenes_statsscene", "label": "StatsScene.tsx", "size": 24.154270172858446, "score": 0.5641, "node_type": "module", "isolated": false, "description": "", "file_path": ".agents/skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/scenes/StatsScene.tsx", "importance": null}, {"id": "types_database_matchstats", "label": "MatchStats", "size": 24.14838721215586, "score": 0.5638, "node_type": "class", "isolated": true, "description": "", "file_path": "types/database.ts", "importance": null}, {"id": "comp_home_away_stats", "label": "home-away-stats.tsx", "size": 24.14724663403667, "score": 0.5637, "node_type": "module", "isolated": false, "description": "", "file_path": "all_tsx_exports.txt", "importance": null}, {"id": "supabase_admin_actions_requireadmin", "label": "requireAdmin()", "size": 21.808167773344643, "score": 0.4338, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "supabase_server_createclient", "label": "createClient()", "size": 20.644109880839842, "score": 0.3691, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/server.ts", "importance": null}, {"id": "lib_utils_cn", "label": "cn()", "size": 20.34922293703645, "score": 0.3527, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/utils.ts", "importance": null}, {"id": "skills_lock_seo_sourcetype", "label": "sourceType", "size": 20.34174931784287, "score": 0.3523, "node_type": "default", "isolated": true, "description": "", "file_path": "skills-lock.json", "importance": null}, {"id": "skills_lock_seo_source", "label": "source", "size": 20.34174931784287, "score": 0.3523, "node_type": "default", "isolated": true, "description": "", "file_path": "skills-lock.json", "importance": null}, {"id": "skills_lock_seo_computedhash", "label": "computedHash", "size": 20.34174931784287, "score": 0.3523, "node_type": "default", "isolated": true, "description": "", "file_path": "skills-lock.json", "importance": null}, {"id": "ndarray", "label": "ndarray", "size": 20.1886634157518, "score": 0.3438, "node_type": "default", "isolated": true, "description": "", "file_path": ".agents/skills/gsap/scripts/extract-audio-data.py", "importance": null}, {"id": "lib_utils", "label": "utils.ts", "size": 19.913005728848155, "score": 0.3285, "node_type": "module", "isolated": false, "description": "", "file_path": "lib/utils.ts", "importance": null}, {"id": "supabase_server", "label": "server.ts", "size": 19.861057444732563, "score": 0.3256, "node_type": "module", "isolated": false, "description": "", "file_path": "lib/supabase/server.ts", "importance": null}, {"id": "supabase_admin", "label": "admin.ts", "size": 19.8394161013981, "score": 0.3244, "node_type": "module", "isolated": false, "description": "", "file_path": "lib/supabase/admin.ts", "importance": null}, {"id": "chat_chat_context_usechatcontext", "label": "useChatContext()", "size": 19.809884483945087, "score": 0.3228, "node_type": "function", "isolated": true, "description": "", "file_path": "lib/chat/chat-context.tsx", "importance": null}, {"id": "supabase_cantera_actions_getclubid", "label": "getClubId()", "size": 19.806988399241405, "score": 0.3226, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/cantera-actions.ts", "importance": null}, {"id": "layout_nav_items_navitem", "label": "NavItem", "size": 19.79972709266816, "score": 0.3222, "node_type": "class", "isolated": true, "description": "", "file_path": "components/layout/nav-items.ts", "importance": null}, {"id": "supabase_cantera_actions_jugadorcantera", "label": "JugadorCantera", "size": 19.77337344680878, "score": 0.3207, "node_type": "class", "isolated": true, "description": "", "file_path": "lib/supabase/cantera-actions.ts", "importance": null}, {"id": "supabase_dashboard_actions", "label": "dashboard-actions.ts", "size": 19.769849022763825, "score": 0.3205, "node_type": "module", "isolated": false, "description": "", "file_path": "lib/supabase/dashboard-actions.ts", "importance": null}, {"id": "supabase_dashboard_actions_getmatchresult", "label": "getMatchResult()", "size": 19.769842488060988, "score": 0.3205, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/dashboard-actions.ts", "importance": null}, {"id": "supabase_admin_actions_getallclubs", "label": "getAllClubs()", "size": 19.731335705772864, "score": 0.3184, "node_type": "function", "isolated": false, "description": "", "file_path": "lib/supabase/admin-actions.ts", "importance": null}, {"id": "path", "label": "Path", "size": 19.72941240402176, "score": 0.3183, "node_type": "class", "isolated": true, "description": "", "file_path": ".agents/skills/remotion-to-hyperframes/scripts/lint_source.py", "importance": null}, {"id": "admin_page_diffdays", "label": "diffDays()", "size": 19.721112761831737, "score": 0.3178, "node_type": "function", "isolated": true, "description": "", "file_path": "app/admin/page.tsx", "importance": null}, {"id": "skills_lock_gsap_skillpath", "label": "skillPath", "size": 19.7086277454195, "score": 0.3171, "node_type": "default", "isolated": true, "description": "", "file_path": "skills-lock.json", "importance": null}, {"id": "test_corpus_run_write_result", "label": "write_result()", "size": 19.704675445570082, "score": 0.3169, "node_type": "function", "isolated": true, "description": "", "file_path": ".agents/skills/remotion-to-hyperframes/assets/test-corpus/run.sh", "importance": null}, {"id": "basemodel", "label": "BaseModel", "size": 19.698230168437494, "score": 0.3166, "node_type": "class", "isolated": true, "description": "", "file_path": "", "importance": null}, {"id": "supabase_dashboard_actions_radarpoint", "label": "RadarPoint", "size": 19.688501436638315, "score": 0.316, "node_type": "class", "isolated": false, "description": "", "file_path": "lib/supabase/dashboard-actions.ts", "importance": null}];
+var RE = [{"from": "lib_utils", "to": "lib_utils_cn", "label": "contains"}, {"from": "supabase_admin_actions_getallclubs", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "dashboard_player_scatter", "to": "dashboard_player_scatter_playerscatter", "label": "contains"}, {"from": "dashboard_player_scatter", "to": "supabase_dashboard_actions", "label": "imports_from"}, {"from": "dashboard_player_scatter", "to": "supabase_dashboard_actions_playerscatterpoint", "label": "imports"}, {"from": "supabase_admin_actions_updateplayerstatsadmin", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "supabase_admin_actions_updateplayerstatsadmin", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "scenes_statsscene", "to": "scenes_statsscene_statsscene", "label": "contains"}, {"from": "supabase_admin_actions_recalcularplayerstats", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "supabase_admin_actions_insertplayer", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "supabase_admin_actions_insertplayer", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "supabase_admin_actions_getplayerstatsadmin", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "supabase_admin_actions_getplayerstatsadmin", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "supabase_dashboard_actions", "to": "supabase_admin", "label": "imports_from"}, {"from": "supabase_dashboard_actions", "to": "supabase_admin_createadminclient", "label": "imports"}, {"from": "supabase_dashboard_actions", "to": "comp_featured_player", "label": "contains"}, {"from": "supabase_dashboard_actions", "to": "supabase_dashboard_actions_getmatchresult", "label": "contains"}, {"from": "supabase_dashboard_actions", "to": "supabase_dashboard_actions_playerscatterpoint", "label": "contains"}, {"from": "supabase_dashboard_actions", "to": "supabase_dashboard_actions_radarpoint", "label": "contains"}, {"from": "supabase_dashboard_actions", "to": "supabase_server", "label": "imports_from"}, {"from": "supabase_dashboard_actions", "to": "supabase_server_createclient", "label": "imports"}, {"from": "comp_home_away_stats", "to": "supabase_dashboard_actions", "label": "imports_from"}, {"from": "datos_player_combobox", "to": "datos_player_combobox_playeroption", "label": "contains"}, {"from": "datos_player_combobox", "to": "lib_utils", "label": "imports_from"}, {"from": "datos_player_combobox", "to": "lib_utils_cn", "label": "imports"}, {"from": "supabase_cantera_actions_getclubid", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "supabase_cantera_actions_getclubid", "to": "supabase_server_createclient", "label": "calls"}, {"from": "supabase_server", "to": "supabase_server_createclient", "label": "contains"}, {"from": "supabase_admin_actions_getadminstats", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "supabase_admin_actions_getusagestats", "to": "supabase_admin_actions_requireadmin", "label": "calls"}, {"from": "supabase_admin_actions_getusagestats", "to": "supabase_admin_createadminclient", "label": "calls"}, {"from": "supabase_admin", "to": "supabase_admin_createadminclient", "label": "contains"}];
+
+var DIFF_TYPES=["added","removed","modified","unchanged"];
+var vn = new vis.DataSet(RN.map(function(n){
+  var col = c(n.node_type);
+  var isDiff = DIFF_TYPES.indexOf(n.node_type) !== -1;
+  var sz = isDiff ? (n.node_type === "unchanged" ? 16 : 22)
+                  : (n.node_type === "import" ? IMPORT_SIZE : n.size);
+  // Short labels sit inside the node; longer ones would blow the circle out of
+  // proportion and lose the score-encoded size, so they hang underneath.
+  // Low-scoring nodes would carpet the canvas in text, so their label is held
+  // back until hover. They stay "dot" so revealing it never resizes the node.
+  var quiet = !isDiff && n.score < QUIET_SCORE;
+  var inside = !quiet && String(n.label).length <= INLINE_MAX;
+  return {
+    id: n.id,
+    label: quiet ? "" : n.label,
+    title: n.label,
+    size: sz,
+    shape: inside ? "circle" : "dot",
+    widthConstraint: inside ? {minimum: sz * 1.9, maximum: sz * 3.4} : undefined,
+    color: {
+      background: col.fill,
+      border: col.border,
+      highlight: {background: col.fill, border: "#ffffff"},
+      hover: {background: col.fill, border: "#ffffff"}
+    },
+    font: {
+      color: "#ffffff",
+      size: 12,
+      face: '"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace',
+      strokeWidth: 4,
+      strokeColor: "rgba(2,6,23,0.95)",
+      vadjust: inside ? 0 : 1
+    },
+    borderWidth: 2,
+    borderWidthSelected: 3,
+    opacity: n.isolated ? 0.55 : 1.0,
+    // Glow in the node's own hue — this is what makes types readable at 14px.
+    shadow: {enabled: true, color: col.fill, size: 12, x: 0, y: 0},
+    _r: n
+  };
+}));
+
+var _anyDiff = RN.some(function(n){ return DIFF_TYPES.slice(0,3).indexOf(n.node_type) !== -1; });
+var ve = new vis.DataSet(RE.map(function(e){
+  return {
+    from:e.from, to:e.to,
+    label:"",
+    arrows:{to:{enabled:true,scaleFactor:0.42}},
+    color:{color:"rgba(148,163,184,0.25)",highlight:"#f97316",hover:"#f97316",opacity:1},
+    smooth:{type:"continuous"},
+    _rel: e.label
+  };
+}));
+
+var net = new vis.Network(
+  document.getElementById("graph"),
+  {nodes:vn, edges:ve},
+  {
+    nodes:{shape:"dot"},
+    edges:{width:1,selectionWidth:2,hoverWidth:1},
+    physics:{
+      barnesHut:{gravitationalConstant:-2000,centralGravity:0.3,springLength:60,springConstant:0.04,damping:0.09},
+      stabilization:{enabled:true,iterations:500,onlyDynamicEdges:false}
+    },
+    interaction:{hover:true,tooltipDelay:150,hideEdgesOnDrag:true},
+    layout:{improvedLayout:true}
+  }
+);
+net.once('stabilized', function(){ net.setOptions({physics:{enabled:false}}); });
+
+/* ---- reveal held-back labels on hover ---- */
+net.on("hoverNode", function(p){
+  var nd = vn.get(p.node);
+  if(nd && !nd.label){ vn.update({id: p.node, label: nd._r.label}); }
+});
+net.on("blurNode", function(p){
+  var nd = vn.get(p.node);
+  if(nd && nd._r.score < QUIET_SCORE && DIFF_TYPES.indexOf(nd._r.node_type) === -1){
+    vn.update({id: p.node, label: ""});
+  }
+});
+
+/* ---- legend ---- */
+(function(){
+  var box = document.getElementById("legend");
+  if(!LEGEND.length){ box.style.display = "none"; return; }
+  var items = document.getElementById("legend-items");
+  items.innerHTML = LEGEND.map(function(l){
+    return '<div class="lg-row"><span class="lg-dot" style="background:'+l.color+
+           ';box-shadow:0 0 6px '+l.color+'"></span>'+x(l.type)+'</div>';
+  }).join("");
+  document.getElementById("legend-hd").addEventListener("click", function(){
+    var hidden = items.classList.toggle("hidden");
+    document.getElementById("legend-tog").innerHTML = hidden ? "+" : "&minus;";
+  });
+})();
+
+/* ---- relevance copy ---- */
+function relevanceText(score){
+  if(score >= 0.75) return "Top match \u2014 scored very highly against your query, so it was selected first.";
+  if(score >= 0.45) return "Strong match \u2014 directly relevant to your query.";
+  if(score >= 0.20) return "Related \u2014 moderate relevance, or pulled in as a neighbour of a strong match.";
+  return "Context \u2014 low direct relevance; included because it connects to selected nodes.";
+}
+
+net.on("click",function(p){
+  var body=document.getElementById("pbody");
+  if(!p.nodes.length){body.innerHTML='<div class="hint">Click a node<br>to inspect it</div>';return;}
+  var nd=vn.get(p.nodes[0]);
+  var d=nd._r;
+  var col=c(d.node_type);
+  var pct=Math.round(d.score*100);
+  var h="";
+
+  h+='<div class="node-hd"><span class="node-dot" style="background:'+col.fill+
+     ';box-shadow:0 0 9px '+col.fill+'"></span><span class="node-label">'+x(d.label)+'</span></div>';
+  if(d.node_type&&d.node_type!=="default"){
+    h+='<span class="type-badge" style="background:'+col.fill+'">'+x(d.node_type)+'</span>';
+  }
+
+  h+='<div class="pf"><div class="pf-lbl">Score</div>'+
+     '<div class="score-row"><span class="pf-val">relevance</span>'+
+     '<span class="score-num">'+d.score.toFixed(4)+'</span></div>'+
+     '<div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div></div>';
+
+  h+=fld("Relevance",'<div class="relevance">'+relevanceText(d.score)+'</div>');
+
+  if(d.description){h+=fld("Description",'<span style="color:var(--ink-dim)">'+x(d.description)+"</span>");}
+  if(d.file_path){
+    h+=fld("Source",'<a class="src" href="file://'+x(d.file_path)+'">'+x(d.file_path)+"</a>");
+  }
+  if(d.importance!=null){h+=fld("Importance",String(d.importance));}
+
+  var ce=net.getConnectedEdges(p.nodes[0]);
+  if(ce.length){
+    var ch="";
+    ce.slice(0,8).forEach(function(eid){
+      var e=ve.get(eid);
+      var oid=e.from===p.nodes[0]?e.to:e.from;
+      var dir=e.from===p.nodes[0]?"&rarr;":"&larr;";
+      var on=vn.get(oid);
+      var ol=on?on._r.label:String(oid);
+      var rel=e._rel?'<span class="rel">'+x(e._rel)+"</span> ":"";
+      ch+='<div class="conn"><span class="arrow">'+dir+'</span>'+rel+
+          '<span class="peer">'+x(ol)+"</span></div>";
+    });
+    if(ce.length>8){ch+='<div class="conn" style="color:var(--ink-mute)">+ '+(ce.length-8)+" more</div>";}
+    h+=fld("Connections ("+ce.length+")",ch);
+  }
+  body.innerHTML=h;
+});
+
+function fld(lbl,val){
+  return '<div class="pf"><div class="pf-lbl">'+x(lbl)+'</div><div class="pf-val">'+val+"</div></div>";
+}
+function x(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+</script>
+</body>
+</html>
