@@ -896,6 +896,14 @@
     }
     .bento-small:hover { border-color: rgba(249,115,22,0.3); }
 
+    /* v0.9.0 headline features — own row of 3, they carry longer descriptions */
+    .bento-thirds {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
     .bento-icon { color: var(--orange); flex-shrink: 0; line-height: 0; }
 
     .bento-hero-title {
@@ -943,6 +951,8 @@
       line-height: 1.4;
       margin: auto 0 0;
     }
+
+    .bento-small-line code { color: var(--orange); font-family: var(--mono); font-size: 0.95em; }
 
     .bento-code {
       background: var(--bg);
@@ -1019,6 +1029,7 @@
       .bento-hero { padding: 24px 20px; border-radius: 4px; }
       .bento-medium { padding: 24px 20px; border-radius: 4px; }
       .bento-smalls { grid-template-columns: repeat(2, 1fr); }
+      .bento-thirds { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1403,6 +1414,7 @@ pip install slurp-graph</div>
 slurp index .
 <span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span></div>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.</span></p>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">Already indexed? Use <code>slurp index . --smart</code> to update only changed files.</span></p>
           </div>
         </div>
 
@@ -1582,6 +1594,48 @@ slurp index .
           </div>
 
         </div>
+
+        <!-- v0.9.0 features -->
+        <div class="bento-thirds">
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="3" x2="6" y2="15"/>
+                <circle cx="18" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/>
+                <path d="M18 9a9 9 0 0 1-9 9"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp index --smart</p>
+            <p class="bento-small-line" data-i18n="features.smart.line">Git-aware re-indexing. Only updates what changed. 21× faster.</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18h6"/>
+                <path d="M10 22h4"/>
+                <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp advisor</p>
+            <p class="bento-small-line" data-i18n="features.advisor.line">Recommends the optimal token budget from your query history.</p>
+          </div>
+
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 2 9 5-9 5-9-5 9-5z"/>
+                <path d="m3 12 9 5 9-5"/>
+                <path d="m3 17 9 5 9-5"/>
+              </svg>
+            </div>
+            <p class="bento-small-title" data-i18n="features.federation.title">Multi-graph federation</p>
+            <p class="bento-small-line" data-i18n-html="features.federation.line">Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.</p>
+          </div>
+
+        </div>
       </div>
     </div>
   </section>
@@ -1598,7 +1652,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.8.1</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1700,6 +1754,11 @@ slurp index .
         'features.session.line': 'See every query slurp processed in real time.',
         'features.vizoutput.line': 'Save the visualization HTML to share or review later.',
         'features.pricemodel.line': 'Real USD cost, not just percentages — on queries now 8.1× faster.',
+        'features.smart.line': 'Git-aware re-indexing. Only updates what changed. 21× faster.',
+        'features.advisor.line': 'Recommends the optimal token budget from your query history.',
+        'features.federation.title': 'Multi-graph federation',
+        'features.federation.line': 'Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.',
+        'how.smart.note': 'Already indexed? Use <code>slurp index . --smart</code> to update only changed files.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       es: {
@@ -1793,6 +1852,11 @@ slurp index .
         'features.session.line': 'Mira en tiempo real cada query que slurp ha procesado.',
         'features.vizoutput.line': 'Guarda el HTML de la visualización para compartir o revisar después.',
         'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes — sobre queries ahora 8,1× más rápidas.',
+        'features.smart.line': 'Re-indexado consciente de git. Solo actualiza lo que cambió. 21× más rápido.',
+        'features.advisor.line': 'Recomienda el presupuesto de tokens óptimo a partir de tu historial de queries.',
+        'features.federation.title': 'Federación multi-grafo',
+        'features.federation.line': 'Consulta varios codebases a la vez con <code>--graph g1 --graph g2</code>.',
+        'how.smart.note': '¿Ya lo has indexado? Usa <code>slurp index . --smart</code> para actualizar solo los archivos que cambiaron.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       it: {
@@ -1886,6 +1950,11 @@ slurp index .
         'features.session.line': 'Vedi in tempo reale ogni query elaborata da slurp.',
         'features.vizoutput.line': 'Salva l\'HTML della visualizzazione per condividerlo o rivederlo.',
         'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali — su query ora 8,1× più veloci.',
+        'features.smart.line': 'Re-indicizzazione git-aware. Aggiorna solo ciò che è cambiato. 21× più veloce.',
+        'features.advisor.line': 'Consiglia il budget di token ottimale dalla cronologia delle tue query.',
+        'features.federation.title': 'Federazione multi-grafo',
+        'features.federation.line': 'Interroga più codebase contemporaneamente con <code>--graph g1 --graph g2</code>.',
+        'how.smart.note': 'Già indicizzato? Usa <code>slurp index . --smart</code> per aggiornare solo i file modificati.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       fr: {
@@ -1979,6 +2048,11 @@ slurp index .
         'features.session.line': 'Voir en temps réel chaque requête traitée par slurp.',
         'features.vizoutput.line': 'Enregistrer le HTML de la visualisation pour le partager ou le revoir.',
         'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages — sur des requêtes 8,1× plus rapides.',
+        'features.smart.line': 'Ré-indexation compatible git. Ne met à jour que ce qui a changé. 21× plus rapide.',
+        'features.advisor.line': 'Recommande le budget de tokens optimal à partir de votre historique de requêtes.',
+        'features.federation.title': 'Fédération multi-graphe',
+        'features.federation.line': 'Interrogez plusieurs codebases simultanément avec <code>--graph g1 --graph g2</code>.',
+        'how.smart.note': 'Déjà indexé ? Utilisez <code>slurp index . --smart</code> pour ne mettre à jour que les fichiers modifiés.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
       de: {
@@ -2072,6 +2146,11 @@ slurp index .
         'features.session.line': 'Jede von slurp verarbeitete Query in Echtzeit sehen.',
         'features.vizoutput.line': 'Das Visualisierungs-HTML zum Teilen oder späteren Prüfen speichern.',
         'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte — bei jetzt 8,1× schnelleren Queries.',
+        'features.smart.line': 'Git-bewusstes Neuindizieren. Aktualisiert nur Geändertes. 21× schneller.',
+        'features.advisor.line': 'Empfiehlt das optimale Token-Budget aus deinem Query-Verlauf.',
+        'features.federation.title': 'Multi-Graph-Föderation',
+        'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen mit <code>--graph g1 --graph g2</code>.',
+        'how.smart.note': 'Schon indiziert? Nutze <code>slurp index . --smart</code>, um nur geänderte Dateien zu aktualisieren.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
     };
