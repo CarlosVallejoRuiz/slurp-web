@@ -896,11 +896,11 @@
     }
     .bento-small:hover { border-color: rgba(249,115,22,0.3); }
 
-    /* v0.9.0 headline features — own row of 3, they carry longer descriptions */
-    .bento-thirds {
+    /* v0.9.x headline features — 2×2 so their longer descriptions get the width */
+    .bento-pairs {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
@@ -1029,7 +1029,7 @@
       .bento-hero { padding: 24px 20px; border-radius: 4px; }
       .bento-medium { padding: 24px 20px; border-radius: 4px; }
       .bento-smalls { grid-template-columns: repeat(2, 1fr); }
-      .bento-thirds { grid-template-columns: 1fr; }
+      .bento-pairs { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1173,6 +1173,7 @@
       </table>
 
       <p class="install-note" data-i18n-html="install.note">Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.</p>
+      <p class="install-note" style="margin-top:10px;" data-i18n-html="install.explain.note">For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or point to a local Ollama instance. No LLM? Use <code>--no-llm</code> for structural analysis.</p>
     </div>
   </section>
 
@@ -1441,6 +1442,7 @@ slurp index .
     }
   }
 }</div>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain.note">Want to understand any part of your codebase? <code>slurp explain "functionName" --graph graph.json</code> explains it in plain language using your LLM.</span></p>
           </div>
         </div>
       </div>
@@ -1595,8 +1597,8 @@ slurp index .
 
         </div>
 
-        <!-- v0.9.0 features -->
-        <div class="bento-thirds">
+        <!-- v0.9.x features -->
+        <div class="bento-pairs">
 
           <div class="bento-small">
             <div class="bento-icon">
@@ -1635,6 +1637,18 @@ slurp index .
             <p class="bento-small-line" data-i18n-html="features.federation.line">Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.</p>
           </div>
 
+          <div class="bento-small">
+            <div class="bento-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <line x1="8" y1="9" x2="16" y2="9"/>
+                <line x1="8" y1="13" x2="13" y2="13"/>
+              </svg>
+            </div>
+            <p class="bento-small-title">slurp explain</p>
+            <p class="bento-small-line" data-i18n="features.explain.line">LLM-powered explanations. What a node does, its architecture, and the risk of changing it. Works with any LLM provider.</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1652,7 +1666,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.0</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.1</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1758,6 +1772,9 @@ slurp index .
         'features.advisor.line': 'Recommends the optimal token budget from your query history.',
         'features.federation.title': 'Multi-graph federation',
         'features.federation.line': 'Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.',
+        'features.explain.line': 'LLM-powered explanations. What a node does, its architecture, and the risk of changing it. Works with any LLM provider.',
+        'how.explain.note': 'Want to understand any part of your codebase? <code>slurp explain "functionName" --graph graph.json</code> explains it in plain language using your LLM.',
+        'install.explain.note': 'For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or point to a local Ollama instance. No LLM? Use <code>--no-llm</code> for structural analysis.',
         'how.smart.note': 'Already indexed? Use <code>slurp index . --smart</code> to update only changed files.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
@@ -1856,6 +1873,9 @@ slurp index .
         'features.advisor.line': 'Recomienda el presupuesto de tokens óptimo a partir de tu historial de queries.',
         'features.federation.title': 'Federación multi-grafo',
         'features.federation.line': 'Consulta varios codebases a la vez con <code>--graph g1 --graph g2</code>.',
+        'features.explain.line': 'Explicaciones con LLM. Qué hace un nodo, su arquitectura y el riesgo de cambiarlo. Funciona con cualquier proveedor de LLM.',
+        'how.explain.note': '¿Quieres entender cualquier parte de tu codebase? <code>slurp explain "functionName" --graph graph.json</code> te lo explica en lenguaje natural usando tu LLM.',
+        'install.explain.note': 'Para <code>slurp explain</code>: define <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, o apunta a una instancia local de Ollama. ¿Sin LLM? Usa <code>--no-llm</code> para análisis estructural.',
         'how.smart.note': '¿Ya lo has indexado? Usa <code>slurp index . --smart</code> para actualizar solo los archivos que cambiaron.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
@@ -1954,6 +1974,9 @@ slurp index .
         'features.advisor.line': 'Consiglia il budget di token ottimale dalla cronologia delle tue query.',
         'features.federation.title': 'Federazione multi-grafo',
         'features.federation.line': 'Interroga più codebase contemporaneamente con <code>--graph g1 --graph g2</code>.',
+        'features.explain.line': 'Spiegazioni con LLM. Cosa fa un nodo, la sua architettura e il rischio di modificarlo. Funziona con qualsiasi provider LLM.',
+        'how.explain.note': 'Vuoi capire una qualsiasi parte del tuo codebase? <code>slurp explain "functionName" --graph graph.json</code> te la spiega in linguaggio naturale usando il tuo LLM.',
+        'install.explain.note': 'Per <code>slurp explain</code>: imposta <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oppure punta a un\'istanza locale di Ollama. Nessun LLM? Usa <code>--no-llm</code> per l\'analisi strutturale.',
         'how.smart.note': 'Già indicizzato? Usa <code>slurp index . --smart</code> per aggiornare solo i file modificati.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
@@ -2052,6 +2075,9 @@ slurp index .
         'features.advisor.line': 'Recommande le budget de tokens optimal à partir de votre historique de requêtes.',
         'features.federation.title': 'Fédération multi-graphe',
         'features.federation.line': 'Interrogez plusieurs codebases simultanément avec <code>--graph g1 --graph g2</code>.',
+        'features.explain.line': 'Explications par LLM. Ce que fait un nœud, son architecture et le risque de le modifier. Fonctionne avec n\'importe quel fournisseur LLM.',
+        'how.explain.note': 'Envie de comprendre n\'importe quelle partie de votre codebase ? <code>slurp explain "functionName" --graph graph.json</code> vous l\'explique en langage naturel avec votre LLM.',
+        'install.explain.note': 'Pour <code>slurp explain</code> : définissez <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, ou pointez vers une instance Ollama locale. Pas de LLM ? Utilisez <code>--no-llm</code> pour l\'analyse structurelle.',
         'how.smart.note': 'Déjà indexé ? Utilisez <code>slurp index . --smart</code> pour ne mettre à jour que les fichiers modifiés.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
@@ -2150,6 +2176,9 @@ slurp index .
         'features.advisor.line': 'Empfiehlt das optimale Token-Budget aus deinem Query-Verlauf.',
         'features.federation.title': 'Multi-Graph-Föderation',
         'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen mit <code>--graph g1 --graph g2</code>.',
+        'features.explain.line': 'LLM-gestützte Erklärungen. Was ein Knoten tut, seine Architektur und das Risiko einer Änderung. Funktioniert mit jedem LLM-Anbieter.',
+        'how.explain.note': 'Willst du einen beliebigen Teil deiner Codebase verstehen? <code>slurp explain "functionName" --graph graph.json</code> erklärt ihn in normaler Sprache mit deinem LLM.',
+        'install.explain.note': 'Für <code>slurp explain</code>: setze <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oder verweise auf eine lokale Ollama-Instanz. Kein LLM? Nutze <code>--no-llm</code> für strukturelle Analyse.',
         'how.smart.note': 'Schon indiziert? Nutze <code>slurp index . --smart</code>, um nur geänderte Dateien zu aktualisieren.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
       },
