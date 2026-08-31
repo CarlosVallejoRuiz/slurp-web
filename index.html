@@ -546,6 +546,104 @@
       padding-left: 4px;
     }
 
+    /* Quality benchmark — LLM-judge results, distinct from the token table above */
+    .quality-bench {
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .quality-title {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 18px;
+    }
+
+    .quality-rows { display: flex; flex-wrap: wrap; gap: 14px 40px; }
+
+    .quality-row { display: flex; align-items: baseline; gap: 12px; }
+
+    .quality-row .qval {
+      font-family: var(--mono);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      color: var(--orange);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .quality-row .qtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      max-width: 260px;
+    }
+
+    .quality-honest {
+      margin-top: 22px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border-left: 2px solid var(--orange);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .quality-honest strong { color: var(--text); font-weight: 600; }
+
+    /* ─────────────────────────────
+       ARCHITECTURE INTELLIGENCE
+    ───────────────────────────── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 36px;
+    }
+
+    .arch-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .arch-col:hover { border-color: rgba(249,115,22,0.3); }
+
+    .arch-col-title {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--orange);
+    }
+
+    .arch-col-line {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .arch-code {
+      margin-top: auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      overflow-wrap: anywhere;
+    }
+    .arch-code .risk { color: var(--orange); font-weight: 600; }
+
     .bench-cost {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -848,7 +946,7 @@
 
     .bento-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 40px;
     }
@@ -896,13 +994,17 @@
     }
     .bento-small:hover { border-color: rgba(249,115,22,0.3); }
 
-    /* v0.9.x headline features — 2×2 so their longer descriptions get the width */
-    .bento-pairs {
+    /* Middle tier: four medium cards spanning the grid */
+    .bento-quad {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
+    .bento-quad .bento-medium { padding: 22px 18px; gap: 10px; }
+    .bento-quad .bento-medium-title { font-size: 0.92rem; overflow-wrap: anywhere; }
+    .bento-quad .bento-medium-sub { font-size: 0.8rem; }
+    .bento-quad .bento-medium-sub code { color: var(--orange); font-family: var(--mono); font-size: 0.95em; }
 
     .bento-icon { color: var(--orange); flex-shrink: 0; line-height: 0; }
 
@@ -993,9 +1095,21 @@
     /* ─────────────────────────────
        RESPONSIVE
     ───────────────────────────── */
-    @media (max-width: 700px) {
+    /* Eight nav items overflow well before the 700px breakpoint — German labels
+       run past the language selector — so collapse the links to the menu earlier.
+       The mobile menu carries every link, so nothing becomes unreachable. */
+    @media (max-width: 960px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
+      /* .nav-links carried flex:1; without it the selector needs its own push.
+         The hamburger drops its own auto margin so both sit flush right. */
+      .lang-selector { margin-left: auto; }
+      .hamburger { margin-left: 0; }
+    }
+
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; margin-left: auto; }
       .lang-selector { display: none; }
 
       #hero { padding: 80px 0 72px; }
@@ -1025,11 +1139,15 @@
       .demo-status { flex-direction: column; align-items: flex-start; gap: 3px; }
       .demo-status .right { text-align: left; }
 
+      .arch-grid { grid-template-columns: 1fr; }
+      .quality-rows { gap: 14px 24px; }
+      .quality-row .qtext { max-width: none; }
+
       .bento-grid { grid-template-columns: 1fr; }
       .bento-hero { padding: 24px 20px; border-radius: 4px; }
       .bento-medium { padding: 24px 20px; border-radius: 4px; }
       .bento-smalls { grid-template-columns: repeat(2, 1fr); }
-      .bento-pairs { grid-template-columns: 1fr; }
+      .bento-quad { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -1050,6 +1168,7 @@
         <a href="#problem" data-i18n="nav.problem">Problem</a>
         <a href="#benchmark" data-i18n="nav.benchmark">Benchmark</a>
         <a href="#demo" data-i18n="nav.demo">Demo</a>
+        <a href="#architecture" data-i18n="nav.architecture">Architecture</a>
         <a href="#performance" data-i18n="nav.performance">Performance</a>
         <a href="#how" data-i18n="nav.how">How it works</a>
         <a href="#features" data-i18n="nav.features">Features</a>
@@ -1082,6 +1201,7 @@
     <a href="#problem" data-i18n="nav.problem" class="mobile-link">Problem</a>
     <a href="#benchmark" data-i18n="nav.benchmark" class="mobile-link">Benchmark</a>
     <a href="#demo" data-i18n="nav.demo" class="mobile-link">Demo</a>
+    <a href="#architecture" data-i18n="nav.architecture" class="mobile-link">Architecture</a>
     <a href="#performance" data-i18n="nav.performance" class="mobile-link">Performance</a>
     <a href="#how" data-i18n="nav.how" class="mobile-link">How it works</a>
     <a href="#features" data-i18n="nav.features" class="mobile-link">Features</a>
@@ -1104,7 +1224,7 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
-      <p class="hero-subtagline" data-i18n="hero.subtagline">16 languages supported · Works standalone or as a companion to graphify.</p>
+      <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="install-block">
@@ -1173,7 +1293,7 @@
       </table>
 
       <p class="install-note" data-i18n-html="install.note">Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.</p>
-      <p class="install-note" style="margin-top:10px;" data-i18n-html="install.explain.note">For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or point to a local Ollama instance. No LLM? Use <code>--no-llm</code> for structural analysis.</p>
+      <p class="install-note" style="margin-top:10px;" data-i18n-html="install.explain.note">For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, run Ollama locally, or use any OpenAI-compatible endpoint. No LLM? Use <code>--no-llm</code> for structural analysis.</p>
     </div>
   </section>
 
@@ -1277,6 +1397,21 @@
           <span class="desc" data-i18n="benchmark.stat.llm">extra LLM calls</span>
         </div>
       </div>
+
+      <div class="quality-bench">
+        <p class="quality-title" data-i18n="benchmark.quality.title">Quality benchmark</p>
+        <div class="quality-rows">
+          <div class="quality-row">
+            <span class="qval">5&times;</span>
+            <span class="qtext" data-i18n="benchmark.quality.pertoken">more quality per token than full-graph injection</span>
+          </div>
+          <div class="quality-row">
+            <span class="qval">46.7%</span>
+            <span class="qtext" data-i18n="benchmark.quality.winrate">win rate vs full-graph injection</span>
+          </div>
+        </div>
+        <p class="quality-honest" data-i18n-html="benchmark.quality.honest"><strong>Honest result:</strong> slurp excels at efficiency, not just token savings.</p>
+      </div>
     </div>
   </section>
 
@@ -1327,6 +1462,36 @@ slurp index .
           <span class="left">50 nodes shown · 4,000 token budget · 96% saved</span>
           <span class="right" data-i18n="demo.status.hint">Click any node to inspect · Drag to explore</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       ARCHITECTURE INTELLIGENCE
+  ══════════════════════════════ -->
+  <section id="architecture">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="arch.label">// architecture intelligence</p>
+      <h2 data-i18n="arch.h2">slurp understands your code, not just your files</h2>
+
+      <div class="arch-grid">
+
+        <div class="arch-col">
+          <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python and TypeScript/JS. Cross-file resolution.</p>
+          <div class="arch-code">recalcularPlayerStats()<br>&rarr; 4 callers detected<br><span class="risk">RISK: MEDIUM</span></div>
+        </div>
+
+        <div class="arch-col">
+          <p class="arch-col-title">slurp explain</p>
+          <p class="arch-col-line" data-i18n="arch.explain.line">Any node explained in natural language. Architecture, callers, blast radius.</p>
+        </div>
+
+        <div class="arch-col">
+          <p class="arch-col-title">slurp eval</p>
+          <p class="arch-col-line" data-i18n="arch.eval.line">Objective quality measurement. LLM judge compares responses with and without slurp context.</p>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1416,6 +1581,7 @@ slurp index .
 <span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span></div>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">Already indexed? Use <code>slurp index . --smart</code> to update only changed files.</span></p>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain2.note">Want to understand your codebase? <code>slurp explain "functionName"</code> explains any function in plain language.</span></p>
           </div>
         </div>
 
@@ -1442,7 +1608,6 @@ slurp index .
     }
   }
 }</div>
-            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain.note">Want to understand any part of your codebase? <code>slurp explain "functionName" --graph graph.json</code> explains it in plain language using your LLM.</span></p>
           </div>
         </div>
       </div>
@@ -1464,44 +1629,86 @@ slurp index .
 
       <div class="bento-grid">
 
-        <!-- Hero card: slurp index -->
+        <!-- Hero row: the two v0.9.5 headline commands -->
         <div class="bento-hero">
           <div class="bento-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <circle cx="5" cy="12" r="2"/>
-              <circle cx="19" cy="5" r="2"/>
-              <circle cx="19" cy="19" r="2"/>
-              <circle cx="13" cy="12" r="2"/>
-              <line x1="7" y1="12" x2="11" y2="12"/>
-              <line x1="15" y1="11" x2="17.3" y2="7"/>
-              <line x1="15" y1="13" x2="17.3" y2="17"/>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <line x1="8" y1="9" x2="16" y2="9"/>
+              <line x1="8" y1="13" x2="13" y2="13"/>
             </svg>
           </div>
-          <p class="bento-hero-title">slurp index</p>
-          <p class="bento-hero-sub" data-i18n="features.hero.sub">16 languages. Zero dependencies. No APIs. No cost.</p>
-          <p class="bento-langs">Python · TS/JS · Java · Rust · C# · Ruby · PHP · Kotlin · Scala · Swift · C · C++ · Go · Lua · Elixir · PS</p>
-          <div class="bento-code">
-            <span class="bc"># index your project locally</span><br>
-            slurp index .<br>
-            <span class="bc"># </span><span class="bo">1473 nodes · 1443 edges · 30 files</span>
-          </div>
+          <p class="bento-hero-title">slurp explain</p>
+          <p class="bento-hero-sub" data-i18n="features.explain.sub">LLM-powered architecture explanations. What any function does, who calls it, and the risk of changing it. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.</p>
         </div>
 
-        <!-- Medium card: MCP server -->
-        <div class="bento-medium">
+        <div class="bento-hero">
           <div class="bento-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22v-5"/>
-              <path d="M9 8V3"/>
-              <path d="M15 8V3"/>
-              <path d="M18 8H6a1 1 0 0 0-1 1v4a5 5 0 0 0 10 0V9a1 1 0 0 0-1-1z"/>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h4l2 12 3-15 2.5 9 1.5-4h5"/>
             </svg>
           </div>
-          <p class="bento-medium-title">MCP server</p>
-          <p class="bento-medium-sub" data-i18n="features.mcp.sub">Configure once. Claude Code handles the rest.</p>
+          <p class="bento-hero-title">slurp eval</p>
+          <p class="bento-hero-sub" data-i18n="features.eval.sub">Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.</p>
         </div>
 
-        <!-- Small cards row -->
+        <!-- Medium row -->
+        <div class="bento-quad">
+
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="3" x2="6" y2="15"/>
+                <circle cx="18" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/>
+                <path d="M18 9a9 9 0 0 1-9 9"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title">slurp index --smart</p>
+            <p class="bento-medium-sub" data-i18n="features.smart.line">Git-aware incremental re-indexing. 21× faster on changed files.</p>
+          </div>
+
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18h6"/>
+                <path d="M10 22h4"/>
+                <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title">slurp advisor</p>
+            <p class="bento-medium-sub" data-i18n="features.advisor.line">Recommends optimal token budget from your query history.</p>
+          </div>
+
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 2 9 5-9 5-9-5 9-5z"/>
+                <path d="m3 12 9 5 9-5"/>
+                <path d="m3 17 9 5 9-5"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title" data-i18n="features.federation.title">Multi-graph federation</p>
+            <p class="bento-medium-sub" data-i18n="features.federation.line">Query multiple codebases simultaneously.</p>
+          </div>
+
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="6" r="2.5"/>
+                <circle cx="18" cy="12" r="2.5"/>
+                <circle cx="6" cy="18" r="2.5"/>
+                <path d="M8.5 7.2 15.6 10.8"/>
+                <path d="M8.5 16.8 15.6 13.2"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title" data-i18n="features.callgraph.title">Call graph</p>
+            <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python and TypeScript/JS call edges. Cross-file resolution. Accurate risk analysis.</p>
+          </div>
+
+        </div>
+
+        <!-- Small row -->
         <div class="bento-smalls">
 
           <div class="bento-small">
@@ -1550,105 +1757,6 @@ slurp index .
             <p class="bento-small-line" data-i18n="features.inject.line">Attach source code to nodes</p>
           </div>
 
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M13 2 4 14h7l-1 8 9-12h-7z"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp init</p>
-            <p class="bento-small-line" data-i18n="features.init.line">One command setup. Detects your language, indexes, configures MCP.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <polyline points="12 7 12 12 15.5 14"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp session</p>
-            <p class="bento-small-line" data-i18n="features.session.line">See every query slurp processed in real time.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                <polyline points="17 21 17 13 7 13 7 21"/>
-                <polyline points="7 3 7 8 15 8"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">--viz-output PATH</p>
-            <p class="bento-small-line" data-i18n="features.vizoutput.line">Save the visualization HTML to share or review later.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M14.8 9.3a2.6 2.6 0 0 0-2.4-1.3c-1.5 0-2.6.8-2.6 2s1 1.7 2.6 2 2.6.8 2.6 2-1.1 2-2.6 2a2.6 2.6 0 0 1-2.4-1.3"/>
-                <line x1="12" y1="6" x2="12" y2="18"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp benchmark --price-model</p>
-            <p class="bento-small-line" data-i18n="features.pricemodel.line">Real USD cost, not just percentages — on queries now 8.1× faster.</p>
-          </div>
-
-        </div>
-
-        <!-- v0.9.x features -->
-        <div class="bento-pairs">
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="6" y1="3" x2="6" y2="15"/>
-                <circle cx="18" cy="6" r="3"/>
-                <circle cx="6" cy="18" r="3"/>
-                <path d="M18 9a9 9 0 0 1-9 9"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp index --smart</p>
-            <p class="bento-small-line" data-i18n="features.smart.line">Git-aware re-indexing. Only updates what changed. 21× faster.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18h6"/>
-                <path d="M10 22h4"/>
-                <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp advisor</p>
-            <p class="bento-small-line" data-i18n="features.advisor.line">Recommends the optimal token budget from your query history.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m12 2 9 5-9 5-9-5 9-5z"/>
-                <path d="m3 12 9 5 9-5"/>
-                <path d="m3 17 9 5 9-5"/>
-              </svg>
-            </div>
-            <p class="bento-small-title" data-i18n="features.federation.title">Multi-graph federation</p>
-            <p class="bento-small-line" data-i18n-html="features.federation.line">Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.</p>
-          </div>
-
-          <div class="bento-small">
-            <div class="bento-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                <line x1="8" y1="9" x2="16" y2="9"/>
-                <line x1="8" y1="13" x2="13" y2="13"/>
-              </svg>
-            </div>
-            <p class="bento-small-title">slurp explain</p>
-            <p class="bento-small-line" data-i18n="features.explain.line">LLM-powered explanations. What a node does, its architecture, and the risk of changing it. Works with any LLM provider.</p>
-          </div>
-
         </div>
       </div>
     </div>
@@ -1666,7 +1774,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.1</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.5</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1687,7 +1795,23 @@ slurp index .
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
-        'hero.subtagline': '16 languages supported · Works standalone or as a companion to graphify.',
+        'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.',
+        'benchmark.quality.title': 'Quality benchmark',
+        'benchmark.quality.pertoken': 'more quality per token than full-graph injection',
+        'benchmark.quality.winrate': 'win rate vs full-graph injection',
+        'benchmark.quality.honest': '<strong>Honest result:</strong> slurp excels at efficiency, not just token savings.',
+        'features.explain.sub': 'LLM-powered architecture explanations. What any function does, who calls it, and the risk of changing it. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
+        'features.eval.sub': 'Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.',
+        'features.callgraph.title': 'Call graph',
+        'features.callgraph.line': 'Python and TypeScript/JS call edges. Cross-file resolution. Accurate risk analysis.',
+        'arch.label': '// architecture intelligence',
+        'arch.h2': 'slurp understands your code, not just your files',
+        'arch.callgraph.title': 'Call graph',
+        'arch.callgraph.line': 'Python and TypeScript/JS. Cross-file resolution.',
+        'arch.explain.line': 'Any node explained in natural language. Architecture, callers, blast radius.',
+        'arch.eval.line': 'Objective quality measurement. LLM judge compares responses with and without slurp context.',
+        'how.explain2.note': 'Want to understand your codebase? <code>slurp explain \"functionName\"</code> explains any function in plain language.',
+        'nav.architecture': 'Architecture',
         'problem.label': '// the problem',
         'problem.h2': "Your LLM doesn't need the whole bowl",
         'problem.p1': "graphify maps your entire codebase into a knowledge graph. Great. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.",
@@ -1768,10 +1892,10 @@ slurp index .
         'features.session.line': 'See every query slurp processed in real time.',
         'features.vizoutput.line': 'Save the visualization HTML to share or review later.',
         'features.pricemodel.line': 'Real USD cost, not just percentages — on queries now 8.1× faster.',
-        'features.smart.line': 'Git-aware re-indexing. Only updates what changed. 21× faster.',
-        'features.advisor.line': 'Recommends the optimal token budget from your query history.',
+        'features.smart.line': 'Git-aware incremental re-indexing. 21× faster on changed files.',
+        'features.advisor.line': 'Recommends optimal token budget from your query history.',
         'features.federation.title': 'Multi-graph federation',
-        'features.federation.line': 'Query across multiple codebases simultaneously with <code>--graph g1 --graph g2</code>.',
+        'features.federation.line': 'Query multiple codebases simultaneously.',
         'features.explain.line': 'LLM-powered explanations. What a node does, its architecture, and the risk of changing it. Works with any LLM provider.',
         'how.explain.note': 'Want to understand any part of your codebase? <code>slurp explain "functionName" --graph graph.json</code> explains it in plain language using your LLM.',
         'install.explain.note': 'For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or point to a local Ollama instance. No LLM? Use <code>--no-llm</code> for structural analysis.',
@@ -1788,7 +1912,23 @@ slurp index .
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
-        'hero.subtagline': '16 lenguajes soportados · Funciona de forma autónoma o como complemento de graphify.',
+        'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona de forma autónoma o como complemento de graphify.',
+        'benchmark.quality.title': 'Benchmark de calidad',
+        'benchmark.quality.pertoken': 'más calidad por token que inyectar el grafo completo',
+        'benchmark.quality.winrate': 'de victorias frente al grafo completo',
+        'benchmark.quality.honest': '<strong>Resultado honesto:</strong> slurp destaca en eficiencia, no solo en ahorro de tokens.',
+        'features.explain.sub': 'Explicaciones de arquitectura con LLM. Qué hace cualquier función, quién la llama y el riesgo de cambiarla. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
+        'features.eval.sub': 'Benchmark de calidad con juez LLM. Mide si el contexto de slurp mejora la calidad de las respuestas frente a inyectar el grafo completo. 5× mejor calidad por token, demostrado.',
+        'features.callgraph.title': 'Grafo de llamadas',
+        'features.callgraph.line': 'Aristas de llamadas en Python y TypeScript/JS. Resolución entre archivos. Análisis de riesgo preciso.',
+        'arch.label': '// inteligencia de arquitectura',
+        'arch.h2': 'slurp entiende tu código, no solo tus archivos',
+        'arch.callgraph.title': 'Grafo de llamadas',
+        'arch.callgraph.line': 'Python y TypeScript/JS. Resolución entre archivos.',
+        'arch.explain.line': 'Cualquier nodo explicado en lenguaje natural. Arquitectura, llamadores, radio de impacto.',
+        'arch.eval.line': 'Medición objetiva de calidad. Un juez LLM compara las respuestas con y sin el contexto de slurp.',
+        'how.explain2.note': '¿Quieres entender tu codebase? <code>slurp explain \"functionName\"</code> explica cualquier función en lenguaje natural.',
+        'nav.architecture': 'Arquitectura',
         'problem.label': '// el problema',
         'problem.h2': 'Tu LLM no necesita el bol entero',
         'problem.p1': 'graphify mapea todo tu codebase en un grafo de conocimiento. Genial. Pero inyectar <em>cada nodo</em> en cada consulta es ineficiente — tu LLM gasta la mayor parte de su presupuesto de contexto en nodos que nunca usará.',
@@ -1869,10 +2009,10 @@ slurp index .
         'features.session.line': 'Mira en tiempo real cada query que slurp ha procesado.',
         'features.vizoutput.line': 'Guarda el HTML de la visualización para compartir o revisar después.',
         'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes — sobre queries ahora 8,1× más rápidas.',
-        'features.smart.line': 'Re-indexado consciente de git. Solo actualiza lo que cambió. 21× más rápido.',
+        'features.smart.line': 'Re-indexado incremental consciente de git. 21× más rápido en los archivos modificados.',
         'features.advisor.line': 'Recomienda el presupuesto de tokens óptimo a partir de tu historial de queries.',
         'features.federation.title': 'Federación multi-grafo',
-        'features.federation.line': 'Consulta varios codebases a la vez con <code>--graph g1 --graph g2</code>.',
+        'features.federation.line': 'Consulta varios codebases simultáneamente.',
         'features.explain.line': 'Explicaciones con LLM. Qué hace un nodo, su arquitectura y el riesgo de cambiarlo. Funciona con cualquier proveedor de LLM.',
         'how.explain.note': '¿Quieres entender cualquier parte de tu codebase? <code>slurp explain "functionName" --graph graph.json</code> te lo explica en lenguaje natural usando tu LLM.',
         'install.explain.note': 'Para <code>slurp explain</code>: define <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, o apunta a una instancia local de Ollama. ¿Sin LLM? Usa <code>--no-llm</code> para análisis estructural.',
@@ -1889,7 +2029,23 @@ slurp index .
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
-        'hero.subtagline': '16 linguaggi supportati · Funziona in autonomia o come complemento di graphify.',
+        'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona in autonomia o come complemento di graphify.',
+        'benchmark.quality.title': 'Benchmark di qualità',
+        'benchmark.quality.pertoken': 'più qualità per token rispetto al grafo completo',
+        'benchmark.quality.winrate': 'di vittorie rispetto al grafo completo',
+        'benchmark.quality.honest': '<strong>Risultato onesto:</strong> slurp eccelle in efficienza, non solo nel risparmio di token.',
+        'features.explain.sub': 'Spiegazioni di architettura con LLM. Cosa fa una funzione, chi la chiama e il rischio di modificarla. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
+        'features.eval.sub': 'Benchmark di qualità con giudice LLM. Misura se il contesto di slurp migliora la qualità delle risposte rispetto al grafo completo. 5× migliore qualità per token, dimostrato.',
+        'features.callgraph.title': 'Grafo delle chiamate',
+        'features.callgraph.line': 'Archi di chiamata in Python e TypeScript/JS. Risoluzione tra file. Analisi del rischio accurata.',
+        'arch.label': '// intelligenza architetturale',
+        'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
+        'arch.callgraph.title': 'Grafo delle chiamate',
+        'arch.callgraph.line': 'Python e TypeScript/JS. Risoluzione tra file.',
+        'arch.explain.line': 'Qualsiasi nodo spiegato in linguaggio naturale. Architettura, chiamanti, raggio d\'impatto.',
+        'arch.eval.line': 'Misurazione oggettiva della qualità. Un giudice LLM confronta le risposte con e senza il contesto di slurp.',
+        'how.explain2.note': 'Vuoi capire il tuo codebase? <code>slurp explain \"functionName\"</code> spiega qualsiasi funzione in linguaggio naturale.',
+        'nav.architecture': 'Architettura',
         'problem.label': '// il problema',
         'problem.h2': "Il tuo LLM non ha bisogno dell'intera ciotola",
         'problem.p1': "graphify mappa l'intero codebase in un knowledge graph. Ottimo. Ma iniettare <em>ogni nodo</em> in ogni query è dispendioso — il tuo LLM spende la maggior parte del suo budget di contesto su nodi che non userà mai.",
@@ -1970,10 +2126,10 @@ slurp index .
         'features.session.line': 'Vedi in tempo reale ogni query elaborata da slurp.',
         'features.vizoutput.line': 'Salva l\'HTML della visualizzazione per condividerlo o rivederlo.',
         'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali — su query ora 8,1× più veloci.',
-        'features.smart.line': 'Re-indicizzazione git-aware. Aggiorna solo ciò che è cambiato. 21× più veloce.',
+        'features.smart.line': 'Re-indicizzazione incrementale git-aware. 21× più veloce sui file modificati.',
         'features.advisor.line': 'Consiglia il budget di token ottimale dalla cronologia delle tue query.',
         'features.federation.title': 'Federazione multi-grafo',
-        'features.federation.line': 'Interroga più codebase contemporaneamente con <code>--graph g1 --graph g2</code>.',
+        'features.federation.line': 'Interroga più codebase simultaneamente.',
         'features.explain.line': 'Spiegazioni con LLM. Cosa fa un nodo, la sua architettura e il rischio di modificarlo. Funziona con qualsiasi provider LLM.',
         'how.explain.note': 'Vuoi capire una qualsiasi parte del tuo codebase? <code>slurp explain "functionName" --graph graph.json</code> te la spiega in linguaggio naturale usando il tuo LLM.',
         'install.explain.note': 'Per <code>slurp explain</code>: imposta <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oppure punta a un\'istanza locale di Ollama. Nessun LLM? Usa <code>--no-llm</code> per l\'analisi strutturale.',
@@ -1990,7 +2146,23 @@ slurp index .
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
-        'hero.subtagline': '16 langages pris en charge · Fonctionne de manière autonome ou en complément de graphify.',
+        'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne de manière autonome ou en complément de graphify.',
+        'benchmark.quality.title': 'Benchmark de qualité',
+        'benchmark.quality.pertoken': 'de qualité par token de plus qu\'en injectant le graphe entier',
+        'benchmark.quality.winrate': 'de victoires face au graphe entier',
+        'benchmark.quality.honest': '<strong>Résultat honnête :</strong> slurp excelle en efficacité, pas seulement en économie de tokens.',
+        'features.explain.sub': 'Explications d\'architecture par LLM. Ce que fait une fonction, qui l\'appelle et le risque de la modifier. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
+        'features.eval.sub': 'Benchmark de qualité avec juge LLM. Mesure si le contexte de slurp améliore la qualité des réponses face au graphe entier. 5× meilleure qualité par token, prouvé.',
+        'features.callgraph.title': 'Graphe d\'appels',
+        'features.callgraph.line': 'Arêtes d\'appel en Python et TypeScript/JS. Résolution inter-fichiers. Analyse de risque précise.',
+        'arch.label': '// intelligence d\'architecture',
+        'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
+        'arch.callgraph.title': 'Graphe d\'appels',
+        'arch.callgraph.line': 'Python et TypeScript/JS. Résolution inter-fichiers.',
+        'arch.explain.line': 'N\'importe quel nœud expliqué en langage naturel. Architecture, appelants, rayon d\'impact.',
+        'arch.eval.line': 'Mesure objective de la qualité. Un juge LLM compare les réponses avec et sans le contexte de slurp.',
+        'how.explain2.note': 'Envie de comprendre votre codebase ? <code>slurp explain \"functionName\"</code> explique n\'importe quelle fonction en langage naturel.',
+        'nav.architecture': 'Architecture',
         'problem.label': '// le problème',
         'problem.h2': "Votre LLM n'a pas besoin du bol entier",
         'problem.p1': "graphify cartographie l'intégralité de votre codebase en un graphe de connaissances. Parfait. Mais injecter <em>chaque nœud</em> dans chaque requête est inefficace — votre LLM dépense la majeure partie de son budget de contexte sur des nœuds qu'il n'utilisera jamais.",
@@ -2071,10 +2243,10 @@ slurp index .
         'features.session.line': 'Voir en temps réel chaque requête traitée par slurp.',
         'features.vizoutput.line': 'Enregistrer le HTML de la visualisation pour le partager ou le revoir.',
         'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages — sur des requêtes 8,1× plus rapides.',
-        'features.smart.line': 'Ré-indexation compatible git. Ne met à jour que ce qui a changé. 21× plus rapide.',
+        'features.smart.line': 'Ré-indexation incrémentale compatible git. 21× plus rapide sur les fichiers modifiés.',
         'features.advisor.line': 'Recommande le budget de tokens optimal à partir de votre historique de requêtes.',
         'features.federation.title': 'Fédération multi-graphe',
-        'features.federation.line': 'Interrogez plusieurs codebases simultanément avec <code>--graph g1 --graph g2</code>.',
+        'features.federation.line': 'Interrogez plusieurs codebases simultanément.',
         'features.explain.line': 'Explications par LLM. Ce que fait un nœud, son architecture et le risque de le modifier. Fonctionne avec n\'importe quel fournisseur LLM.',
         'how.explain.note': 'Envie de comprendre n\'importe quelle partie de votre codebase ? <code>slurp explain "functionName" --graph graph.json</code> vous l\'explique en langage naturel avec votre LLM.',
         'install.explain.note': 'Pour <code>slurp explain</code> : définissez <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, ou pointez vers une instance Ollama locale. Pas de LLM ? Utilisez <code>--no-llm</code> pour l\'analyse structurelle.',
@@ -2091,7 +2263,23 @@ slurp index .
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
-        'hero.subtagline': '16 Sprachen unterstützt · Funktioniert eigenständig oder als Ergänzung zu graphify.',
+        'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert eigenständig oder als Ergänzung zu graphify.',
+        'benchmark.quality.title': 'Qualitäts-Benchmark',
+        'benchmark.quality.pertoken': 'mehr Qualität pro Token als der komplette Graph',
+        'benchmark.quality.winrate': 'Gewinnrate gegenüber dem kompletten Graphen',
+        'benchmark.quality.honest': '<strong>Ehrliches Ergebnis:</strong> slurp glänzt bei der Effizienz, nicht nur beim Token-Sparen.',
+        'features.explain.sub': 'LLM-gestützte Architektur-Erklärungen. Was eine Funktion tut, wer sie aufruft und das Risiko einer Änderung. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
+        'features.eval.sub': 'Qualitäts-Benchmark mit LLM-Richter. Misst, ob slurp-Kontext die Antwortqualität gegenüber dem kompletten Graphen verbessert. 5× bessere Qualität pro Token, bewiesen.',
+        'features.callgraph.title': 'Aufrufgraph',
+        'features.callgraph.line': 'Aufrufkanten in Python und TypeScript/JS. Dateiübergreifende Auflösung. Präzise Risikoanalyse.',
+        'arch.label': '// architektur-intelligenz',
+        'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
+        'arch.callgraph.title': 'Aufrufgraph',
+        'arch.callgraph.line': 'Python und TypeScript/JS. Dateiübergreifende Auflösung.',
+        'arch.explain.line': 'Jeder Knoten in natürlicher Sprache erklärt. Architektur, Aufrufer, Wirkungsradius.',
+        'arch.eval.line': 'Objektive Qualitätsmessung. Ein LLM-Richter vergleicht Antworten mit und ohne slurp-Kontext.',
+        'how.explain2.note': 'Willst du deine Codebase verstehen? <code>slurp explain \"functionName\"</code> erklärt jede Funktion in normaler Sprache.',
+        'nav.architecture': 'Architektur',
         'problem.label': '// das Problem',
         'problem.h2': 'Dein LLM braucht nicht die ganze Schüssel',
         'problem.p1': "graphify bildet dein gesamtes Codebase in einem Wissensgraphen ab. Prima. Aber <em>jeden Knoten</em> in jede Anfrage zu injizieren ist verschwenderisch — dein LLM gibt den Großteil seines Kontextbudgets für Knoten aus, die es nie verwenden wird.",
@@ -2172,10 +2360,10 @@ slurp index .
         'features.session.line': 'Jede von slurp verarbeitete Query in Echtzeit sehen.',
         'features.vizoutput.line': 'Das Visualisierungs-HTML zum Teilen oder späteren Prüfen speichern.',
         'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte — bei jetzt 8,1× schnelleren Queries.',
-        'features.smart.line': 'Git-bewusstes Neuindizieren. Aktualisiert nur Geändertes. 21× schneller.',
+        'features.smart.line': 'Git-bewusstes inkrementelles Neuindizieren. 21× schneller bei geänderten Dateien.',
         'features.advisor.line': 'Empfiehlt das optimale Token-Budget aus deinem Query-Verlauf.',
         'features.federation.title': 'Multi-Graph-Föderation',
-        'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen mit <code>--graph g1 --graph g2</code>.',
+        'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen.',
         'features.explain.line': 'LLM-gestützte Erklärungen. Was ein Knoten tut, seine Architektur und das Risiko einer Änderung. Funktioniert mit jedem LLM-Anbieter.',
         'how.explain.note': 'Willst du einen beliebigen Teil deiner Codebase verstehen? <code>slurp explain "functionName" --graph graph.json</code> erklärt ihn in normaler Sprache mit deinem LLM.',
         'install.explain.note': 'Für <code>slurp explain</code>: setze <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oder verweise auf eine lokale Ollama-Instanz. Kein LLM? Nutze <code>--no-llm</code> für strukturelle Analyse.',
