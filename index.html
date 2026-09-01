@@ -1478,7 +1478,7 @@ slurp index .
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
-          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python and TypeScript/JS. Cross-file resolution.</p>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python, TypeScript/JS and Go call edges. Cross-file resolution for Python and TypeScript. Receiver methods, struct init and package-local resolution for Go.</p>
           <div class="arch-code">recalcularPlayerStats()<br>&rarr; 4 callers detected<br><span class="risk">RISK: MEDIUM</span></div>
         </div>
 
@@ -1703,7 +1703,7 @@ slurp index .
               </svg>
             </div>
             <p class="bento-medium-title" data-i18n="features.callgraph.title">Call graph</p>
-            <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python and TypeScript/JS call edges. Cross-file resolution. Accurate risk analysis.</p>
+            <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python, TypeScript/JS and Go call edges. Cross-file resolution. Accurate risk analysis.</p>
           </div>
 
         </div>
@@ -1774,7 +1774,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.5</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.6</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1803,11 +1803,11 @@ slurp index .
         'features.explain.sub': 'LLM-powered architecture explanations. What any function does, who calls it, and the risk of changing it. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
         'features.eval.sub': 'Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.',
         'features.callgraph.title': 'Call graph',
-        'features.callgraph.line': 'Python and TypeScript/JS call edges. Cross-file resolution. Accurate risk analysis.',
+        'features.callgraph.line': 'Python, TypeScript/JS and Go call edges. Cross-file resolution. Accurate risk analysis.',
         'arch.label': '// architecture intelligence',
         'arch.h2': 'slurp understands your code, not just your files',
         'arch.callgraph.title': 'Call graph',
-        'arch.callgraph.line': 'Python and TypeScript/JS. Cross-file resolution.',
+        'arch.callgraph.line': 'Python, TypeScript/JS and Go call edges. Cross-file resolution for Python and TypeScript. Receiver methods, struct init and package-local resolution for Go.',
         'arch.explain.line': 'Any node explained in natural language. Architecture, callers, blast radius.',
         'arch.eval.line': 'Objective quality measurement. LLM judge compares responses with and without slurp context.',
         'how.explain2.note': 'Want to understand your codebase? <code>slurp explain \"functionName\"</code> explains any function in plain language.',
@@ -1920,11 +1920,11 @@ slurp index .
         'features.explain.sub': 'Explicaciones de arquitectura con LLM. Qué hace cualquier función, quién la llama y el riesgo de cambiarla. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
         'features.eval.sub': 'Benchmark de calidad con juez LLM. Mide si el contexto de slurp mejora la calidad de las respuestas frente a inyectar el grafo completo. 5× mejor calidad por token, demostrado.',
         'features.callgraph.title': 'Grafo de llamadas',
-        'features.callgraph.line': 'Aristas de llamadas en Python y TypeScript/JS. Resolución entre archivos. Análisis de riesgo preciso.',
+        'features.callgraph.line': 'Aristas de llamadas en Python, TypeScript/JS y Go. Resolución entre archivos. Análisis de riesgo preciso.',
         'arch.label': '// inteligencia de arquitectura',
         'arch.h2': 'slurp entiende tu código, no solo tus archivos',
         'arch.callgraph.title': 'Grafo de llamadas',
-        'arch.callgraph.line': 'Python y TypeScript/JS. Resolución entre archivos.',
+        'arch.callgraph.line': 'Aristas de llamadas en Python, TypeScript/JS y Go. Resolución entre archivos para Python y TypeScript. Métodos con receptor, inicialización de structs y resolución dentro del paquete para Go.',
         'arch.explain.line': 'Cualquier nodo explicado en lenguaje natural. Arquitectura, llamadores, radio de impacto.',
         'arch.eval.line': 'Medición objetiva de calidad. Un juez LLM compara las respuestas con y sin el contexto de slurp.',
         'how.explain2.note': '¿Quieres entender tu codebase? <code>slurp explain \"functionName\"</code> explica cualquier función en lenguaje natural.',
@@ -2037,11 +2037,11 @@ slurp index .
         'features.explain.sub': 'Spiegazioni di architettura con LLM. Cosa fa una funzione, chi la chiama e il rischio di modificarla. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
         'features.eval.sub': 'Benchmark di qualità con giudice LLM. Misura se il contesto di slurp migliora la qualità delle risposte rispetto al grafo completo. 5× migliore qualità per token, dimostrato.',
         'features.callgraph.title': 'Grafo delle chiamate',
-        'features.callgraph.line': 'Archi di chiamata in Python e TypeScript/JS. Risoluzione tra file. Analisi del rischio accurata.',
+        'features.callgraph.line': 'Archi di chiamata in Python, TypeScript/JS e Go. Risoluzione tra file. Analisi del rischio accurata.',
         'arch.label': '// intelligenza architetturale',
         'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
         'arch.callgraph.title': 'Grafo delle chiamate',
-        'arch.callgraph.line': 'Python e TypeScript/JS. Risoluzione tra file.',
+        'arch.callgraph.line': 'Archi di chiamata in Python, TypeScript/JS e Go. Risoluzione tra file per Python e TypeScript. Metodi con receiver, inizializzazione di struct e risoluzione a livello di package per Go.',
         'arch.explain.line': 'Qualsiasi nodo spiegato in linguaggio naturale. Architettura, chiamanti, raggio d\'impatto.',
         'arch.eval.line': 'Misurazione oggettiva della qualità. Un giudice LLM confronta le risposte con e senza il contesto di slurp.',
         'how.explain2.note': 'Vuoi capire il tuo codebase? <code>slurp explain \"functionName\"</code> spiega qualsiasi funzione in linguaggio naturale.',
@@ -2154,11 +2154,11 @@ slurp index .
         'features.explain.sub': 'Explications d\'architecture par LLM. Ce que fait une fonction, qui l\'appelle et le risque de la modifier. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
         'features.eval.sub': 'Benchmark de qualité avec juge LLM. Mesure si le contexte de slurp améliore la qualité des réponses face au graphe entier. 5× meilleure qualité par token, prouvé.',
         'features.callgraph.title': 'Graphe d\'appels',
-        'features.callgraph.line': 'Arêtes d\'appel en Python et TypeScript/JS. Résolution inter-fichiers. Analyse de risque précise.',
+        'features.callgraph.line': 'Arêtes d\'appel en Python, TypeScript/JS et Go. Résolution inter-fichiers. Analyse de risque précise.',
         'arch.label': '// intelligence d\'architecture',
         'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
         'arch.callgraph.title': 'Graphe d\'appels',
-        'arch.callgraph.line': 'Python et TypeScript/JS. Résolution inter-fichiers.',
+        'arch.callgraph.line': 'Arêtes d\'appel en Python, TypeScript/JS et Go. Résolution inter-fichiers pour Python et TypeScript. Méthodes à récepteur, initialisation de structs et résolution au sein du package pour Go.',
         'arch.explain.line': 'N\'importe quel nœud expliqué en langage naturel. Architecture, appelants, rayon d\'impact.',
         'arch.eval.line': 'Mesure objective de la qualité. Un juge LLM compare les réponses avec et sans le contexte de slurp.',
         'how.explain2.note': 'Envie de comprendre votre codebase ? <code>slurp explain \"functionName\"</code> explique n\'importe quelle fonction en langage naturel.',
@@ -2271,11 +2271,11 @@ slurp index .
         'features.explain.sub': 'LLM-gestützte Architektur-Erklärungen. Was eine Funktion tut, wer sie aufruft und das Risiko einer Änderung. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
         'features.eval.sub': 'Qualitäts-Benchmark mit LLM-Richter. Misst, ob slurp-Kontext die Antwortqualität gegenüber dem kompletten Graphen verbessert. 5× bessere Qualität pro Token, bewiesen.',
         'features.callgraph.title': 'Aufrufgraph',
-        'features.callgraph.line': 'Aufrufkanten in Python und TypeScript/JS. Dateiübergreifende Auflösung. Präzise Risikoanalyse.',
+        'features.callgraph.line': 'Aufrufkanten in Python, TypeScript/JS und Go. Dateiübergreifende Auflösung. Präzise Risikoanalyse.',
         'arch.label': '// architektur-intelligenz',
         'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
         'arch.callgraph.title': 'Aufrufgraph',
-        'arch.callgraph.line': 'Python und TypeScript/JS. Dateiübergreifende Auflösung.',
+        'arch.callgraph.line': 'Aufrufkanten in Python, TypeScript/JS und Go. Dateiübergreifende Auflösung für Python und TypeScript. Receiver-Methoden, Struct-Initialisierung und paketlokale Auflösung für Go.',
         'arch.explain.line': 'Jeder Knoten in natürlicher Sprache erklärt. Architektur, Aufrufer, Wirkungsradius.',
         'arch.eval.line': 'Objektive Qualitätsmessung. Ein LLM-Richter vergleicht Antworten mit und ohne slurp-Kontext.',
         'how.explain2.note': 'Willst du deine Codebase verstehen? <code>slurp explain \"functionName\"</code> erklärt jede Funktion in normaler Sprache.',
