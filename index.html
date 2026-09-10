@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -312,9 +313,10 @@
     }
 
     .hero-title {
-      font-family: var(--mono);
+      /* Zen Dots is display-only: scoped to this h1, nothing else on the page. */
+      font-family: 'Zen Dots', cursive;
       font-size: clamp(2.8rem, 8vw, 4.5rem);
-      font-weight: 500;
+      font-weight: 400;
       letter-spacing: -0.02em;
       color: var(--text);
       margin-bottom: 20px;
@@ -1304,7 +1306,7 @@
     <div class="container hero-content">
       <h1 class="hero-title">slurp</h1>
       <p class="hero-tagline" data-i18n-html="hero.tagline">
-        graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
+        Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
       <p><span class="hero-badge" data-i18n="hero.badge">v1.0.0 — Production release</span></p>
       <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.</p>
@@ -1911,7 +1913,7 @@ slurp index .
         'nav.performance': 'Performance',
         'nav.how': 'How it works',
         'nav.features': 'Features',
-        'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
+        'hero.tagline': 'Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.',
         'hero.badge': 'v1.0.0 — Production release',
         'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> call edges · createAdminClient: <strong>0 &rarr; 97</strong> callers',
@@ -2039,7 +2041,7 @@ slurp index .
         'nav.performance': 'Rendimiento',
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
-        'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
+        'hero.tagline': 'Tu codebase es el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona de forma autónoma o como complemento de graphify.',
         'hero.badge': 'v1.0.0 — Versión de producción',
         'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> aristas de llamadas · createAdminClient: <strong>0 &rarr; 97</strong> llamadores',
@@ -2167,7 +2169,7 @@ slurp index .
         'nav.performance': 'Prestazioni',
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
-        'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
+        'hero.tagline': 'Il tuo codebase è la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona in autonomia o come complemento di graphify.',
         'hero.badge': 'v1.0.0 — Release di produzione',
         'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> archi di chiamata · createAdminClient: <strong>0 &rarr; 97</strong> chiamanti',
@@ -2295,7 +2297,7 @@ slurp index .
         'nav.performance': 'Performances',
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
-        'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
+        'hero.tagline': 'Votre codebase est le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne de manière autonome ou en complément de graphify.',
         'hero.badge': 'v1.0.0 — Version de production',
         'benchmark.quality.edges': 'PrismaStats : <strong>193 &rarr; 488</strong> arêtes d\'appel · createAdminClient : <strong>0 &rarr; 97</strong> appelants',
@@ -2423,7 +2425,7 @@ slurp index .
         'nav.performance': 'Performance',
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
-        'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
+        'hero.tagline': 'Deine Codebase ist die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert eigenständig oder als Ergänzung zu graphify.',
         'hero.badge': 'v1.0.0 — Produktions-Release',
         'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> Aufrufkanten · createAdminClient: <strong>0 &rarr; 97</strong> Aufrufer',
