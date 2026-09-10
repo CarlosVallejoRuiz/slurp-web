@@ -594,6 +594,77 @@
     }
     .quality-honest strong { color: var(--text); font-weight: 600; }
 
+    /* Hero milestone badge */
+    .hero-badge {
+      display: inline-block;
+      margin: 4px 0 14px;
+      padding: 4px 12px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--orange);
+      background: var(--orange-dim);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 999px;
+    }
+
+    /* Optional step 0 — visually softer than the numbered steps */
+    .step.step-optional .step-num {
+      color: var(--text-dim);
+      border-color: var(--border);
+      background: var(--bg-card);
+    }
+    .step-optional-tag {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      margin-left: 8px;
+    }
+
+    /* ─────────────────────────────
+       1.0.0 MILESTONE
+    ───────────────────────────── */
+    .milestone-h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .milestone-p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 640px;
+    }
+    .milestone-p code { color: var(--orange); font-family: var(--mono); font-size: 0.92em; }
+
+    .milestone-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 64px;
+      margin-top: 40px;
+    }
+
+    .milestone-stat .val {
+      font-family: var(--mono);
+      font-size: clamp(2.2rem, 7vw, 3.4rem);
+      font-weight: 700;
+      color: var(--orange);
+      display: block;
+      line-height: 1;
+    }
+
+    .milestone-stat .desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: block;
+      font-family: var(--mono);
+    }
+
     .quality-callgraph {
       margin-top: 14px;
       font-family: var(--mono);
@@ -1150,6 +1221,7 @@
       .demo-status .right { text-align: left; }
 
       .arch-grid { grid-template-columns: 1fr; }
+      .milestone-stats { gap: 20px 32px; }
       .quality-rows { gap: 14px 24px; }
       .quality-row .qtext { max-width: none; }
 
@@ -1234,6 +1306,7 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
+      <p><span class="hero-badge" data-i18n="hero.badge">v1.0.0 — Production release</span></p>
       <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
@@ -1417,11 +1490,12 @@
           </div>
           <div class="quality-row">
             <span class="qval">46.7%</span>
-            <span class="qtext" data-i18n="benchmark.quality.winrate">win rate vs full-graph injection</span>
+            <span class="qtext" data-i18n="benchmark.quality.winrate">win rate vs full-graph baseline</span>
           </div>
         </div>
         <p class="quality-honest" data-i18n-html="benchmark.quality.honest"><strong>Honest result:</strong> slurp excels at efficiency, not just token savings.</p>
-        <p class="quality-callgraph" data-i18n-html="benchmark.quality.callgraph">Call graph: 5 languages with cross-file resolution. PrismaStats: <strong>193 &rarr; 488</strong> call edges after TypeScript cross-file.</p>
+        <p class="quality-callgraph" data-i18n="benchmark.quality.callgraph">Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution</p>
+        <p class="quality-callgraph" style="margin-top:6px;" data-i18n-html="benchmark.quality.edges">PrismaStats: <strong>193 &rarr; 488</strong> call edges · createAdminClient: <strong>0 &rarr; 97</strong> callers</p>
       </div>
     </div>
   </section>
@@ -1489,18 +1563,18 @@ slurp index .
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
-          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python, TypeScript/JS, Go, Java and Rust call edges. Cross-file resolution for all five languages. createAdminClient went from 0 to 97 callers.</p>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. 2,132 tests.</p>
           <div class="arch-code">recalcularPlayerStats()<br>&rarr; 4 callers detected<br><span class="risk">RISK: MEDIUM</span></div>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp explain</p>
-          <p class="arch-col-line" data-i18n="arch.explain.line">Any node explained in natural language. Architecture, callers, blast radius.</p>
+          <p class="arch-col-line" data-i18n="arch.explain.line">Any node explained in natural language. Callers, callees, blast radius. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.</p>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp eval</p>
-          <p class="arch-col-line" data-i18n="arch.eval.line">Objective quality measurement. LLM judge compares responses with and without slurp context.</p>
+          <p class="arch-col-line" data-i18n="arch.eval.line">Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.</p>
         </div>
 
       </div>
@@ -1572,6 +1646,16 @@ slurp index .
       <h2 data-i18n="how.h2">Three steps to zero wasted tokens</h2>
 
       <div class="steps">
+        <div class="step step-optional">
+          <div class="step-num">0</div>
+          <div class="step-body">
+            <h3><span data-i18n="how.step0.h3">New to slurp?</span><span class="step-optional-tag" data-i18n="how.step0.tag">optional</span></h3>
+            <p data-i18n-html="how.step0.p">Run <code>slurp init</code> — detects your language, indexes your codebase, and configures the MCP server in one step.</p>
+            <div class="code-block"><span class="c"># guided one-command setup</span>
+slurp init</div>
+          </div>
+        </div>
+
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
@@ -1714,7 +1798,7 @@ slurp index .
               </svg>
             </div>
             <p class="bento-medium-title" data-i18n="features.callgraph.title">Call graph</p>
-            <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. Accurate blast radius analysis.</p>
+            <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five languages. Accurate blast radius analysis.</p>
           </div>
 
         </div>
@@ -1774,6 +1858,28 @@ slurp index .
   </section>
 
   <!-- ══════════════════════════════
+       1.0.0 MILESTONE
+  ══════════════════════════════ -->
+  <section id="milestone">
+    <div class="container reveal">
+      <p class="section-label" data-i18n="v1.label">// 1.0.0</p>
+      <h2 class="milestone-h2" data-i18n="v1.h2">Production ready.</h2>
+      <p class="milestone-p" data-i18n-html="v1.p">slurp 1.0.0 ships with a complete call graph for Python, TypeScript/JS, Go, Java and Rust — with cross-file resolution for all five. <code>slurp explain</code> and <code>slurp diff</code> now tell the truth about your codebase.</p>
+
+      <div class="milestone-stats">
+        <div class="milestone-stat">
+          <span class="val">2,132</span>
+          <span class="desc" data-i18n="v1.stat.tests">tests</span>
+        </div>
+        <div class="milestone-stat">
+          <span class="val">5</span>
+          <span class="desc" data-i18n="v1.stat.langs">languages</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
        FOOTER
   ══════════════════════════════ -->
   <footer>
@@ -1785,7 +1891,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v0.9.9</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.0.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1807,21 +1913,31 @@ slurp index .
         'nav.features': 'Features',
         'hero.tagline': 'graphify builds the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works standalone or as a companion to graphify.',
+        'hero.badge': 'v1.0.0 — Production release',
+        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> call edges · createAdminClient: <strong>0 &rarr; 97</strong> callers',
+        'how.step0.h3': 'New to slurp?',
+        'how.step0.tag': 'optional',
+        'how.step0.p': 'Run <code>slurp init</code> — detects your language, indexes your codebase, and configures the MCP server in one step.',
+        'v1.label': '// 1.0.0',
+        'v1.h2': 'Production ready.',
+        'v1.p': 'slurp 1.0.0 ships with a complete call graph for Python, TypeScript/JS, Go, Java and Rust — with cross-file resolution for all five. <code>slurp explain</code> and <code>slurp diff</code> now tell the truth about your codebase.',
+        'v1.stat.tests': 'tests',
+        'v1.stat.langs': 'languages',
         'benchmark.quality.title': 'Quality benchmark',
         'benchmark.quality.pertoken': 'more quality per token than full-graph injection',
-        'benchmark.quality.winrate': 'win rate vs full-graph injection',
+        'benchmark.quality.winrate': 'win rate vs full-graph baseline',
         'benchmark.quality.honest': '<strong>Honest result:</strong> slurp excels at efficiency, not just token savings.',
-        'benchmark.quality.callgraph': 'Call graph: 5 languages with cross-file resolution. PrismaStats: <strong>193 &rarr; 488</strong> call edges after TypeScript cross-file.',
+        'benchmark.quality.callgraph': 'Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution',
         'features.explain.sub': 'LLM-powered architecture explanations. What any function does, who calls it, and the risk of changing it. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
         'features.eval.sub': 'Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.',
         'features.callgraph.title': 'Call graph',
-        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. Accurate blast radius analysis.',
+        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five languages. Accurate blast radius analysis.',
         'arch.label': '// architecture intelligence',
         'arch.h2': 'slurp understands your code, not just your files',
         'arch.callgraph.title': 'Call graph',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust call edges. Cross-file resolution for all five languages. createAdminClient went from 0 to 97 callers.',
-        'arch.explain.line': 'Any node explained in natural language. Architecture, callers, blast radius.',
-        'arch.eval.line': 'Objective quality measurement. LLM judge compares responses with and without slurp context.',
+        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. 2,132 tests.',
+        'arch.explain.line': 'Any node explained in natural language. Callers, callees, blast radius. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
+        'arch.eval.line': 'Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.',
         'how.explain2.note': 'Want to understand your codebase? <code>slurp explain \"functionName\"</code> explains any function in plain language.',
         'nav.architecture': 'Architecture',
         'problem.label': '// the problem',
@@ -1925,21 +2041,31 @@ slurp index .
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'graphify construye el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona de forma autónoma o como complemento de graphify.',
+        'hero.badge': 'v1.0.0 — Versión de producción',
+        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> aristas de llamadas · createAdminClient: <strong>0 &rarr; 97</strong> llamadores',
+        'how.step0.h3': '¿Nuevo en slurp?',
+        'how.step0.tag': 'opcional',
+        'how.step0.p': 'Ejecuta <code>slurp init</code> — detecta tu lenguaje, indexa tu codebase y configura el servidor MCP en un solo paso.',
+        'v1.label': '// 1.0.0',
+        'v1.h2': 'Listo para producción.',
+        'v1.p': 'slurp 1.0.0 llega con un grafo de llamadas completo para Python, TypeScript/JS, Go, Java y Rust — con resolución entre archivos para los cinco. <code>slurp explain</code> y <code>slurp diff</code> ahora dicen la verdad sobre tu codebase.',
+        'v1.stat.tests': 'tests',
+        'v1.stat.langs': 'lenguajes',
         'benchmark.quality.title': 'Benchmark de calidad',
         'benchmark.quality.pertoken': 'más calidad por token que inyectar el grafo completo',
-        'benchmark.quality.winrate': 'de victorias frente al grafo completo',
+        'benchmark.quality.winrate': 'de victorias frente al baseline del grafo completo',
         'benchmark.quality.honest': '<strong>Resultado honesto:</strong> slurp destaca en eficiencia, no solo en ahorro de tokens.',
-        'benchmark.quality.callgraph': 'Grafo de llamadas: 5 lenguajes con resolución entre archivos. PrismaStats: <strong>193 &rarr; 488</strong> aristas de llamadas tras el paso cross-file de TypeScript.',
+        'benchmark.quality.callgraph': 'Grafo de llamadas: Python, TypeScript/JS, Go, Java y Rust con resolución entre archivos',
         'features.explain.sub': 'Explicaciones de arquitectura con LLM. Qué hace cualquier función, quién la llama y el riesgo de cambiarla. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
         'features.eval.sub': 'Benchmark de calidad con juez LLM. Mide si el contexto de slurp mejora la calidad de las respuestas frente a inyectar el grafo completo. 5× mejor calidad por token, demostrado.',
         'features.callgraph.title': 'Grafo de llamadas',
-        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco. Análisis preciso del radio de impacto.',
+        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco lenguajes. Análisis preciso del radio de impacto.',
         'arch.label': '// inteligencia de arquitectura',
         'arch.h2': 'slurp entiende tu código, no solo tus archivos',
         'arch.callgraph.title': 'Grafo de llamadas',
-        'arch.callgraph.line': 'Aristas de llamadas en Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco lenguajes. createAdminClient pasó de 0 a 97 llamadores.',
-        'arch.explain.line': 'Cualquier nodo explicado en lenguaje natural. Arquitectura, llamadores, radio de impacto.',
-        'arch.eval.line': 'Medición objetiva de calidad. Un juez LLM compara las respuestas con y sin el contexto de slurp.',
+        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco. 2.132 tests.',
+        'arch.explain.line': 'Cualquier nodo explicado en lenguaje natural. Llamadores, llamados, radio de impacto. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
+        'arch.eval.line': 'Benchmark de calidad objetivo con juez LLM. 5× mejor calidad por token, demostrado en proyectos reales.',
         'how.explain2.note': '¿Quieres entender tu codebase? <code>slurp explain \"functionName\"</code> explica cualquier función en lenguaje natural.',
         'nav.architecture': 'Arquitectura',
         'problem.label': '// el problema',
@@ -2043,21 +2169,31 @@ slurp index .
         'nav.features': 'Funzionalità',
         'hero.tagline': 'graphify costruisce la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona in autonomia o come complemento di graphify.',
+        'hero.badge': 'v1.0.0 — Release di produzione',
+        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> archi di chiamata · createAdminClient: <strong>0 &rarr; 97</strong> chiamanti',
+        'how.step0.h3': 'Nuovo su slurp?',
+        'how.step0.tag': 'opzionale',
+        'how.step0.p': 'Esegui <code>slurp init</code> — rileva il linguaggio, indicizza il codebase e configura il server MCP in un solo passaggio.',
+        'v1.label': '// 1.0.0',
+        'v1.h2': 'Pronto per la produzione.',
+        'v1.p': 'slurp 1.0.0 arriva con un grafo delle chiamate completo per Python, TypeScript/JS, Go, Java e Rust — con risoluzione tra file per tutti e cinque. <code>slurp explain</code> e <code>slurp diff</code> ora dicono la verità sul tuo codebase.',
+        'v1.stat.tests': 'test',
+        'v1.stat.langs': 'linguaggi',
         'benchmark.quality.title': 'Benchmark di qualità',
         'benchmark.quality.pertoken': 'più qualità per token rispetto al grafo completo',
-        'benchmark.quality.winrate': 'di vittorie rispetto al grafo completo',
+        'benchmark.quality.winrate': 'di vittorie rispetto al baseline del grafo completo',
         'benchmark.quality.honest': '<strong>Risultato onesto:</strong> slurp eccelle in efficienza, non solo nel risparmio di token.',
-        'benchmark.quality.callgraph': 'Grafo delle chiamate: 5 linguaggi con risoluzione tra file. PrismaStats: <strong>193 &rarr; 488</strong> archi di chiamata dopo il passaggio cross-file di TypeScript.',
+        'benchmark.quality.callgraph': 'Grafo delle chiamate: Python, TypeScript/JS, Go, Java e Rust con risoluzione tra file',
         'features.explain.sub': 'Spiegazioni di architettura con LLM. Cosa fa una funzione, chi la chiama e il rischio di modificarla. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
         'features.eval.sub': 'Benchmark di qualità con giudice LLM. Misura se il contesto di slurp migliora la qualità delle risposte rispetto al grafo completo. 5× migliore qualità per token, dimostrato.',
         'features.callgraph.title': 'Grafo delle chiamate',
-        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque. Analisi accurata del raggio d\'impatto.',
+        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque i linguaggi. Analisi accurata del raggio d\'impatto.',
         'arch.label': '// intelligenza architetturale',
         'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
         'arch.callgraph.title': 'Grafo delle chiamate',
-        'arch.callgraph.line': 'Archi di chiamata in Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque i linguaggi. createAdminClient è passato da 0 a 97 chiamanti.',
-        'arch.explain.line': 'Qualsiasi nodo spiegato in linguaggio naturale. Architettura, chiamanti, raggio d\'impatto.',
-        'arch.eval.line': 'Misurazione oggettiva della qualità. Un giudice LLM confronta le risposte con e senza il contesto di slurp.',
+        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque. 2.132 test.',
+        'arch.explain.line': 'Qualsiasi nodo spiegato in linguaggio naturale. Chiamanti, chiamati, raggio d\'impatto. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
+        'arch.eval.line': 'Benchmark di qualità oggettivo con giudice LLM. 5× migliore qualità per token, dimostrato su progetti reali.',
         'how.explain2.note': 'Vuoi capire il tuo codebase? <code>slurp explain \"functionName\"</code> spiega qualsiasi funzione in linguaggio naturale.',
         'nav.architecture': 'Architettura',
         'problem.label': '// il problema',
@@ -2161,21 +2297,31 @@ slurp index .
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'graphify construit le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne de manière autonome ou en complément de graphify.',
+        'hero.badge': 'v1.0.0 — Version de production',
+        'benchmark.quality.edges': 'PrismaStats : <strong>193 &rarr; 488</strong> arêtes d\'appel · createAdminClient : <strong>0 &rarr; 97</strong> appelants',
+        'how.step0.h3': 'Nouveau sur slurp ?',
+        'how.step0.tag': 'optionnel',
+        'how.step0.p': 'Lancez <code>slurp init</code> — détecte votre langage, indexe votre codebase et configure le serveur MCP en une seule étape.',
+        'v1.label': '// 1.0.0',
+        'v1.h2': 'Prêt pour la production.',
+        'v1.p': 'slurp 1.0.0 arrive avec un graphe d\'appels complet pour Python, TypeScript/JS, Go, Java et Rust — avec résolution inter-fichiers pour les cinq. <code>slurp explain</code> et <code>slurp diff</code> disent enfin la vérité sur votre codebase.',
+        'v1.stat.tests': 'tests',
+        'v1.stat.langs': 'langages',
         'benchmark.quality.title': 'Benchmark de qualité',
         'benchmark.quality.pertoken': 'de qualité par token de plus qu\'en injectant le graphe entier',
-        'benchmark.quality.winrate': 'de victoires face au graphe entier',
+        'benchmark.quality.winrate': 'de victoires face au baseline du graphe entier',
         'benchmark.quality.honest': '<strong>Résultat honnête :</strong> slurp excelle en efficacité, pas seulement en économie de tokens.',
-        'benchmark.quality.callgraph': 'Graphe d\'appels : 5 langages avec résolution inter-fichiers. PrismaStats : <strong>193 &rarr; 488</strong> arêtes d\'appel après la passe inter-fichiers TypeScript.',
+        'benchmark.quality.callgraph': 'Graphe d\'appels : Python, TypeScript/JS, Go, Java et Rust avec résolution inter-fichiers',
         'features.explain.sub': 'Explications d\'architecture par LLM. Ce que fait une fonction, qui l\'appelle et le risque de la modifier. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
         'features.eval.sub': 'Benchmark de qualité avec juge LLM. Mesure si le contexte de slurp améliore la qualité des réponses face au graphe entier. 5× meilleure qualité par token, prouvé.',
         'features.callgraph.title': 'Graphe d\'appels',
-        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq. Analyse précise du rayon d\'impact.',
+        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq langages. Analyse précise du rayon d\'impact.',
         'arch.label': '// intelligence d\'architecture',
         'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
         'arch.callgraph.title': 'Graphe d\'appels',
-        'arch.callgraph.line': 'Arêtes d\'appel en Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq langages. createAdminClient est passé de 0 à 97 appelants.',
-        'arch.explain.line': 'N\'importe quel nœud expliqué en langage naturel. Architecture, appelants, rayon d\'impact.',
-        'arch.eval.line': 'Mesure objective de la qualité. Un juge LLM compare les réponses avec et sans le contexte de slurp.',
+        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq. 2 132 tests.',
+        'arch.explain.line': 'N\'importe quel nœud expliqué en langage naturel. Appelants, appelés, rayon d\'impact. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
+        'arch.eval.line': 'Benchmark de qualité objectif avec juge LLM. 5× meilleure qualité par token, prouvé sur des projets réels.',
         'how.explain2.note': 'Envie de comprendre votre codebase ? <code>slurp explain \"functionName\"</code> explique n\'importe quelle fonction en langage naturel.',
         'nav.architecture': 'Architecture',
         'problem.label': '// le problème',
@@ -2279,21 +2425,31 @@ slurp index .
         'nav.features': 'Funktionen',
         'hero.tagline': 'graphify baut die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
         'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert eigenständig oder als Ergänzung zu graphify.',
+        'hero.badge': 'v1.0.0 — Produktions-Release',
+        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> Aufrufkanten · createAdminClient: <strong>0 &rarr; 97</strong> Aufrufer',
+        'how.step0.h3': 'Neu bei slurp?',
+        'how.step0.tag': 'optional',
+        'how.step0.p': 'Führe <code>slurp init</code> aus — erkennt deine Sprache, indiziert deine Codebase und konfiguriert den MCP-Server in einem Schritt.',
+        'v1.label': '// 1.0.0',
+        'v1.h2': 'Produktionsreif.',
+        'v1.p': 'slurp 1.0.0 kommt mit einem vollständigen Aufrufgraphen für Python, TypeScript/JS, Go, Java und Rust — mit dateiübergreifender Auflösung für alle fünf. <code>slurp explain</code> und <code>slurp diff</code> sagen jetzt die Wahrheit über deine Codebase.',
+        'v1.stat.tests': 'Tests',
+        'v1.stat.langs': 'Sprachen',
         'benchmark.quality.title': 'Qualitäts-Benchmark',
         'benchmark.quality.pertoken': 'mehr Qualität pro Token als der komplette Graph',
-        'benchmark.quality.winrate': 'Gewinnrate gegenüber dem kompletten Graphen',
+        'benchmark.quality.winrate': 'Gewinnrate gegenüber dem Full-Graph-Baseline',
         'benchmark.quality.honest': '<strong>Ehrliches Ergebnis:</strong> slurp glänzt bei der Effizienz, nicht nur beim Token-Sparen.',
-        'benchmark.quality.callgraph': 'Aufrufgraph: 5 Sprachen mit dateiübergreifender Auflösung. PrismaStats: <strong>193 &rarr; 488</strong> Aufrufkanten nach dem TypeScript-Cross-File-Durchlauf.',
+        'benchmark.quality.callgraph': 'Aufrufgraph: Python, TypeScript/JS, Go, Java und Rust mit dateiübergreifender Auflösung',
         'features.explain.sub': 'LLM-gestützte Architektur-Erklärungen. Was eine Funktion tut, wer sie aufruft und das Risiko einer Änderung. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
         'features.eval.sub': 'Qualitäts-Benchmark mit LLM-Richter. Misst, ob slurp-Kontext die Antwortqualität gegenüber dem kompletten Graphen verbessert. 5× bessere Qualität pro Token, bewiesen.',
         'features.callgraph.title': 'Aufrufgraph',
-        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf. Präzise Analyse des Wirkungsradius.',
+        'features.callgraph.line': 'Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf Sprachen. Präzise Analyse des Wirkungsradius.',
         'arch.label': '// architektur-intelligenz',
         'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
         'arch.callgraph.title': 'Aufrufgraph',
-        'arch.callgraph.line': 'Aufrufkanten in Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf Sprachen. createAdminClient ging von 0 auf 97 Aufrufer.',
-        'arch.explain.line': 'Jeder Knoten in natürlicher Sprache erklärt. Architektur, Aufrufer, Wirkungsradius.',
-        'arch.eval.line': 'Objektive Qualitätsmessung. Ein LLM-Richter vergleicht Antworten mit und ohne slurp-Kontext.',
+        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf. 2.132 Tests.',
+        'arch.explain.line': 'Jeder Knoten in natürlicher Sprache erklärt. Aufrufer, Aufgerufene, Wirkungsradius. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
+        'arch.eval.line': 'Objektiver Qualitäts-Benchmark mit LLM-Richter. 5× bessere Qualität pro Token, an echten Projekten bewiesen.',
         'how.explain2.note': 'Willst du deine Codebase verstehen? <code>slurp explain \"functionName\"</code> erklärt jede Funktion in normaler Sprache.',
         'nav.architecture': 'Architektur',
         'problem.label': '// das Problem',
