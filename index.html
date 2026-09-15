@@ -682,7 +682,7 @@
     ───────────────────────────── */
     .arch-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-top: 36px;
     }
@@ -726,6 +726,8 @@
       overflow-wrap: anywhere;
     }
     .arch-code .risk { color: var(--orange); font-weight: 600; }
+
+    .arch-col-line code { color: var(--orange); font-family: var(--mono); font-size: 0.92em; overflow-wrap: anywhere; }
 
     .bench-cost {
       background: var(--bg-card);
@@ -1081,7 +1083,7 @@
     .bento-quad {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
     .bento-quad .bento-medium { padding: 22px 18px; gap: 10px; }
@@ -1565,18 +1567,23 @@ slurp index .
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
-          <p class="arch-col-line" data-i18n="arch.callgraph.line">Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. 2,132 tests.</p>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">5 languages with cross-file resolution. Return type propagation. 2,273 tests.</p>
           <div class="arch-code">recalcularPlayerStats()<br>&rarr; 4 callers detected<br><span class="risk">RISK: MEDIUM</span></div>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp explain</p>
-          <p class="arch-col-line" data-i18n="arch.explain.line">Any node explained in natural language. Callers, callees, blast radius. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.</p>
+          <p class="arch-col-line" data-i18n="arch.explain.line">Architectural role, risk percentage, explore further suggestions. Structural mode improved — no LLM needed.</p>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp eval</p>
           <p class="arch-col-line" data-i18n="arch.eval.line">Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.</p>
+        </div>
+
+        <div class="arch-col">
+          <p class="arch-col-title" data-i18n="arch.mcp.title">MCP tools</p>
+          <p class="arch-col-line" data-i18n-html="arch.mcp.line">5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically.</p>
         </div>
 
       </div>
@@ -1679,6 +1686,7 @@ slurp index .
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">Already indexed? Use <code>slurp index . --smart</code> to update only changed files.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain2.note">Want to understand your codebase? <code>slurp explain "functionName"</code> explains any function in plain language.</span></p>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.impact.note">Before editing a file, run <code>slurp impact &lt;file&gt;</code> to see what might break.</span></p>
           </div>
         </div>
 
@@ -1803,6 +1811,34 @@ slurp index .
             <p class="bento-medium-sub" data-i18n="features.callgraph.line">Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five languages. Accurate blast radius analysis.</p>
           </div>
 
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="2.5"/>
+                <circle cx="12" cy="12" r="6.5"/>
+                <circle cx="12" cy="12" r="10.5"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title">slurp impact</p>
+            <p class="bento-medium-sub" data-i18n="features.impact.line">Pre-edit blast radius analysis. Know what breaks before you touch a file.</p>
+          </div>
+
+          <div class="bento-medium">
+            <div class="bento-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v3"/>
+                <path d="M12 18v3"/>
+                <path d="M3 12h3"/>
+                <path d="M18 12h3"/>
+                <circle cx="12" cy="12" r="4"/>
+                <path d="m6.3 6.3 2.1 2.1"/>
+                <path d="m15.6 15.6 2.1 2.1"/>
+              </svg>
+            </div>
+            <p class="bento-medium-title">slurp suggest</p>
+            <p class="bento-medium-sub" data-i18n="features.suggest.line">Query recommendations from the graph frontier. Know what to explore next.</p>
+          </div>
+
         </div>
 
         <!-- Small row -->
@@ -1870,7 +1906,7 @@ slurp index .
 
       <div class="milestone-stats">
         <div class="milestone-stat">
-          <span class="val">2,132</span>
+          <span class="val">2,273</span>
           <span class="desc" data-i18n="v1.stat.tests">tests</span>
         </div>
         <div class="milestone-stat">
@@ -1893,7 +1929,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.0.0</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.0.5</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1937,9 +1973,14 @@ slurp index .
         'arch.label': '// architecture intelligence',
         'arch.h2': 'slurp understands your code, not just your files',
         'arch.callgraph.title': 'Call graph',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five. 2,132 tests.',
-        'arch.explain.line': 'Any node explained in natural language. Callers, callees, blast radius. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
+        'arch.callgraph.line': '5 languages with cross-file resolution. Return type propagation. 2,273 tests.',
+        'arch.explain.line': 'Architectural role, risk percentage, explore further suggestions. Structural mode improved — no LLM needed.',
         'arch.eval.line': 'Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.',
+        'features.impact.line': 'Pre-edit blast radius analysis. Know what breaks before you touch a file.',
+        'features.suggest.line': 'Query recommendations from the graph frontier. Know what to explore next.',
+        'arch.mcp.title': 'MCP tools',
+        'arch.mcp.line': '5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically.',
+        'how.impact.note': 'Before editing a file, run <code>slurp impact &lt;file&gt;</code> to see what might break.',
         'how.explain2.note': 'Want to understand your codebase? <code>slurp explain \"functionName\"</code> explains any function in plain language.',
         'nav.architecture': 'Architecture',
         'problem.label': '// the problem',
@@ -2065,9 +2106,14 @@ slurp index .
         'arch.label': '// inteligencia de arquitectura',
         'arch.h2': 'slurp entiende tu código, no solo tus archivos',
         'arch.callgraph.title': 'Grafo de llamadas',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco. 2.132 tests.',
-        'arch.explain.line': 'Cualquier nodo explicado en lenguaje natural. Llamadores, llamados, radio de impacto. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
+        'arch.callgraph.line': '5 lenguajes con resolución entre archivos. Propagación de tipos de retorno. 2.273 tests.',
+        'arch.explain.line': 'Rol arquitectónico, porcentaje de riesgo y sugerencias para seguir explorando. Modo estructural mejorado — sin necesidad de LLM.',
         'arch.eval.line': 'Benchmark de calidad objetivo con juez LLM. 5× mejor calidad por token, demostrado en proyectos reales.',
+        'features.impact.line': 'Análisis del radio de impacto antes de editar. Sabe qué se rompe antes de tocar un archivo.',
+        'features.suggest.line': 'Recomendaciones de queries desde la frontera del grafo. Sabe qué explorar a continuación.',
+        'arch.mcp.title': 'Herramientas MCP',
+        'arch.mcp.line': '5 herramientas: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code las llama automáticamente.',
+        'how.impact.note': 'Antes de editar un archivo, ejecuta <code>slurp impact &lt;archivo&gt;</code> para ver qué podría romperse.',
         'how.explain2.note': '¿Quieres entender tu codebase? <code>slurp explain \"functionName\"</code> explica cualquier función en lenguaje natural.',
         'nav.architecture': 'Arquitectura',
         'problem.label': '// el problema',
@@ -2193,9 +2239,14 @@ slurp index .
         'arch.label': '// intelligenza architetturale',
         'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
         'arch.callgraph.title': 'Grafo delle chiamate',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque. 2.132 test.',
-        'arch.explain.line': 'Qualsiasi nodo spiegato in linguaggio naturale. Chiamanti, chiamati, raggio d\'impatto. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
+        'arch.callgraph.line': '5 linguaggi con risoluzione tra file. Propagazione dei tipi di ritorno. 2.273 test.',
+        'arch.explain.line': 'Ruolo architetturale, percentuale di rischio e suggerimenti per approfondire. Modalità strutturale migliorata — nessun LLM necessario.',
         'arch.eval.line': 'Benchmark di qualità oggettivo con giudice LLM. 5× migliore qualità per token, dimostrato su progetti reali.',
+        'features.impact.line': 'Analisi del raggio d\'impatto prima di modificare. Sai cosa si rompe prima di toccare un file.',
+        'features.suggest.line': 'Suggerimenti di query dalla frontiera del grafo. Sai cosa esplorare dopo.',
+        'arch.mcp.title': 'Strumenti MCP',
+        'arch.mcp.line': '5 strumenti: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code li chiama automaticamente.',
+        'how.impact.note': 'Prima di modificare un file, esegui <code>slurp impact &lt;file&gt;</code> per vedere cosa potrebbe rompersi.',
         'how.explain2.note': 'Vuoi capire il tuo codebase? <code>slurp explain \"functionName\"</code> spiega qualsiasi funzione in linguaggio naturale.',
         'nav.architecture': 'Architettura',
         'problem.label': '// il problema',
@@ -2321,9 +2372,14 @@ slurp index .
         'arch.label': '// intelligence d\'architecture',
         'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
         'arch.callgraph.title': 'Graphe d\'appels',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq. 2 132 tests.',
-        'arch.explain.line': 'N\'importe quel nœud expliqué en langage naturel. Appelants, appelés, rayon d\'impact. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
+        'arch.callgraph.line': '5 langages avec résolution inter-fichiers. Propagation des types de retour. 2 273 tests.',
+        'arch.explain.line': 'Rôle architectural, pourcentage de risque et suggestions pour aller plus loin. Mode structurel amélioré — aucun LLM requis.',
         'arch.eval.line': 'Benchmark de qualité objectif avec juge LLM. 5× meilleure qualité par token, prouvé sur des projets réels.',
+        'features.impact.line': 'Analyse du rayon d\'impact avant édition. Sachez ce qui casse avant de toucher un fichier.',
+        'features.suggest.line': 'Recommandations de requêtes depuis la frontière du graphe. Sachez quoi explorer ensuite.',
+        'arch.mcp.title': 'Outils MCP',
+        'arch.mcp.line': '5 outils : <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code les appelle automatiquement.',
+        'how.impact.note': 'Avant de modifier un fichier, lancez <code>slurp impact &lt;fichier&gt;</code> pour voir ce qui pourrait casser.',
         'how.explain2.note': 'Envie de comprendre votre codebase ? <code>slurp explain \"functionName\"</code> explique n\'importe quelle fonction en langage naturel.',
         'nav.architecture': 'Architecture',
         'problem.label': '// le problème',
@@ -2449,9 +2505,14 @@ slurp index .
         'arch.label': '// architektur-intelligenz',
         'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
         'arch.callgraph.title': 'Aufrufgraph',
-        'arch.callgraph.line': 'Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf. 2.132 Tests.',
-        'arch.explain.line': 'Jeder Knoten in natürlicher Sprache erklärt. Aufrufer, Aufgerufene, Wirkungsradius. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
+        'arch.callgraph.line': '5 Sprachen mit dateiübergreifender Auflösung. Rückgabetyp-Propagierung. 2.273 Tests.',
+        'arch.explain.line': 'Architektonische Rolle, Risikoprozentsatz und Vorschläge zum Weiterforschen. Struktureller Modus verbessert — kein LLM nötig.',
         'arch.eval.line': 'Objektiver Qualitäts-Benchmark mit LLM-Richter. 5× bessere Qualität pro Token, an echten Projekten bewiesen.',
+        'features.impact.line': 'Wirkungsradius-Analyse vor dem Bearbeiten. Wisse, was bricht, bevor du eine Datei anfasst.',
+        'features.suggest.line': 'Query-Empfehlungen von der Graph-Grenze. Wisse, was als Nächstes zu erkunden ist.',
+        'arch.mcp.title': 'MCP-Tools',
+        'arch.mcp.line': '5 Tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code ruft sie automatisch auf.',
+        'how.impact.note': 'Führe vor dem Bearbeiten einer Datei <code>slurp impact &lt;Datei&gt;</code> aus, um zu sehen, was brechen könnte.',
         'how.explain2.note': 'Willst du deine Codebase verstehen? <code>slurp explain \"functionName\"</code> erklärt jede Funktion in normaler Sprache.',
         'nav.architecture': 'Architektur',
         'problem.label': '// das Problem',
