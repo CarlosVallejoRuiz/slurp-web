@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>slurp — token-budget-aware graph navigation for AI agents</title>
-  <meta name="description" content="slurp selects only the relevant nodes from your knowledge graph within a token budget. 93.3% mean savings. No LLM calls. Pure math." />
+  <meta name="description" content="slurp selects only the relevant nodes from your knowledge graph within a token budget. 96.1% mean savings. No LLM calls. Pure math." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -539,6 +539,7 @@
     .perf-table td.opt { color: var(--text); font-weight: 500; }
     .perf-table td.before { color: var(--text-dim); }
     .perf-table td.gain { color: var(--orange); font-weight: 600; }
+    .perf-table .perf-sub { display: block; margin-top: 2px; font-size: 0.72rem; font-weight: 400; color: var(--text-dim); }
 
     .perf-note {
       margin-top: 20px;
@@ -548,7 +549,7 @@
       padding-left: 4px;
     }
 
-    /* Quality benchmark — LLM-judge results, distinct from the token table above */
+    /* Retrieval quality — recall results, distinct from the token table above */
     .quality-bench {
       margin-top: 40px;
       padding-top: 28px;
@@ -564,37 +565,6 @@
       margin-bottom: 18px;
     }
 
-    .quality-rows { display: flex; flex-wrap: wrap; gap: 14px 40px; }
-
-    .quality-row { display: flex; align-items: baseline; gap: 12px; }
-
-    .quality-row .qval {
-      font-family: var(--mono);
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      font-weight: 700;
-      color: var(--orange);
-      line-height: 1;
-      flex-shrink: 0;
-    }
-
-    .quality-row .qtext {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-      max-width: 260px;
-    }
-
-    .quality-honest {
-      margin-top: 22px;
-      padding: 12px 16px;
-      background: var(--bg-card);
-      border-left: 2px solid var(--orange);
-      border-radius: 0 6px 6px 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-    .quality-honest strong { color: var(--text); font-weight: 600; }
 
     /* Hero milestone badge */
     .hero-badge {
@@ -626,7 +596,7 @@
     }
 
     /* ─────────────────────────────
-       1.0.0 MILESTONE
+       RELEASE MILESTONE
     ───────────────────────────── */
     .milestone-h2 {
       font-size: clamp(2rem, 5vw, 3rem);
@@ -729,31 +699,39 @@
 
     .arch-col-line code { color: var(--orange); font-family: var(--mono); font-size: 0.92em; overflow-wrap: anywhere; }
 
-    .bench-cost {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 20px;
-      margin: -8px 0 32px;
+    /* Benchmark footnote and retrieval-recall block (slurp eval --retrieval) */
+    .bench-note {
+      margin: -16px 0 32px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
       font-family: var(--mono);
+      line-height: 1.6;
+      padding-left: 4px;
+    }
+
+    .recall-intro,
+    .recall-why {
       font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
     }
+    .recall-intro code,
+    .recall-why code,
+    .recall-fine code { color: var(--orange); font-family: var(--mono); font-size: 0.9em; }
 
-    .bench-cost-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 16px;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--border);
+    .recall-table { margin: 22px 0; }
+    .recall-table .recall-ver { color: var(--text-dim); text-transform: none; letter-spacing: 0; white-space: nowrap; }
+    .recall-table .recall-from { color: var(--text-dim); white-space: nowrap; }
+    .recall-table .recall-to { color: var(--orange); font-weight: 600; }
+
+    .recall-fine {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.6;
     }
-    .bench-cost-row:last-child { border-bottom: none; }
-
-    .bench-cost-row .label { color: var(--text-muted); }
-    .bench-cost-row .amount { color: var(--text); font-weight: 500; }
-
-    .bench-cost-row.saved .label { color: var(--text); font-weight: 500; }
-    .bench-cost-row.saved .amount { color: var(--orange); font-weight: 700; font-size: 1.05rem; }
+    .recall-fine a { color: var(--orange); text-decoration: none; white-space: nowrap; }
+    .recall-fine a:hover { text-decoration: underline; }
 
     /* ─────────────────────────────
        DEMO
@@ -1209,12 +1187,17 @@
       .token-viz { flex-direction: column; align-items: flex-start; gap: 12px; }
       .token-arrow { transform: rotate(90deg); }
 
-      .bench-table:not(.perf-table) th:nth-child(3),
-      .bench-table:not(.perf-table) td:nth-child(3) { display: none; }
+      /* token table drops "Full graph" (the same 117,828 in every row, stated above it);
+         the recall and perf tables keep every column */
+      .bench-table:not(.perf-table):not(.recall-table) th:nth-child(3),
+      .bench-table:not(.perf-table):not(.recall-table) td:nth-child(3) { display: none; }
 
-      /* perf table drops "Before" instead — the after/gain pair carries the story */
-      .perf-table th:nth-child(2),
-      .perf-table td:nth-child(2) { display: none; }
+      .recall-table th, .recall-table td,
+      .perf-table th, .perf-table td { padding: 11px 10px; }
+      /* three columns at 375px: version range on its own line, free to wrap */
+      .recall-table { font-size: 0.8rem; }
+      .recall-table th, .recall-table td { padding: 10px 8px; }
+      .recall-table .recall-ver { display: block; white-space: normal; }
 
       .bench-summary { gap: 20px; }
       .steps::before { display: none; }
@@ -1226,8 +1209,6 @@
 
       .arch-grid { grid-template-columns: 1fr; }
       .milestone-stats { gap: 20px 32px; }
-      .quality-rows { gap: 14px 24px; }
-      .quality-row .qtext { max-width: none; }
 
       .bento-grid { grid-template-columns: 1fr; }
       .bento-hero { padding: 24px 20px; border-radius: 4px; }
@@ -1310,8 +1291,8 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
-      <p><span class="hero-badge" data-i18n="hero.badge">v1.0.0 — Production release</span></p>
-      <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works with any codebase, any language.</p>
+      <p><span class="hero-badge" data-i18n="hero.badge">v1.2.0 — Better selection, measured</span></p>
+      <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works with any codebase.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="install-block">
@@ -1380,7 +1361,7 @@
       </table>
 
       <p class="install-note" data-i18n-html="install.note">Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.</p>
-      <p class="install-note" style="margin-top:10px;" data-i18n-html="install.explain.note">For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, run Ollama locally, or use any OpenAI-compatible endpoint. No LLM? Use <code>--no-llm</code> for structural analysis.</p>
+      <p class="install-note" style="margin-top:10px;" data-i18n-html="install.explain.note">For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>, run Ollama locally, or point it at any OpenAI-compatible endpoint. No LLM? Use <code>--no-llm</code> for structural analysis.</p>
     </div>
   </section>
 
@@ -1396,7 +1377,7 @@
 
       <div class="token-viz">
         <div class="token-num before">
-          <span class="num">69,418</span>
+          <span class="num">117,828</span>
           <span class="label" data-i18n="problem.before.label">full graph (tokens)</span>
         </div>
         <span class="token-arrow">→</span>
@@ -1404,10 +1385,10 @@
           <span class="num">4,000</span>
           <span class="label" data-i18n="problem.after.label">slurp budget (tokens)</span>
         </div>
-        <span class="token-saving" data-i18n="problem.saving">94.2% saved</span>
+        <span class="token-saving" data-i18n="problem.saving">96.7% saved</span>
       </div>
 
-      <p style="font-size:0.85rem;color:var(--text-dim);font-family:var(--mono);" data-i18n="problem.benchmark">Benchmark: PrismaStats codebase · 2,111 nodes · "player stats" query</p>
+      <p style="font-size:0.85rem;color:var(--text-dim);font-family:var(--mono);" data-i18n="problem.benchmark">Benchmark: PrismaStats · graphify graph, 2,111 nodes · budget 4,000</p>
     </div>
   </section>
 
@@ -1418,12 +1399,11 @@
     <div class="container reveal">
       <p class="section-label" data-i18n="benchmark.label">// benchmark</p>
       <h2 data-i18n="benchmark.h2">Real numbers on a real codebase</h2>
-      <p data-i18n="benchmark.p">PrismaStats: 2,111 nodes, 69,418 tokens. No mocks.</p>
+      <p data-i18n="benchmark.p">PrismaStats: graphify graph, 2,111 nodes. The whole graph, printed the same way as a subgraph, is 117,828 tokens. No mocks.</p>
 
       <table class="bench-table">
         <thead>
           <tr>
-            <th data-i18n="benchmark.th.query">Query</th>
             <th data-i18n="benchmark.th.budget">Budget</th>
             <th data-i18n="benchmark.th.tokens">Tokens used</th>
             <th data-i18n="benchmark.th.graph">Full graph</th>
@@ -1432,51 +1412,35 @@
         </thead>
         <tbody>
           <tr>
-            <td class="query">"auth flow"</td>
-            <td>2,000</td>
-            <td>2,000</td>
-            <td>69,418</td>
-            <td class="saving">97.1%</td>
+            <td class="query">2,000</td>
+            <td>1,964–1,968</td>
+            <td>117,828</td>
+            <td class="saving">98.3%</td>
           </tr>
           <tr>
-            <td class="query">"player stats"</td>
-            <td>4,000</td>
-            <td>4,000</td>
-            <td>69,418</td>
-            <td class="saving">94.2%</td>
+            <td class="query">4,000</td>
+            <td>3,926–3,928</td>
+            <td>117,828</td>
+            <td class="saving">96.7%</td>
           </tr>
           <tr>
-            <td class="query">"database schema"</td>
-            <td>8,000</td>
-            <td>8,000</td>
-            <td>69,418</td>
-            <td class="saving">88.5%</td>
+            <td class="query">8,000</td>
+            <td>7,841–7,847</td>
+            <td>117,828</td>
+            <td class="saving">93.3%</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="bench-cost">
-        <div class="bench-cost-row">
-          <span class="label" data-i18n="benchmark.cost.with">Cost with slurp</span>
-          <span class="amount">$0.13</span>
-        </div>
-        <div class="bench-cost-row">
-          <span class="label" data-i18n="benchmark.cost.without">Cost without slurp</span>
-          <span class="amount">$1.87</span>
-        </div>
-        <div class="bench-cost-row saved">
-          <span class="label" data-i18n="benchmark.cost.saved">Money saved</span>
-          <span class="amount">$1.74 (93.3%)</span>
-        </div>
-      </div>
+      <p class="bench-note" data-i18n="benchmark.note">Same savings for the three queries — "auth flow", "prisma schema", "database pool". Both sides are the text that would be sent, counted with tiktoken.</p>
 
       <div class="bench-summary">
         <div class="bench-stat">
-          <span class="val">93.3%</span>
+          <span class="val">96.1%</span>
           <span class="desc" data-i18n="benchmark.stat.mean">mean savings</span>
         </div>
         <div class="bench-stat">
-          <span class="val">97.1%</span>
+          <span class="val">98.3%</span>
           <span class="desc" data-i18n="benchmark.stat.best">best case</span>
         </div>
         <div class="bench-stat">
@@ -1486,20 +1450,36 @@
       </div>
 
       <div class="quality-bench">
-        <p class="quality-title" data-i18n="benchmark.quality.title">Quality benchmark</p>
-        <div class="quality-rows">
-          <div class="quality-row">
-            <span class="qval">5&times;</span>
-            <span class="qtext" data-i18n="benchmark.quality.pertoken">more quality per token than full-graph injection</span>
-          </div>
-          <div class="quality-row">
-            <span class="qval">46.7%</span>
-            <span class="qtext" data-i18n="benchmark.quality.winrate">win rate vs full-graph baseline</span>
-          </div>
-        </div>
-        <p class="quality-honest" data-i18n-html="benchmark.quality.honest"><strong>Honest result:</strong> slurp excels at efficiency, not just token savings.</p>
+        <p class="quality-title" data-i18n="benchmark.recall.title">Retrieval quality</p>
+        <p class="recall-intro" data-i18n-html="benchmark.recall.intro"><code>slurp eval --retrieval</code> measures recall: the share of each question's labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 questions at <code>--budget 4000</code>: 15 built-in on PrismaStats's <code>slurp index</code> graph (1,582 nodes), 16 on slurp's own graph (4,165 nodes).</p>
+
+        <table class="bench-table recall-table">
+          <thead>
+            <tr>
+              <th data-i18n="benchmark.recall.th.graph">Graph</th>
+              <th>Markdown <span class="recall-ver">v1.1.1 &rarr; v1.2.0</span></th>
+              <th>JSON <span class="recall-ver">v1.1.1 &rarr; v1.2.0</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="query">PrismaStats</td>
+              <td><span class="recall-from">0.867 &rarr;</span> <strong class="recall-to">0.967</strong></td>
+              <td><span class="recall-from">0.589 &rarr;</span> <strong class="recall-to">0.900</strong></td>
+            </tr>
+            <tr>
+              <td class="query">slurp</td>
+              <td><span class="recall-from">0.688 &rarr;</span> <strong class="recall-to">0.875</strong></td>
+              <td><span class="recall-from">0.562 &rarr;</span> <strong class="recall-to">0.812</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="recall-why" data-i18n-html="benchmark.recall.why">What changed in v1.2: tests and import nodes no longer take places in the subgraph (<code>--include-tests</code> and <code>--include-imports</code> let them back), and a node lends its neighbour boost to at most ten neighbours, so a hub's callers no longer fill the budget.</p>
+        <p class="recall-fine" data-i18n-html="benchmark.recall.holdout">On the half of the questions not used to tune v1.2 (mean recall in markdown and JSON at 4,000 and 8,000): PrismaStats 0.780 &rarr; 0.893, slurp 0.562 &rarr; 0.750. slurp's 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Full detail in the README &rarr;</a></p>
+
         <p class="quality-callgraph" data-i18n="benchmark.quality.callgraph">Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution</p>
-        <p class="quality-callgraph" style="margin-top:6px;" data-i18n-html="benchmark.quality.edges">PrismaStats: <strong>193 &rarr; 488</strong> call edges · createAdminClient: <strong>0 &rarr; 97</strong> callers</p>
+        <p class="quality-callgraph" style="margin-top:6px;" data-i18n-html="benchmark.quality.edges">PrismaStats · createAdminClient: <strong>97</strong> callers</p>
       </div>
     </div>
   </section>
@@ -1516,8 +1496,10 @@
 
       <div class="code-block"><span class="c"># Index your project locally</span>
 slurp index .
-<span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span>
+<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span>
 <span class="c"># Next: slurp 'your query' --graph graphify-out/graph.json</span></div>
+
+      <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="zerodeps.speed">v1.1.1 made <code>slurp index</code> faster: it skips the build output of web frameworks (<code>.next/</code> and the like) and prunes skipped folders instead of walking them — PrismaStats 4.9 s → 0.5 s.</span></p>
 
       <p class="extras-line"><span data-i18n="zerodeps.extras.label">Install language extras:</span> <code>uv sync --extra java</code> · <code>uv sync --extra rust</code> · <code>uv sync --extra all-languages</code></p>
     </div>
@@ -1539,7 +1521,7 @@ slurp index .
           <span class="demo-dot red"></span>
           <span class="demo-dot yellow"></span>
           <span class="demo-dot green"></span>
-          <span class="demo-title">slurp — player stats calculation</span>
+          <span class="demo-title">slurp — player stats</span>
         </div>
         <iframe
           class="demo-frame"
@@ -1548,7 +1530,7 @@ slurp index .
           scrolling="no"
           loading="lazy"></iframe>
         <div class="demo-status">
-          <span class="left">50 nodes shown · 4,000 token budget · 96% saved</span>
+          <span class="left" data-i18n="demo.status.left">Top 50 of 108 selected nodes · 3,928 / 4,000 tokens · 96.7% saved</span>
           <span class="right" data-i18n="demo.status.hint">Click any node to inspect · Drag to explore</span>
         </div>
       </div>
@@ -1567,18 +1549,18 @@ slurp index .
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
-          <p class="arch-col-line" data-i18n="arch.callgraph.line">5 languages with cross-file resolution. Return type propagation. 2,273 tests.</p>
-          <div class="arch-code">recalcularPlayerStats()<br>&rarr; 4 callers detected<br><span class="risk">RISK: MEDIUM</span></div>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">5 languages with cross-file resolution. Return type propagation within a file. 2,694 tests.</p>
+          <div class="arch-code">recalcularPlayerStats()<br>&rarr; 3 production callers<br><span class="risk">RISK: MEDIUM</span></div>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp explain</p>
-          <p class="arch-col-line" data-i18n="arch.explain.line">Architectural role, risk percentage, explore further suggestions. Structural mode improved — no LLM needed.</p>
+          <p class="arch-col-line" data-i18n="arch.explain.line">Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed.</p>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp eval</p>
-          <p class="arch-col-line" data-i18n="arch.eval.line">Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.</p>
+          <p class="arch-col-line" data-i18n="arch.eval.line">Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.875 on slurp's own graph at budget 4,000. An LLM-judge mode is also available.</p>
         </div>
 
         <div class="arch-col">
@@ -1597,51 +1579,36 @@ slurp index .
     <div class="container reveal">
       <p class="section-label" data-i18n="perf.label">// performance</p>
       <h2 data-i18n="perf.h2">Built for speed.</h2>
-      <p data-i18n="perf.p">Optimized at v0.7.0 — measured on a real 2,111-node codebase.</p>
+      <p data-i18n="perf.p">Latency of one slurp_query call through the MCP server at budget 4,000 — PrismaStats graphify graph (2,111 nodes), mean of ten queries after a warm-up run. Measured for v1.1.0 on an Apple M4, Python 3.12; three runs, range shown.</p>
 
       <table class="bench-table perf-table">
         <thead>
           <tr>
-            <th data-i18n="perf.th.opt">Optimization</th>
-            <th data-i18n="perf.th.before">Before</th>
-            <th data-i18n="perf.th.after">After</th>
-            <th data-i18n="perf.th.gain">Improvement</th>
+            <th data-i18n="perf.th.version">Version</th>
+            <th data-i18n="perf.th.mean">Mean of 10 hot queries</th>
+            <th data-i18n="perf.th.published">Published then</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="opt" data-i18n="perf.row.pagerank">PageRank cache</td>
-            <td class="before">8.32 ms</td>
-            <td>0.002 ms</td>
-            <td class="gain">4000×</td>
-          </tr>
-          <tr>
-            <td class="opt" data-i18n="perf.row.tokencache">Token count cache</td>
-            <td class="before">~50 ms</td>
-            <td>0.174 ms</td>
-            <td class="gain">280×</td>
-          </tr>
-          <tr>
-            <td class="opt" data-i18n="perf.row.heap">Greedy heap (O(n log n))</td>
-            <td class="before">63.78 ms</td>
-            <td>10.69 ms</td>
-            <td class="gain">6×</td>
-          </tr>
-          <tr>
-            <td class="opt" data-i18n="perf.row.latency">End-to-end latency</td>
+            <td class="opt">v0.6.5 <span class="perf-sub" data-i18n="perf.row.v065">before the caches and the heap</span></td>
+            <td>73–86 ms</td>
             <td class="before">86.41 ms</td>
-            <td>10.69 ms</td>
-            <td class="gain">8.1×</td>
           </tr>
           <tr>
-            <td class="opt" data-i18n="perf.row.staleness">Graph staleness</td>
-            <td class="before" data-i18n="perf.silent">silent</td>
-            <td data-i18n="perf.autoreload">auto-reload</td>
-            <td class="gain">✓</td>
+            <td class="opt">v0.7.0</td>
+            <td>9.9–10.1 ms</td>
+            <td class="before">10.69 ms</td>
+          </tr>
+          <tr>
+            <td class="opt">v1.1.0</td>
+            <td class="gain">11.4–11.6 ms</td>
+            <td class="before">—</td>
           </tr>
         </tbody>
       </table>
 
+      <p class="perf-note" style="margin-top:0;" data-i18n="perf.slower">v1.1.0 is about 1.5 ms slower per query than v0.7.0, and does more for it: the budget costs relationships as well as nodes, and the text is rendered and counted before it is sent.</p>
       <p class="perf-note" data-i18n="perf.note">Graph changes detected automatically — no server restart needed.</p>
     </div>
   </section>
@@ -1669,7 +1636,7 @@ slurp init</div>
           <div class="step-num">1</div>
           <div class="step-body">
             <h3 data-i18n="how.step1.h3">Install slurp</h3>
-            <p data-i18n="how.step1.p">One command, no dependencies beyond Python.</p>
+            <p data-i18n="how.step1.p">One command. Requires Python 3.12+.</p>
             <div class="code-block"><span class="c"># install</span>
 pip install slurp-graph</div>
           </div>
@@ -1682,8 +1649,8 @@ pip install slurp-graph</div>
             <p data-i18n="how.step2.p">slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.</p>
             <div class="code-block"><span class="c"># generates the graph locally</span>
 slurp index .
-<span class="c"># Output: 1473 nodes · 1443 edges · 30 files</span></div>
-            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.</span></p>
+<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span></div>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">Already indexed? Use <code>slurp index . --smart</code> to update only changed files.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain2.note">Want to understand your codebase? <code>slurp explain "functionName"</code> explains any function in plain language.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.impact.note">Before editing a file, run <code>slurp impact &lt;file&gt;</code> to see what might break.</span></p>
@@ -1694,13 +1661,13 @@ slurp index .
           <div class="step-num">3</div>
           <div class="step-body">
             <h3 data-i18n="how.step3.h3">Configure MCP once, done forever</h3>
-            <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.</p>
+            <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically.</p>
             <p class="mcp-variant-label" data-i18n="how.mcp.global">Global install:</p>
             <div class="code-block">{
   <span class="k">"mcpServers"</span>: {
     <span class="k">"slurp"</span>: {
       <span class="k">"command"</span>: <span class="s">"slurp"</span>,
-      <span class="k">"args"</span>: [<span class="s">"serve"</span>, <span class="s">"--graph"</span>, <span class="s">"graphify-out/graph.json"</span>]
+      <span class="k">"args"</span>: [<span class="s">"serve"</span>, <span class="s">"--graph"</span>, <span class="s">"/absolute/path/to/graphify-out/graph.json"</span>]
     }
   }
 }</div>
@@ -1718,9 +1685,9 @@ slurp index .
       </div>
 
       <div class="mcp-note" data-i18n-html="how.mcp">
-        <strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.
+        <strong>Fully automatic after step 3.</strong> Claude Code calls slurp's tools when it needs them — no extra commands, no prompt engineering. You work exactly as before, just cheaper.
       </div>
-      <p class="graphify-compat-note" data-i18n="how.graphify.note">Already using graphify? slurp works with your existing graph.json out of the box.</p>
+      <p class="graphify-compat-note" data-i18n="how.graphify.note">Already using graphify? slurp works with your existing graph.json out of the box — and slurp index asks before replacing it (-o graphify-out/slurp-graph.json keeps both, --force replaces it).</p>
     </div>
   </section>
 
@@ -1754,7 +1721,7 @@ slurp index .
             </svg>
           </div>
           <p class="bento-hero-title">slurp eval</p>
-          <p class="bento-hero-sub" data-i18n="features.eval.sub">Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.</p>
+          <p class="bento-hero-sub" data-i18n="features.eval.sub">Recall against labelled nodes with no LLM, no cost, reproducible (--retrieval). Or an LLM judge that scores answers with slurp context against the full graph.</p>
         </div>
 
         <!-- Medium row -->
@@ -1770,7 +1737,7 @@ slurp index .
               </svg>
             </div>
             <p class="bento-medium-title">slurp index --smart</p>
-            <p class="bento-medium-sub" data-i18n="features.smart.line">Git-aware incremental re-indexing. 21× faster on changed files.</p>
+            <p class="bento-medium-sub" data-i18n="features.smart.line">Git-aware incremental re-indexing. Produces the same graph as a full index, and is faster when only function bodies change.</p>
           </div>
 
           <div class="bento-medium">
@@ -1835,7 +1802,7 @@ slurp index .
                 <path d="m15.6 15.6 2.1 2.1"/>
               </svg>
             </div>
-            <p class="bento-medium-title">slurp suggest</p>
+            <p class="bento-medium-title">--suggest</p>
             <p class="bento-medium-sub" data-i18n="features.suggest.line">Query recommendations from the graph frontier. Know what to explore next.</p>
           </div>
 
@@ -1896,22 +1863,22 @@ slurp index .
   </section>
 
   <!-- ══════════════════════════════
-       1.0.0 MILESTONE
+       RELEASE MILESTONE
   ══════════════════════════════ -->
   <section id="milestone">
     <div class="container reveal">
-      <p class="section-label" data-i18n="v1.label">// 1.0.0</p>
-      <h2 class="milestone-h2" data-i18n="v1.h2">Production ready.</h2>
-      <p class="milestone-p" data-i18n-html="v1.p">slurp 1.0.0 ships with a complete call graph for Python, TypeScript/JS, Go, Java and Rust — with cross-file resolution for all five. <code>slurp explain</code> and <code>slurp diff</code> now tell the truth about your codebase.</p>
+      <p class="section-label" data-i18n="v1.label">// 1.2.0</p>
+      <h2 class="milestone-h2" data-i18n="v1.h2">Better selection, measured.</h2>
+      <p class="milestone-p" data-i18n-html="v1.p">slurp 1.2.0 keeps tests and import nodes out of the subgraph and caps the neighbour boost at ten neighbours: recall at <code>--budget 4000</code> in markdown goes from 0.867 to 0.967 on PrismaStats and from 0.688 to 0.875 on slurp's own graph. <code>slurp explain</code>, <code>slurp impact</code> and <code>slurp diff</code> now count production callers only, with tests shown apart.</p>
 
       <div class="milestone-stats">
         <div class="milestone-stat">
-          <span class="val">2,273</span>
+          <span class="val">2,694</span>
           <span class="desc" data-i18n="v1.stat.tests">tests</span>
         </div>
         <div class="milestone-stat">
           <span class="val">5</span>
-          <span class="desc" data-i18n="v1.stat.langs">languages</span>
+          <span class="desc" data-i18n="v1.stat.langs">call-graph languages</span>
         </div>
       </div>
     </div>
@@ -1929,7 +1896,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.0.5</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.2.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1950,32 +1917,28 @@ slurp index .
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works with any codebase, any language.',
-        'hero.badge': 'v1.0.0 — Production release',
-        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> call edges · createAdminClient: <strong>0 &rarr; 97</strong> callers',
+        'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works with any codebase.',
+        'hero.badge': 'v1.2.0 — Better selection, measured',
+        'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> callers',
         'how.step0.h3': 'New to slurp?',
         'how.step0.tag': 'optional',
         'how.step0.p': 'Run <code>slurp init</code> — detects your language, indexes your codebase, and configures the MCP server in one step.',
-        'v1.label': '// 1.0.0',
-        'v1.h2': 'Production ready.',
-        'v1.p': 'slurp 1.0.0 ships with a complete call graph for Python, TypeScript/JS, Go, Java and Rust — with cross-file resolution for all five. <code>slurp explain</code> and <code>slurp diff</code> now tell the truth about your codebase.',
+        'v1.label': '// 1.2.0',
+        'v1.h2': 'Better selection, measured.',
+        'v1.p': 'slurp 1.2.0 keeps tests and import nodes out of the subgraph and caps the neighbour boost at ten neighbours: recall at <code>--budget 4000</code> in markdown goes from 0.867 to 0.967 on PrismaStats and from 0.688 to 0.875 on slurp\'s own graph. <code>slurp explain</code>, <code>slurp impact</code> and <code>slurp diff</code> now count production callers only, with tests shown apart.',
         'v1.stat.tests': 'tests',
-        'v1.stat.langs': 'languages',
-        'benchmark.quality.title': 'Quality benchmark',
-        'benchmark.quality.pertoken': 'more quality per token than full-graph injection',
-        'benchmark.quality.winrate': 'win rate vs full-graph baseline',
-        'benchmark.quality.honest': '<strong>Honest result:</strong> slurp excels at efficiency, not just token savings.',
+        'v1.stat.langs': 'call-graph languages',
         'benchmark.quality.callgraph': 'Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution',
         'features.explain.sub': 'LLM-powered architecture explanations. What any function does, who calls it, and the risk of changing it. Works with Anthropic, OpenAI, Ollama, or any compatible endpoint.',
-        'features.eval.sub': 'Quality benchmark with LLM judge. Measures if slurp context improves response quality vs full graph injection. 5× better quality per token proven.',
+        'features.eval.sub': 'Recall against labelled nodes with no LLM, no cost, reproducible (--retrieval). Or an LLM judge that scores answers with slurp context against the full graph.',
         'features.callgraph.title': 'Call graph',
         'features.callgraph.line': 'Python, TypeScript/JS, Go, Java and Rust. Cross-file resolution for all five languages. Accurate blast radius analysis.',
         'arch.label': '// architecture intelligence',
         'arch.h2': 'slurp understands your code, not just your files',
         'arch.callgraph.title': 'Call graph',
-        'arch.callgraph.line': '5 languages with cross-file resolution. Return type propagation. 2,273 tests.',
-        'arch.explain.line': 'Architectural role, risk percentage, explore further suggestions. Structural mode improved — no LLM needed.',
-        'arch.eval.line': 'Objective quality benchmark with LLM judge. 5× better quality per token proven on real projects.',
+        'arch.callgraph.line': '5 languages with cross-file resolution. Return type propagation within a file. 2,694 tests.',
+        'arch.explain.line': 'Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed.',
+        'arch.eval.line': 'Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.875 on slurp\'s own graph at budget 4,000. An LLM-judge mode is also available.',
         'features.impact.line': 'Pre-edit blast radius analysis. Know what breaks before you touch a file.',
         'features.suggest.line': 'Query recommendations from the graph frontier. Know what to explore next.',
         'arch.mcp.title': 'MCP tools',
@@ -1989,12 +1952,11 @@ slurp index .
         'problem.p2': "slurp scores each node against your query using PageRank + TF-IDF — zero LLM calls, zero extra tokens spent — and serves only what fits inside your budget.",
         'problem.before.label': 'full graph (tokens)',
         'problem.after.label': 'slurp budget (tokens)',
-        'problem.saving': '94.2% saved',
-        'problem.benchmark': 'Benchmark: PrismaStats codebase · 2,111 nodes · "player stats" query',
+        'problem.saving': '96.7% saved',
+        'problem.benchmark': 'Benchmark: PrismaStats · graphify graph, 2,111 nodes · budget 4,000',
         'benchmark.label': '// benchmark',
         'benchmark.h2': 'Real numbers on a real codebase',
-        'benchmark.p': 'PrismaStats: 2,111 nodes, 69,418 tokens. No mocks.',
-        'benchmark.th.query': 'Query',
+        'benchmark.p': 'PrismaStats: graphify graph, 2,111 nodes. The whole graph, printed the same way as a subgraph, is 117,828 tokens. No mocks.',
         'benchmark.th.budget': 'Budget',
         'benchmark.th.tokens': 'Tokens used',
         'benchmark.th.graph': 'Full graph',
@@ -2002,40 +1964,27 @@ slurp index .
         'benchmark.stat.mean': 'mean savings',
         'benchmark.stat.best': 'best case',
         'benchmark.stat.llm': 'extra LLM calls',
-        'benchmark.cost.with': 'Cost with slurp',
-        'benchmark.cost.without': 'Cost without slurp',
-        'benchmark.cost.saved': 'Money saved',
         'demo.label': '// demo',
         'demo.h2': 'See it in action',
         'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
         'demo.note': 'Live demo — real PrismaStats codebase, real data. Orange = functions, Blue = classes, Purple = modules.',
         'demo.status.hint': 'Click any node to inspect · Drag to explore',
+        'demo.status.left': 'Top 50 of 108 selected nodes · 3,928 / 4,000 tokens · 96.7% saved',
         'perf.label': '// performance',
         'perf.h2': 'Built for speed.',
-        'perf.p': 'Optimized at v0.7.0 — measured on a real 2,111-node codebase.',
-        'perf.th.opt': 'Optimization',
-        'perf.th.before': 'Before',
-        'perf.th.after': 'After',
-        'perf.th.gain': 'Improvement',
-        'perf.row.pagerank': 'PageRank cache',
-        'perf.row.tokencache': 'Token count cache',
-        'perf.row.heap': 'Greedy heap (O(n log n))',
-        'perf.row.latency': 'End-to-end latency',
-        'perf.row.staleness': 'Graph staleness',
-        'perf.silent': 'silent',
-        'perf.autoreload': 'auto-reload',
+        'perf.p': 'Latency of one slurp_query call through the MCP server at budget 4,000 — PrismaStats graphify graph (2,111 nodes), mean of ten queries after a warm-up run. Measured for v1.1.0 on an Apple M4, Python 3.12; three runs, range shown.',
         'perf.note': 'Graph changes detected automatically — no server restart needed.',
         'how.label': '// how it works',
         'how.h2': 'From zero to optimized in minutes.',
         'how.step1.h3': 'Install slurp',
-        'how.step1.p': 'One command, no dependencies beyond Python.',
+        'how.step1.p': 'One command. Requires Python 3.12+.',
         'how.step2.h3': 'Index your project locally',
         'how.step2.p': 'slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.',
-        'how.update.note': 'Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing · add as a GitHub Actions step for CI/CD.',
+        'how.update.note': 'Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing.',
         'how.step3.h3': 'Configure MCP once, done forever',
-        'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically on every query.',
-        'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp on every query — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
-        'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box.',
+        'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically.',
+        'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp\'s tools when it needs them — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
+        'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box — and slurp index asks before replacing it (-o graphify-out/slurp-graph.json keeps both, --force replaces it).',
         'how.mcp.global': 'Global install:',
         'how.mcp.uv': 'Python project with uv:',
         'zerodeps.label': '// zero dependencies',
@@ -2053,25 +2002,29 @@ slurp index .
         'install.note': 'Using a non-Python project (JS, Go, TypeScript...)? Use <code>uv tool install</code> or <code>pip install</code> — not <code>uv add</code>.',
         'features.label': '// features',
         'features.h2': 'Built different.',
-        'features.hero.sub': '16 languages. Zero dependencies. No APIs. No cost.',
-        'features.mcp.sub': 'Configure once. Claude Code handles the rest.',
         'features.viz.line': 'Interactive subgraph explorer',
         'features.diff.line': 'Compare graph snapshots',
         'features.benchmark.line': 'Measure token savings',
         'features.inject.line': 'Attach source code to nodes',
-        'features.init.line': 'One command setup. Detects your language, indexes, configures MCP.',
-        'features.session.line': 'See every query slurp processed in real time.',
-        'features.vizoutput.line': 'Save the visualization HTML to share or review later.',
-        'features.pricemodel.line': 'Real USD cost, not just percentages — on queries now 8.1× faster.',
-        'features.smart.line': 'Git-aware incremental re-indexing. 21× faster on changed files.',
+        'features.smart.line': 'Git-aware incremental re-indexing. Produces the same graph as a full index, and is faster when only function bodies change.',
         'features.advisor.line': 'Recommends optimal token budget from your query history.',
         'features.federation.title': 'Multi-graph federation',
         'features.federation.line': 'Query multiple codebases simultaneously.',
-        'features.explain.line': 'LLM-powered explanations. What a node does, its architecture, and the risk of changing it. Works with any LLM provider.',
-        'how.explain.note': 'Want to understand any part of your codebase? <code>slurp explain "functionName" --graph graph.json</code> explains it in plain language using your LLM.',
-        'install.explain.note': 'For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or point to a local Ollama instance. No LLM? Use <code>--no-llm</code> for structural analysis.',
+        'install.explain.note': 'For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>, run Ollama locally, or point it at any OpenAI-compatible endpoint. No LLM? Use <code>--no-llm</code> for structural analysis.',
         'how.smart.note': 'Already indexed? Use <code>slurp index . --smart</code> to update only changed files.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+        'benchmark.note': 'Same savings for the three queries — "auth flow", "prisma schema", "database pool". Both sides are the text that would be sent, counted with tiktoken.',
+        'benchmark.recall.title': 'Retrieval quality',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> measures recall: the share of each question\'s labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 questions at <code>--budget 4000</code>: 15 built-in on PrismaStats\'s <code>slurp index</code> graph (1,582 nodes), 16 on slurp\'s own graph (4,165 nodes).',
+        'benchmark.recall.th.graph': 'Graph',
+        'benchmark.recall.why': 'What changed in v1.2: tests and import nodes no longer take places in the subgraph (<code>--include-tests</code> and <code>--include-imports</code> let them back), and a node lends its neighbour boost to at most ten neighbours, so a hub\'s callers no longer fill the budget.',
+        'benchmark.recall.holdout': 'On the half of the questions not used to tune v1.2 (mean recall in markdown and JSON at 4,000 and 8,000): PrismaStats 0.780 → 0.893, slurp 0.562 → 0.750. slurp\'s 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Full detail in the README →</a>',
+        'zerodeps.speed': 'v1.1.1 made <code>slurp index</code> faster: it skips the build output of web frameworks (<code>.next/</code> and the like) and prunes skipped folders instead of walking them — PrismaStats 4.9 s → 0.5 s.',
+        'perf.th.version': 'Version',
+        'perf.th.mean': 'Mean of 10 hot queries',
+        'perf.th.published': 'Published then',
+        'perf.row.v065': 'before the caches and the heap',
+        'perf.slower': 'v1.1.0 is about 1.5 ms slower per query than v0.7.0, and does more for it: the budget costs relationships as well as nodes, and the text is rendered and counted before it is sent.',
       },
       es: {
         flag: '🇪🇸', code: 'ES',
@@ -2083,32 +2036,28 @@ slurp index .
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'Tu codebase es el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona con cualquier codebase, cualquier lenguaje.',
-        'hero.badge': 'v1.0.0 — Versión de producción',
-        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> aristas de llamadas · createAdminClient: <strong>0 &rarr; 97</strong> llamadores',
+        'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona con cualquier codebase.',
+        'hero.badge': 'v1.2.0 — Mejor selección, medida',
+        'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> llamadores',
         'how.step0.h3': '¿Nuevo en slurp?',
         'how.step0.tag': 'opcional',
         'how.step0.p': 'Ejecuta <code>slurp init</code> — detecta tu lenguaje, indexa tu codebase y configura el servidor MCP en un solo paso.',
-        'v1.label': '// 1.0.0',
-        'v1.h2': 'Listo para producción.',
-        'v1.p': 'slurp 1.0.0 llega con un grafo de llamadas completo para Python, TypeScript/JS, Go, Java y Rust — con resolución entre archivos para los cinco. <code>slurp explain</code> y <code>slurp diff</code> ahora dicen la verdad sobre tu codebase.',
+        'v1.label': '// 1.2.0',
+        'v1.h2': 'Mejor selección, medida.',
+        'v1.p': 'slurp 1.2.0 deja los tests y los nodos import fuera del subgrafo y limita el impulso a diez vecinos: el recall a <code>--budget 4000</code> en markdown pasa de 0,867 a 0,967 en PrismaStats y de 0,688 a 0,875 en el grafo del propio slurp. <code>slurp explain</code>, <code>slurp impact</code> y <code>slurp diff</code> cuentan ahora solo llamadores de producción, con los tests aparte.',
         'v1.stat.tests': 'tests',
-        'v1.stat.langs': 'lenguajes',
-        'benchmark.quality.title': 'Benchmark de calidad',
-        'benchmark.quality.pertoken': 'más calidad por token que inyectar el grafo completo',
-        'benchmark.quality.winrate': 'de victorias frente al baseline del grafo completo',
-        'benchmark.quality.honest': '<strong>Resultado honesto:</strong> slurp destaca en eficiencia, no solo en ahorro de tokens.',
+        'v1.stat.langs': 'lenguajes con grafo de llamadas',
         'benchmark.quality.callgraph': 'Grafo de llamadas: Python, TypeScript/JS, Go, Java y Rust con resolución entre archivos',
         'features.explain.sub': 'Explicaciones de arquitectura con LLM. Qué hace cualquier función, quién la llama y el riesgo de cambiarla. Funciona con Anthropic, OpenAI, Ollama o cualquier endpoint compatible.',
-        'features.eval.sub': 'Benchmark de calidad con juez LLM. Mide si el contexto de slurp mejora la calidad de las respuestas frente a inyectar el grafo completo. 5× mejor calidad por token, demostrado.',
+        'features.eval.sub': 'Recall frente a nodos etiquetados sin LLM, sin coste y reproducible (--retrieval). O un juez LLM que puntúa las respuestas con el contexto de slurp frente al grafo completo.',
         'features.callgraph.title': 'Grafo de llamadas',
         'features.callgraph.line': 'Python, TypeScript/JS, Go, Java y Rust. Resolución entre archivos para los cinco lenguajes. Análisis preciso del radio de impacto.',
         'arch.label': '// inteligencia de arquitectura',
         'arch.h2': 'slurp entiende tu código, no solo tus archivos',
         'arch.callgraph.title': 'Grafo de llamadas',
-        'arch.callgraph.line': '5 lenguajes con resolución entre archivos. Propagación de tipos de retorno. 2.273 tests.',
-        'arch.explain.line': 'Rol arquitectónico, porcentaje de riesgo y sugerencias para seguir explorando. Modo estructural mejorado — sin necesidad de LLM.',
-        'arch.eval.line': 'Benchmark de calidad objetivo con juez LLM. 5× mejor calidad por token, demostrado en proyectos reales.',
+        'arch.callgraph.line': '5 lenguajes con resolución entre archivos. Propagación de tipos de retorno dentro de un archivo. 2.694 tests.',
+        'arch.explain.line': 'Rol arquitectónico, porcentaje de riesgo y sugerencias para seguir explorando. El riesgo cuenta solo llamadores de producción; los tests se muestran aparte. Modo estructural, sin necesidad de LLM.',
+        'arch.eval.line': 'Recall sin LLM y sin coste (--retrieval): 0,967 en PrismaStats y 0,875 en el grafo del propio slurp con presupuesto 4.000. También tiene un modo con juez LLM.',
         'features.impact.line': 'Análisis del radio de impacto antes de editar. Sabe qué se rompe antes de tocar un archivo.',
         'features.suggest.line': 'Recomendaciones de queries desde la frontera del grafo. Sabe qué explorar a continuación.',
         'arch.mcp.title': 'Herramientas MCP',
@@ -2122,12 +2071,11 @@ slurp index .
         'problem.p2': 'slurp puntúa cada nodo frente a tu consulta usando PageRank + TF-IDF — sin llamadas a ningún LLM, sin tokens extra gastados — y sirve solo lo que cabe dentro de tu presupuesto.',
         'problem.before.label': 'grafo completo (tokens)',
         'problem.after.label': 'presupuesto slurp (tokens)',
-        'problem.saving': '94,2% ahorrado',
-        'problem.benchmark': 'Benchmark: codebase PrismaStats · 2.111 nodos · consulta "player stats"',
+        'problem.saving': '96,7% ahorrado',
+        'problem.benchmark': 'Benchmark: PrismaStats · grafo de graphify, 2.111 nodos · presupuesto 4.000',
         'benchmark.label': '// benchmark',
         'benchmark.h2': 'Números reales sobre un codebase real',
-        'benchmark.p': 'PrismaStats: 2.111 nodos, 69.418 tokens. Sin mocks.',
-        'benchmark.th.query': 'Consulta',
+        'benchmark.p': 'PrismaStats: grafo de graphify, 2.111 nodos. El grafo entero, impreso igual que un subgrafo, son 117.828 tokens. Sin mocks.',
         'benchmark.th.budget': 'Presupuesto',
         'benchmark.th.tokens': 'Tokens usados',
         'benchmark.th.graph': 'Grafo completo',
@@ -2135,40 +2083,27 @@ slurp index .
         'benchmark.stat.mean': 'ahorro medio',
         'benchmark.stat.best': 'mejor caso',
         'benchmark.stat.llm': 'llamadas LLM extra',
-        'benchmark.cost.with': 'Coste con slurp',
-        'benchmark.cost.without': 'Coste sin slurp',
-        'benchmark.cost.saved': 'Dinero ahorrado',
         'demo.label': '// demo',
         'demo.h2': 'Vélo en acción',
         'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
         'demo.note': 'Demo en vivo — codebase real de PrismaStats, datos reales. Naranja = funciones, Azul = clases, Morado = módulos.',
         'demo.status.hint': 'Haz clic en un nodo para inspeccionarlo · Arrastra para explorar',
+        'demo.status.left': '50 principales de 108 nodos seleccionados · 3.928 / 4.000 tokens · 96,7% ahorrado',
         'perf.label': '// rendimiento',
         'perf.h2': 'Hecho para ir rápido.',
-        'perf.p': 'Optimizado en la v0.7.0 — medido sobre un codebase real de 2.111 nodos.',
-        'perf.th.opt': 'Optimización',
-        'perf.th.before': 'Antes',
-        'perf.th.after': 'Después',
-        'perf.th.gain': 'Mejora',
-        'perf.row.pagerank': 'Caché de PageRank',
-        'perf.row.tokencache': 'Caché de conteo de tokens',
-        'perf.row.heap': 'Heap voraz (O(n log n))',
-        'perf.row.latency': 'Latencia de extremo a extremo',
-        'perf.row.staleness': 'Grafo desactualizado',
-        'perf.silent': 'silencioso',
-        'perf.autoreload': 'recarga automática',
+        'perf.p': 'Latencia de una llamada a slurp_query a través del servidor MCP con presupuesto 4.000 — grafo de graphify de PrismaStats (2.111 nodos), media de diez consultas tras una pasada de calentamiento. Medido para la v1.1.0 en un Apple M4 con Python 3.12; tres ejecuciones, se muestra el rango.',
         'perf.note': 'Los cambios en el grafo se detectan automáticamente — sin reiniciar el servidor.',
         'how.label': '// cómo funciona',
         'how.h2': 'De cero a optimizado en minutos.',
         'how.step1.h3': 'Instala slurp',
-        'how.step1.p': 'Un comando, sin dependencias más allá de Python.',
+        'how.step1.p': 'Un comando. Requiere Python 3.12+.',
         'how.step2.h3': 'Indexa tu proyecto localmente',
         'how.step2.p': 'slurp index . analiza tu código con análisis estático puro — sin LLMs, sin APIs, sin coste.',
-        'how.update.note': 'Mantén el grafo actualizado: re-ejecuta <code>slurp index .</code> cuando haya cambios importantes · <code>slurp index . --watch</code> para re-indexado automático en segundo plano · añádelo como paso en GitHub Actions para CI/CD.',
+        'how.update.note': 'Mantén el grafo actualizado: re-ejecuta <code>slurp index .</code> cuando haya cambios importantes · <code>slurp index . --watch</code> para re-indexado automático en segundo plano.',
         'how.step3.h3': 'Configura el MCP una vez, listo para siempre',
-        'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente en cada consulta.',
-        'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a slurp en cada consulta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
-        'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional.',
+        'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente.',
+        'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a las herramientas de slurp cuando las necesita — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
+        'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional, y slurp index pregunta antes de reemplazarlo (-o graphify-out/slurp-graph.json conserva los dos, --force lo reemplaza).',
         'how.mcp.global': 'Instalación global:',
         'how.mcp.uv': 'Proyecto Python con uv:',
         'zerodeps.label': '// sin dependencias',
@@ -2186,25 +2121,29 @@ slurp index .
         'install.note': '¿Proyecto no Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — no <code>uv add</code>.',
         'features.label': '// funcionalidades',
         'features.h2': 'Construido diferente.',
-        'features.hero.sub': '16 lenguajes. Sin dependencias. Sin APIs. Sin coste.',
-        'features.mcp.sub': 'Configura una vez. Claude Code hace el resto.',
         'features.viz.line': 'Explorador interactivo de subgrafos',
         'features.diff.line': 'Compara snapshots del grafo',
         'features.benchmark.line': 'Mide el ahorro de tokens',
         'features.inject.line': 'Adjunta código fuente a los nodos',
-        'features.init.line': 'Setup en un solo comando. Detecta tu lenguaje, indexa y configura el MCP.',
-        'features.session.line': 'Mira en tiempo real cada query que slurp ha procesado.',
-        'features.vizoutput.line': 'Guarda el HTML de la visualización para compartir o revisar después.',
-        'features.pricemodel.line': 'Coste real en dólares, no solo porcentajes — sobre queries ahora 8,1× más rápidas.',
-        'features.smart.line': 'Re-indexado incremental consciente de git. 21× más rápido en los archivos modificados.',
+        'features.smart.line': 'Re-indexado incremental consciente de git. Produce el mismo grafo que un índice completo y es más rápido cuando solo cambian cuerpos de funciones.',
         'features.advisor.line': 'Recomienda el presupuesto de tokens óptimo a partir de tu historial de queries.',
         'features.federation.title': 'Federación multi-grafo',
         'features.federation.line': 'Consulta varios codebases simultáneamente.',
-        'features.explain.line': 'Explicaciones con LLM. Qué hace un nodo, su arquitectura y el riesgo de cambiarlo. Funciona con cualquier proveedor de LLM.',
-        'how.explain.note': '¿Quieres entender cualquier parte de tu codebase? <code>slurp explain "functionName" --graph graph.json</code> te lo explica en lenguaje natural usando tu LLM.',
-        'install.explain.note': 'Para <code>slurp explain</code>: define <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, o apunta a una instancia local de Ollama. ¿Sin LLM? Usa <code>--no-llm</code> para análisis estructural.',
+        'install.explain.note': 'Para <code>slurp explain</code>: define <code>ANTHROPIC_API_KEY</code> u <code>OPENAI_API_KEY</code>, ejecuta Ollama en local o apunta a cualquier endpoint compatible con OpenAI. ¿Sin LLM? Usa <code>--no-llm</code> para análisis estructural.',
         'how.smart.note': '¿Ya lo has indexado? Usa <code>slurp index . --smart</code> para actualizar solo los archivos que cambiaron.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+        'benchmark.note': 'Mismo ahorro en las tres consultas — "auth flow", "prisma schema", "database pool". Los dos lados son el texto que se enviaría, contado con tiktoken.',
+        'benchmark.recall.title': 'Calidad de recuperación',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mide el recall: la parte de los nodos etiquetados de cada pregunta que entra en el subgrafo. Sin LLM, sin coste, reproducible. 31 preguntas a <code>--budget 4000</code>: las 15 incluidas sobre el grafo <code>slurp index</code> de PrismaStats (1.582 nodos) y 16 sobre el grafo del propio slurp (4.165 nodos).',
+        'benchmark.recall.th.graph': 'Grafo',
+        'benchmark.recall.why': 'Qué cambió en la v1.2: los tests y los nodos import ya no ocupan plazas en el subgrafo (<code>--include-tests</code> e <code>--include-imports</code> los dejan volver) y un nodo presta su impulso a diez vecinos como mucho, así que los llamadores de un hub ya no llenan el presupuesto.',
+        'benchmark.recall.holdout': 'En la mitad de las preguntas que no se usó para ajustar la v1.2 (recall medio en markdown y JSON a 4.000 y 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Las 16 preguntas de slurp las etiquetó la misma herramienta que ajustó la v1.2: son orientativas, no una referencia independiente. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Detalle completo en el README →</a>',
+        'zerodeps.speed': 'La v1.1.1 aceleró <code>slurp index</code>: salta la salida de build de los frameworks web (<code>.next/</code> y similares) y poda las carpetas excluidas en vez de recorrerlas — PrismaStats 4,9 s → 0,5 s.',
+        'perf.th.version': 'Versión',
+        'perf.th.mean': 'Media de 10 consultas en caliente',
+        'perf.th.published': 'Publicado entonces',
+        'perf.row.v065': 'antes de las cachés y el heap',
+        'perf.slower': 'La v1.1.0 es unos 1,5 ms más lenta por consulta que la v0.7.0, y hace más: el presupuesto cuenta las relaciones además de los nodos, y el texto se renderiza y se cuenta antes de enviarlo.',
       },
       it: {
         flag: '🇮🇹', code: 'IT',
@@ -2216,32 +2155,28 @@ slurp index .
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'Il tuo codebase è la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona con qualsiasi codebase, qualsiasi linguaggio.',
-        'hero.badge': 'v1.0.0 — Release di produzione',
-        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> archi di chiamata · createAdminClient: <strong>0 &rarr; 97</strong> chiamanti',
+        'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona con qualsiasi codebase.',
+        'hero.badge': 'v1.2.0 — Selezione migliore, misurata',
+        'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> chiamanti',
         'how.step0.h3': 'Nuovo su slurp?',
         'how.step0.tag': 'opzionale',
         'how.step0.p': 'Esegui <code>slurp init</code> — rileva il linguaggio, indicizza il codebase e configura il server MCP in un solo passaggio.',
-        'v1.label': '// 1.0.0',
-        'v1.h2': 'Pronto per la produzione.',
-        'v1.p': 'slurp 1.0.0 arriva con un grafo delle chiamate completo per Python, TypeScript/JS, Go, Java e Rust — con risoluzione tra file per tutti e cinque. <code>slurp explain</code> e <code>slurp diff</code> ora dicono la verità sul tuo codebase.',
+        'v1.label': '// 1.2.0',
+        'v1.h2': 'Selezione migliore, misurata.',
+        'v1.p': 'slurp 1.2.0 tiene test e nodi import fuori dal sottografo e limita il boost a dieci vicini: il recall a <code>--budget 4000</code> in markdown passa da 0,867 a 0,967 su PrismaStats e da 0,688 a 0,875 sul grafo di slurp stesso. <code>slurp explain</code>, <code>slurp impact</code> e <code>slurp diff</code> ora contano solo i chiamanti di produzione, con i test a parte.',
         'v1.stat.tests': 'test',
-        'v1.stat.langs': 'linguaggi',
-        'benchmark.quality.title': 'Benchmark di qualità',
-        'benchmark.quality.pertoken': 'più qualità per token rispetto al grafo completo',
-        'benchmark.quality.winrate': 'di vittorie rispetto al baseline del grafo completo',
-        'benchmark.quality.honest': '<strong>Risultato onesto:</strong> slurp eccelle in efficienza, non solo nel risparmio di token.',
+        'v1.stat.langs': 'linguaggi con grafo delle chiamate',
         'benchmark.quality.callgraph': 'Grafo delle chiamate: Python, TypeScript/JS, Go, Java e Rust con risoluzione tra file',
         'features.explain.sub': 'Spiegazioni di architettura con LLM. Cosa fa una funzione, chi la chiama e il rischio di modificarla. Funziona con Anthropic, OpenAI, Ollama o qualsiasi endpoint compatibile.',
-        'features.eval.sub': 'Benchmark di qualità con giudice LLM. Misura se il contesto di slurp migliora la qualità delle risposte rispetto al grafo completo. 5× migliore qualità per token, dimostrato.',
+        'features.eval.sub': 'Recall sui nodi etichettati senza LLM, senza costi, riproducibile (--retrieval). Oppure un giudice LLM che valuta le risposte con il contesto di slurp rispetto al grafo completo.',
         'features.callgraph.title': 'Grafo delle chiamate',
         'features.callgraph.line': 'Python, TypeScript/JS, Go, Java e Rust. Risoluzione tra file per tutti e cinque i linguaggi. Analisi accurata del raggio d\'impatto.',
         'arch.label': '// intelligenza architetturale',
         'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
         'arch.callgraph.title': 'Grafo delle chiamate',
-        'arch.callgraph.line': '5 linguaggi con risoluzione tra file. Propagazione dei tipi di ritorno. 2.273 test.',
-        'arch.explain.line': 'Ruolo architetturale, percentuale di rischio e suggerimenti per approfondire. Modalità strutturale migliorata — nessun LLM necessario.',
-        'arch.eval.line': 'Benchmark di qualità oggettivo con giudice LLM. 5× migliore qualità per token, dimostrato su progetti reali.',
+        'arch.callgraph.line': '5 linguaggi con risoluzione tra file. Propagazione dei tipi di ritorno all\'interno di un file. 2.694 test.',
+        'arch.explain.line': 'Ruolo architetturale, percentuale di rischio e suggerimenti per approfondire. Il rischio conta solo i chiamanti di produzione; i test sono mostrati a parte. Modalità strutturale, nessun LLM necessario.',
+        'arch.eval.line': 'Recall senza LLM e senza costi (--retrieval): 0,967 su PrismaStats e 0,875 sul grafo di slurp stesso con budget 4.000. È disponibile anche una modalità con giudice LLM.',
         'features.impact.line': 'Analisi del raggio d\'impatto prima di modificare. Sai cosa si rompe prima di toccare un file.',
         'features.suggest.line': 'Suggerimenti di query dalla frontiera del grafo. Sai cosa esplorare dopo.',
         'arch.mcp.title': 'Strumenti MCP',
@@ -2255,12 +2190,11 @@ slurp index .
         'problem.p2': 'slurp valuta ogni nodo rispetto alla tua query usando PageRank + TF-IDF — zero chiamate LLM, zero token extra spesi — e serve solo ciò che rientra nel tuo budget.',
         'problem.before.label': 'grafo completo (token)',
         'problem.after.label': 'budget slurp (token)',
-        'problem.saving': '94,2% risparmiato',
-        'problem.benchmark': 'Benchmark: codebase PrismaStats · 2.111 nodi · query "player stats"',
+        'problem.saving': '96,7% risparmiato',
+        'problem.benchmark': 'Benchmark: PrismaStats · grafo graphify, 2.111 nodi · budget 4.000',
         'benchmark.label': '// benchmark',
         'benchmark.h2': 'Numeri reali su un codebase reale',
-        'benchmark.p': 'PrismaStats: 2.111 nodi, 69.418 token. Senza mock.',
-        'benchmark.th.query': 'Query',
+        'benchmark.p': 'PrismaStats: grafo graphify, 2.111 nodi. L\'intero grafo, stampato come un sottografo, è di 117.828 token. Senza mock.',
         'benchmark.th.budget': 'Budget',
         'benchmark.th.tokens': 'Token usati',
         'benchmark.th.graph': 'Grafo completo',
@@ -2268,40 +2202,27 @@ slurp index .
         'benchmark.stat.mean': 'risparmio medio',
         'benchmark.stat.best': 'caso migliore',
         'benchmark.stat.llm': 'chiamate LLM extra',
-        'benchmark.cost.with': 'Costo con slurp',
-        'benchmark.cost.without': 'Costo senza slurp',
-        'benchmark.cost.saved': 'Denaro risparmiato',
         'demo.label': '// demo',
         'demo.h2': 'Guardalo in azione',
         'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
         'demo.note': 'Demo dal vivo — codebase reale di PrismaStats, dati reali. Arancione = funzioni, Blu = classi, Viola = moduli.',
         'demo.status.hint': 'Clicca un nodo per ispezionarlo · Trascina per esplorare',
+        'demo.status.left': 'I primi 50 di 108 nodi selezionati · 3.928 / 4.000 token · 96,7% risparmiato',
         'perf.label': '// prestazioni',
         'perf.h2': 'Costruito per la velocità.',
-        'perf.p': 'Ottimizzato nella v0.7.0 — misurato su un codebase reale di 2.111 nodi.',
-        'perf.th.opt': 'Ottimizzazione',
-        'perf.th.before': 'Prima',
-        'perf.th.after': 'Dopo',
-        'perf.th.gain': 'Miglioramento',
-        'perf.row.pagerank': 'Cache di PageRank',
-        'perf.row.tokencache': 'Cache del conteggio token',
-        'perf.row.heap': 'Heap greedy (O(n log n))',
-        'perf.row.latency': 'Latenza end-to-end',
-        'perf.row.staleness': 'Grafo obsoleto',
-        'perf.silent': 'silenzioso',
-        'perf.autoreload': 'ricarica automatica',
+        'perf.p': 'Latenza di una chiamata slurp_query tramite il server MCP con budget 4.000 — grafo graphify di PrismaStats (2.111 nodi), media di dieci query dopo un giro di riscaldamento. Misurata per la v1.1.0 su un Apple M4, Python 3.12; tre esecuzioni, è mostrato l\'intervallo.',
         'perf.note': 'Le modifiche al grafo vengono rilevate automaticamente — nessun riavvio del server.',
         'how.label': '// come funziona',
         'how.h2': 'Da zero a ottimizzato in pochi minuti.',
         'how.step1.h3': 'Installa slurp',
-        'how.step1.p': 'Un solo comando, nessuna dipendenza oltre Python.',
+        'how.step1.p': 'Un solo comando. Richiede Python 3.12+.',
         'how.step2.h3': 'Indicizza il tuo progetto localmente',
         'how.step2.p': 'slurp index . analizza il tuo codice con static analysis pura — nessun LLM, nessuna API, nessun costo.',
-        'how.update.note': 'Mantieni il grafo aggiornato: ri-esegui <code>slurp index .</code> dopo modifiche importanti · <code>slurp index . --watch</code> per il re-indicizzamento automatico in background · aggiungilo come step in GitHub Actions per CI/CD.',
+        'how.update.note': 'Mantieni il grafo aggiornato: ri-esegui <code>slurp index .</code> dopo modifiche importanti · <code>slurp index . --watch</code> per il re-indicizzamento automatico in background.',
         'how.step3.h3': 'Configura MCP una volta, per sempre',
-        'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente ad ogni query.',
-        'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama slurp ad ogni query — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
-        'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive.',
+        'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente.',
+        'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama gli strumenti di slurp quando servono — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
+        'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive, e slurp index chiede prima di sostituirlo (-o graphify-out/slurp-graph.json li conserva entrambi, --force lo sostituisce).',
         'how.mcp.global': 'Installazione globale:',
         'how.mcp.uv': 'Progetto Python con uv:',
         'zerodeps.label': '// zero dipendenze',
@@ -2319,25 +2240,29 @@ slurp index .
         'install.note': 'Progetto non Python (JS, Go, TypeScript...)? Usa <code>uv tool install</code> o <code>pip install</code> — non <code>uv add</code>.',
         'features.label': '// funzionalità',
         'features.h2': 'Costruito diversamente.',
-        'features.hero.sub': '16 linguaggi. Zero dipendenze. Nessuna API. Nessun costo.',
-        'features.mcp.sub': 'Configura una volta. Claude Code fa il resto.',
         'features.viz.line': 'Esploratore interattivo di sottografi',
         'features.diff.line': 'Confronta snapshot del grafo',
         'features.benchmark.line': 'Misura il risparmio di token',
         'features.inject.line': 'Allega codice sorgente ai nodi',
-        'features.init.line': 'Setup con un solo comando. Rileva il linguaggio, indicizza, configura MCP.',
-        'features.session.line': 'Vedi in tempo reale ogni query elaborata da slurp.',
-        'features.vizoutput.line': 'Salva l\'HTML della visualizzazione per condividerlo o rivederlo.',
-        'features.pricemodel.line': 'Costo reale in dollari, non solo percentuali — su query ora 8,1× più veloci.',
-        'features.smart.line': 'Re-indicizzazione incrementale git-aware. 21× più veloce sui file modificati.',
+        'features.smart.line': 'Re-indicizzazione incrementale git-aware. Produce lo stesso grafo di un\'indicizzazione completa ed è più veloce quando cambiano solo i corpi delle funzioni.',
         'features.advisor.line': 'Consiglia il budget di token ottimale dalla cronologia delle tue query.',
         'features.federation.title': 'Federazione multi-grafo',
         'features.federation.line': 'Interroga più codebase simultaneamente.',
-        'features.explain.line': 'Spiegazioni con LLM. Cosa fa un nodo, la sua architettura e il rischio di modificarlo. Funziona con qualsiasi provider LLM.',
-        'how.explain.note': 'Vuoi capire una qualsiasi parte del tuo codebase? <code>slurp explain "functionName" --graph graph.json</code> te la spiega in linguaggio naturale usando il tuo LLM.',
-        'install.explain.note': 'Per <code>slurp explain</code>: imposta <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oppure punta a un\'istanza locale di Ollama. Nessun LLM? Usa <code>--no-llm</code> per l\'analisi strutturale.',
+        'install.explain.note': 'Per <code>slurp explain</code>: imposta <code>ANTHROPIC_API_KEY</code> o <code>OPENAI_API_KEY</code>, esegui Ollama in locale, oppure punta a qualsiasi endpoint compatibile con OpenAI. Nessun LLM? Usa <code>--no-llm</code> per l\'analisi strutturale.',
         'how.smart.note': 'Già indicizzato? Usa <code>slurp index . --smart</code> per aggiornare solo i file modificati.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+        'benchmark.note': 'Stesso risparmio per le tre query — "auth flow", "prisma schema", "database pool". Entrambi i lati sono il testo che verrebbe inviato, contato con tiktoken.',
+        'benchmark.recall.title': 'Qualità del recupero',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misura il recall: la quota dei nodi etichettati di ogni domanda che finisce nel sottografo. Nessun LLM, nessun costo, riproducibile. 31 domande a <code>--budget 4000</code>: le 15 predefinite sul grafo <code>slurp index</code> di PrismaStats (1.582 nodi) e 16 sul grafo di slurp stesso (4.165 nodi).',
+        'benchmark.recall.th.graph': 'Grafo',
+        'benchmark.recall.why': 'Cosa è cambiato nella v1.2: i test e i nodi import non occupano più posti nel sottografo (<code>--include-tests</code> e <code>--include-imports</code> li riammettono) e un nodo presta il suo boost al massimo a dieci vicini, così i chiamanti di un hub non riempiono più il budget.',
+        'benchmark.recall.holdout': 'Sulla metà delle domande non usata per tarare la v1.2 (recall medio in markdown e JSON a 4.000 e 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Le 16 domande di slurp sono state etichettate dallo stesso strumento che ha tarato la v1.2: indicative, non un riferimento indipendente. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Tutti i dettagli nel README →</a>',
+        'zerodeps.speed': 'La v1.1.1 ha reso <code>slurp index</code> più veloce: salta l\'output di build dei framework web (<code>.next/</code> e simili) e pota le cartelle escluse invece di attraversarle — PrismaStats 4,9 s → 0,5 s.',
+        'perf.th.version': 'Versione',
+        'perf.th.mean': 'Media di 10 query a caldo',
+        'perf.th.published': 'Pubblicato allora',
+        'perf.row.v065': 'prima delle cache e dell\'heap',
+        'perf.slower': 'La v1.1.0 è circa 1,5 ms più lenta per query rispetto alla v0.7.0, e fa di più: il budget conta le relazioni oltre ai nodi, e il testo viene generato e contato prima dell\'invio.',
       },
       fr: {
         flag: '🇫🇷', code: 'FR',
@@ -2349,32 +2274,28 @@ slurp index .
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'Votre codebase est le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne avec n\'importe quel codebase, n\'importe quel langage.',
-        'hero.badge': 'v1.0.0 — Version de production',
-        'benchmark.quality.edges': 'PrismaStats : <strong>193 &rarr; 488</strong> arêtes d\'appel · createAdminClient : <strong>0 &rarr; 97</strong> appelants',
+        'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne avec n\'importe quel codebase.',
+        'hero.badge': 'v1.2.0 — Meilleure sélection, mesurée',
+        'benchmark.quality.edges': 'PrismaStats · createAdminClient : <strong>97</strong> appelants',
         'how.step0.h3': 'Nouveau sur slurp ?',
         'how.step0.tag': 'optionnel',
         'how.step0.p': 'Lancez <code>slurp init</code> — détecte votre langage, indexe votre codebase et configure le serveur MCP en une seule étape.',
-        'v1.label': '// 1.0.0',
-        'v1.h2': 'Prêt pour la production.',
-        'v1.p': 'slurp 1.0.0 arrive avec un graphe d\'appels complet pour Python, TypeScript/JS, Go, Java et Rust — avec résolution inter-fichiers pour les cinq. <code>slurp explain</code> et <code>slurp diff</code> disent enfin la vérité sur votre codebase.',
+        'v1.label': '// 1.2.0',
+        'v1.h2': 'Meilleure sélection, mesurée.',
+        'v1.p': 'slurp 1.2.0 garde les tests et les nœuds import hors du sous-graphe et limite le boost à dix voisins : le rappel à <code>--budget 4000</code> en markdown passe de 0,867 à 0,967 sur PrismaStats et de 0,688 à 0,875 sur le graphe de slurp lui-même. <code>slurp explain</code>, <code>slurp impact</code> et <code>slurp diff</code> ne comptent plus que les appelants de production, tests à part.',
         'v1.stat.tests': 'tests',
-        'v1.stat.langs': 'langages',
-        'benchmark.quality.title': 'Benchmark de qualité',
-        'benchmark.quality.pertoken': 'de qualité par token de plus qu\'en injectant le graphe entier',
-        'benchmark.quality.winrate': 'de victoires face au baseline du graphe entier',
-        'benchmark.quality.honest': '<strong>Résultat honnête :</strong> slurp excelle en efficacité, pas seulement en économie de tokens.',
+        'v1.stat.langs': 'langages avec graphe d\'appels',
         'benchmark.quality.callgraph': 'Graphe d\'appels : Python, TypeScript/JS, Go, Java et Rust avec résolution inter-fichiers',
         'features.explain.sub': 'Explications d\'architecture par LLM. Ce que fait une fonction, qui l\'appelle et le risque de la modifier. Fonctionne avec Anthropic, OpenAI, Ollama ou tout endpoint compatible.',
-        'features.eval.sub': 'Benchmark de qualité avec juge LLM. Mesure si le contexte de slurp améliore la qualité des réponses face au graphe entier. 5× meilleure qualité par token, prouvé.',
+        'features.eval.sub': 'Rappel sur des nœuds étiquetés sans LLM, sans coût, reproductible (--retrieval). Ou un juge LLM qui note les réponses avec le contexte de slurp face au graphe complet.',
         'features.callgraph.title': 'Graphe d\'appels',
         'features.callgraph.line': 'Python, TypeScript/JS, Go, Java et Rust. Résolution inter-fichiers pour les cinq langages. Analyse précise du rayon d\'impact.',
         'arch.label': '// intelligence d\'architecture',
         'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
         'arch.callgraph.title': 'Graphe d\'appels',
-        'arch.callgraph.line': '5 langages avec résolution inter-fichiers. Propagation des types de retour. 2 273 tests.',
-        'arch.explain.line': 'Rôle architectural, pourcentage de risque et suggestions pour aller plus loin. Mode structurel amélioré — aucun LLM requis.',
-        'arch.eval.line': 'Benchmark de qualité objectif avec juge LLM. 5× meilleure qualité par token, prouvé sur des projets réels.',
+        'arch.callgraph.line': '5 langages avec résolution inter-fichiers. Propagation des types de retour au sein d\'un fichier. 2 694 tests.',
+        'arch.explain.line': 'Rôle architectural, pourcentage de risque et suggestions pour aller plus loin. Le risque ne compte que les appelants de production ; les tests sont affichés à part. Mode structurel, aucun LLM requis.',
+        'arch.eval.line': 'Rappel sans LLM et sans coût (--retrieval) : 0,967 sur PrismaStats et 0,875 sur le graphe de slurp lui-même avec un budget de 4 000. Un mode avec juge LLM est aussi disponible.',
         'features.impact.line': 'Analyse du rayon d\'impact avant édition. Sachez ce qui casse avant de toucher un fichier.',
         'features.suggest.line': 'Recommandations de requêtes depuis la frontière du graphe. Sachez quoi explorer ensuite.',
         'arch.mcp.title': 'Outils MCP',
@@ -2388,12 +2309,11 @@ slurp index .
         'problem.p2': "slurp évalue chaque nœud par rapport à votre requête en utilisant PageRank + TF-IDF — zéro appel LLM, zéro token supplémentaire dépensé — et ne sert que ce qui rentre dans votre budget.",
         'problem.before.label': 'graphe complet (tokens)',
         'problem.after.label': 'budget slurp (tokens)',
-        'problem.saving': '94,2% économisé',
-        'problem.benchmark': 'Benchmark : codebase PrismaStats · 2 111 nœuds · requête "player stats"',
+        'problem.saving': '96,7% économisé',
+        'problem.benchmark': 'Benchmark : PrismaStats · graphe graphify, 2 111 nœuds · budget 4 000',
         'benchmark.label': '// benchmark',
         'benchmark.h2': 'De vrais chiffres sur un vrai codebase',
-        'benchmark.p': 'PrismaStats : 2 111 nœuds, 69 418 tokens. Sans mocks.',
-        'benchmark.th.query': 'Requête',
+        'benchmark.p': 'PrismaStats : graphe graphify, 2 111 nœuds. Le graphe entier, imprimé comme un sous-graphe, fait 117 828 tokens. Sans mocks.',
         'benchmark.th.budget': 'Budget',
         'benchmark.th.tokens': 'Tokens utilisés',
         'benchmark.th.graph': 'Graphe complet',
@@ -2401,40 +2321,27 @@ slurp index .
         'benchmark.stat.mean': 'économie moyenne',
         'benchmark.stat.best': 'meilleur cas',
         'benchmark.stat.llm': 'appels LLM supplémentaires',
-        'benchmark.cost.with': 'Coût avec slurp',
-        'benchmark.cost.without': 'Coût sans slurp',
-        'benchmark.cost.saved': 'Argent économisé',
         'demo.label': '// démo',
         'demo.h2': 'Voir en action',
         'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
         'demo.note': 'Démo en direct — codebase réel de PrismaStats, données réelles. Orange = fonctions, Bleu = classes, Violet = modules.',
         'demo.status.hint': 'Cliquez sur un nœud pour l\'inspecter · Faites glisser pour explorer',
+        'demo.status.left': 'Les 50 premiers des 108 nœuds sélectionnés · 3 928 / 4 000 tokens · 96,7% économisé',
         'perf.label': '// performances',
         'perf.h2': 'Conçu pour la vitesse.',
-        'perf.p': 'Optimisé en v0.7.0 — mesuré sur un codebase réel de 2 111 nœuds.',
-        'perf.th.opt': 'Optimisation',
-        'perf.th.before': 'Avant',
-        'perf.th.after': 'Après',
-        'perf.th.gain': 'Amélioration',
-        'perf.row.pagerank': 'Cache PageRank',
-        'perf.row.tokencache': 'Cache du comptage de tokens',
-        'perf.row.heap': 'Tas glouton (O(n log n))',
-        'perf.row.latency': 'Latence de bout en bout',
-        'perf.row.staleness': 'Graphe obsolète',
-        'perf.silent': 'silencieux',
-        'perf.autoreload': 'rechargement auto',
+        'perf.p': 'Latence d\'un appel slurp_query via le serveur MCP avec un budget de 4 000 — graphe graphify de PrismaStats (2 111 nœuds), moyenne de dix requêtes après un passage de chauffe. Mesuré pour la v1.1.0 sur un Apple M4, Python 3.12 ; trois exécutions, plage affichée.',
         'perf.note': 'Les changements du graphe sont détectés automatiquement — aucun redémarrage du serveur.',
         'how.label': "// comment ça marche",
         'how.h2': 'De zéro à optimisé en quelques minutes.',
         'how.step1.h3': 'Installer slurp',
-        'how.step1.p': 'Une seule commande, aucune dépendance au-delà de Python.',
+        'how.step1.p': 'Une seule commande. Nécessite Python 3.12+.',
         'how.step2.h3': 'Indexer votre projet localement',
         'how.step2.p': 'slurp index . analyse votre code avec de l\'analyse statique pure — sans LLM, sans API, sans coût.',
-        'how.update.note': 'Gardez le graphe à jour : ré-exécutez <code>slurp index .</code> après des changements importants · <code>slurp index . --watch</code> pour la ré-indexation automatique en arrière-plan · ajoutez-le comme étape dans GitHub Actions pour CI/CD.',
+        'how.update.note': 'Gardez le graphe à jour : ré-exécutez <code>slurp index .</code> après des changements importants · <code>slurp index . --watch</code> pour la ré-indexation automatique en arrière-plan.',
         'how.step3.h3': 'Configurer MCP une fois, c\'est réglé',
-        'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement à chaque requête.',
-        'how.mcp': "<strong>Entièrement automatique après l'étape 3.</strong> Claude Code appelle slurp à chaque requête — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.",
-        'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire.',
+        'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement.',
+        'how.mcp': '<strong>Entièrement automatique après l\'étape 3.</strong> Claude Code appelle les outils de slurp quand il en a besoin — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.',
+        'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire, et slurp index demande avant de le remplacer (-o graphify-out/slurp-graph.json garde les deux, --force le remplace).',
         'how.mcp.global': 'Installation globale :',
         'how.mcp.uv': 'Projet Python avec uv :',
         'zerodeps.label': '// zéro dépendances',
@@ -2452,25 +2359,29 @@ slurp index .
         'install.note': 'Projet non Python (JS, Go, TypeScript...) ? Utilisez <code>uv tool install</code> ou <code>pip install</code> — pas <code>uv add</code>.',
         'features.label': '// fonctionnalités',
         'features.h2': 'Conçu différemment.',
-        'features.hero.sub': '16 langages. Zéro dépendance. Aucune API. Aucun coût.',
-        'features.mcp.sub': 'Configurez une fois. Claude Code fait le reste.',
         'features.viz.line': 'Explorateur interactif de sous-graphes',
         'features.diff.line': 'Comparer les instantanés du graphe',
         'features.benchmark.line': 'Mesurer les économies de tokens',
         'features.inject.line': 'Attacher le code source aux nœuds',
-        'features.init.line': 'Installation en une commande. Détecte le langage, indexe, configure MCP.',
-        'features.session.line': 'Voir en temps réel chaque requête traitée par slurp.',
-        'features.vizoutput.line': 'Enregistrer le HTML de la visualisation pour le partager ou le revoir.',
-        'features.pricemodel.line': 'Coût réel en dollars, pas seulement des pourcentages — sur des requêtes 8,1× plus rapides.',
-        'features.smart.line': 'Ré-indexation incrémentale compatible git. 21× plus rapide sur les fichiers modifiés.',
+        'features.smart.line': 'Ré-indexation incrémentale compatible git. Produit le même graphe qu\'une indexation complète, et va plus vite quand seuls des corps de fonctions changent.',
         'features.advisor.line': 'Recommande le budget de tokens optimal à partir de votre historique de requêtes.',
         'features.federation.title': 'Fédération multi-graphe',
         'features.federation.line': 'Interrogez plusieurs codebases simultanément.',
-        'features.explain.line': 'Explications par LLM. Ce que fait un nœud, son architecture et le risque de le modifier. Fonctionne avec n\'importe quel fournisseur LLM.',
-        'how.explain.note': 'Envie de comprendre n\'importe quelle partie de votre codebase ? <code>slurp explain "functionName" --graph graph.json</code> vous l\'explique en langage naturel avec votre LLM.',
-        'install.explain.note': 'Pour <code>slurp explain</code> : définissez <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, ou pointez vers une instance Ollama locale. Pas de LLM ? Utilisez <code>--no-llm</code> pour l\'analyse structurelle.',
+        'install.explain.note': 'Pour <code>slurp explain</code> : définissez <code>ANTHROPIC_API_KEY</code> ou <code>OPENAI_API_KEY</code>, lancez Ollama en local, ou pointez vers n\'importe quel endpoint compatible OpenAI. Pas de LLM ? Utilisez <code>--no-llm</code> pour l\'analyse structurelle.',
         'how.smart.note': 'Déjà indexé ? Utilisez <code>slurp index . --smart</code> pour ne mettre à jour que les fichiers modifiés.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+        'benchmark.note': 'Même économie pour les trois requêtes — « auth flow », « prisma schema », « database pool ». Les deux côtés sont le texte qui serait envoyé, compté avec tiktoken.',
+        'benchmark.recall.title': 'Qualité de récupération',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mesure le rappel : la part des nœuds étiquetés de chaque question qui entrent dans le sous-graphe. Aucun LLM, aucun coût, reproductible. 31 questions à <code>--budget 4000</code> : les 15 intégrées sur le graphe <code>slurp index</code> de PrismaStats (1 582 nœuds) et 16 sur le graphe de slurp lui-même (4 165 nœuds).',
+        'benchmark.recall.th.graph': 'Graphe',
+        'benchmark.recall.why': 'Ce qui a changé en v1.2 : les tests et les nœuds import n\'occupent plus de place dans le sous-graphe (<code>--include-tests</code> et <code>--include-imports</code> les réintègrent), et un nœud prête son boost à dix voisins au plus, si bien que les appelants d\'un hub ne remplissent plus le budget.',
+        'benchmark.recall.holdout': 'Sur la moitié des questions non utilisée pour régler la v1.2 (rappel moyen en markdown et JSON à 4 000 et 8 000) : PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Les 16 questions de slurp ont été étiquetées par le même outil qui a réglé la v1.2 : indicatives, pas une référence indépendante. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Tous les détails dans le README →</a>',
+        'zerodeps.speed': 'La v1.1.1 a accéléré <code>slurp index</code> : il ignore la sortie de build des frameworks web (<code>.next/</code> et similaires) et élague les dossiers exclus au lieu de les parcourir — PrismaStats 4,9 s → 0,5 s.',
+        'perf.th.version': 'Version',
+        'perf.th.mean': 'Moyenne de 10 requêtes à chaud',
+        'perf.th.published': 'Publié à l\'époque',
+        'perf.row.v065': 'avant les caches et le tas',
+        'perf.slower': 'La v1.1.0 est environ 1,5 ms plus lente par requête que la v0.7.0, et en fait plus : le budget compte les relations en plus des nœuds, et le texte est rendu et compté avant d\'être envoyé.',
       },
       de: {
         flag: '🇩🇪', code: 'DE',
@@ -2482,32 +2393,28 @@ slurp index .
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'Deine Codebase ist die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert mit jeder Codebase, jeder Sprache.',
-        'hero.badge': 'v1.0.0 — Produktions-Release',
-        'benchmark.quality.edges': 'PrismaStats: <strong>193 &rarr; 488</strong> Aufrufkanten · createAdminClient: <strong>0 &rarr; 97</strong> Aufrufer',
+        'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert mit jeder Codebase.',
+        'hero.badge': 'v1.2.0 — Bessere Auswahl, gemessen',
+        'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> Aufrufer',
         'how.step0.h3': 'Neu bei slurp?',
         'how.step0.tag': 'optional',
         'how.step0.p': 'Führe <code>slurp init</code> aus — erkennt deine Sprache, indiziert deine Codebase und konfiguriert den MCP-Server in einem Schritt.',
-        'v1.label': '// 1.0.0',
-        'v1.h2': 'Produktionsreif.',
-        'v1.p': 'slurp 1.0.0 kommt mit einem vollständigen Aufrufgraphen für Python, TypeScript/JS, Go, Java und Rust — mit dateiübergreifender Auflösung für alle fünf. <code>slurp explain</code> und <code>slurp diff</code> sagen jetzt die Wahrheit über deine Codebase.',
+        'v1.label': '// 1.2.0',
+        'v1.h2': 'Bessere Auswahl, gemessen.',
+        'v1.p': 'slurp 1.2.0 hält Tests und Import-Knoten aus dem Teilgraphen heraus und begrenzt den Nachbar-Boost auf zehn Nachbarn: Der Recall bei <code>--budget 4000</code> in Markdown steigt von 0,867 auf 0,967 bei PrismaStats und von 0,688 auf 0,875 auf slurps eigenem Graphen. <code>slurp explain</code>, <code>slurp impact</code> und <code>slurp diff</code> zählen jetzt nur Produktions-Aufrufer, Tests getrennt.',
         'v1.stat.tests': 'Tests',
-        'v1.stat.langs': 'Sprachen',
-        'benchmark.quality.title': 'Qualitäts-Benchmark',
-        'benchmark.quality.pertoken': 'mehr Qualität pro Token als der komplette Graph',
-        'benchmark.quality.winrate': 'Gewinnrate gegenüber dem Full-Graph-Baseline',
-        'benchmark.quality.honest': '<strong>Ehrliches Ergebnis:</strong> slurp glänzt bei der Effizienz, nicht nur beim Token-Sparen.',
+        'v1.stat.langs': 'Sprachen mit Aufrufgraph',
         'benchmark.quality.callgraph': 'Aufrufgraph: Python, TypeScript/JS, Go, Java und Rust mit dateiübergreifender Auflösung',
         'features.explain.sub': 'LLM-gestützte Architektur-Erklärungen. Was eine Funktion tut, wer sie aufruft und das Risiko einer Änderung. Funktioniert mit Anthropic, OpenAI, Ollama oder jedem kompatiblen Endpoint.',
-        'features.eval.sub': 'Qualitäts-Benchmark mit LLM-Richter. Misst, ob slurp-Kontext die Antwortqualität gegenüber dem kompletten Graphen verbessert. 5× bessere Qualität pro Token, bewiesen.',
+        'features.eval.sub': 'Recall gegen markierte Knoten ohne LLM, ohne Kosten, reproduzierbar (--retrieval). Oder ein LLM-Richter, der Antworten mit slurp-Kontext gegen den kompletten Graphen bewertet.',
         'features.callgraph.title': 'Aufrufgraph',
         'features.callgraph.line': 'Python, TypeScript/JS, Go, Java und Rust. Dateiübergreifende Auflösung für alle fünf Sprachen. Präzise Analyse des Wirkungsradius.',
         'arch.label': '// architektur-intelligenz',
         'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
         'arch.callgraph.title': 'Aufrufgraph',
-        'arch.callgraph.line': '5 Sprachen mit dateiübergreifender Auflösung. Rückgabetyp-Propagierung. 2.273 Tests.',
-        'arch.explain.line': 'Architektonische Rolle, Risikoprozentsatz und Vorschläge zum Weiterforschen. Struktureller Modus verbessert — kein LLM nötig.',
-        'arch.eval.line': 'Objektiver Qualitäts-Benchmark mit LLM-Richter. 5× bessere Qualität pro Token, an echten Projekten bewiesen.',
+        'arch.callgraph.line': '5 Sprachen mit dateiübergreifender Auflösung. Rückgabetyp-Propagierung innerhalb einer Datei. 2.694 Tests.',
+        'arch.explain.line': 'Architektonische Rolle, Risikoprozentsatz und Vorschläge zum Weiterforschen. Das Risiko zählt nur Produktions-Aufrufer; Tests werden getrennt gezeigt. Struktureller Modus, kein LLM nötig.',
+        'arch.eval.line': 'Recall ohne LLM und ohne Kosten (--retrieval): 0,967 bei PrismaStats und 0,875 auf slurps eigenem Graphen bei Budget 4.000. Ein Modus mit LLM-Richter ist ebenfalls verfügbar.',
         'features.impact.line': 'Wirkungsradius-Analyse vor dem Bearbeiten. Wisse, was bricht, bevor du eine Datei anfasst.',
         'features.suggest.line': 'Query-Empfehlungen von der Graph-Grenze. Wisse, was als Nächstes zu erkunden ist.',
         'arch.mcp.title': 'MCP-Tools',
@@ -2521,12 +2428,11 @@ slurp index .
         'problem.p2': 'slurp bewertet jeden Knoten anhand deiner Anfrage mit PageRank + TF-IDF — null LLM-Aufrufe, null zusätzliche Token verbraucht — und liefert nur das, was in dein Budget passt.',
         'problem.before.label': 'Gesamtgraph (Token)',
         'problem.after.label': 'slurp-Budget (Token)',
-        'problem.saving': '94,2% gespart',
-        'problem.benchmark': 'Benchmark: PrismaStats-Codebase · 2.111 Knoten · Anfrage „player stats"',
+        'problem.saving': '96,7% gespart',
+        'problem.benchmark': 'Benchmark: PrismaStats · graphify-Graph, 2.111 Knoten · Budget 4.000',
         'benchmark.label': '// benchmark',
         'benchmark.h2': 'Echte Zahlen auf einem echten Codebase',
-        'benchmark.p': 'PrismaStats: 2.111 Knoten, 69.418 Token. Keine Mocks.',
-        'benchmark.th.query': 'Anfrage',
+        'benchmark.p': 'PrismaStats: graphify-Graph, 2.111 Knoten. Der ganze Graph, so ausgegeben wie ein Teilgraph, umfasst 117.828 Token. Keine Mocks.',
         'benchmark.th.budget': 'Budget',
         'benchmark.th.tokens': 'Verwendete Token',
         'benchmark.th.graph': 'Gesamtgraph',
@@ -2534,40 +2440,27 @@ slurp index .
         'benchmark.stat.mean': 'durchschn. Ersparnis',
         'benchmark.stat.best': 'bester Fall',
         'benchmark.stat.llm': 'zusätzl. LLM-Aufrufe',
-        'benchmark.cost.with': 'Kosten mit slurp',
-        'benchmark.cost.without': 'Kosten ohne slurp',
-        'benchmark.cost.saved': 'Gespartes Geld',
         'demo.label': '// demo',
         'demo.h2': 'In Aktion sehen',
         'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
         'demo.note': 'Live-Demo — echte PrismaStats-Codebase, echte Daten. Orange = Funktionen, Blau = Klassen, Lila = Module.',
         'demo.status.hint': 'Auf einen Knoten klicken zum Inspizieren · Ziehen zum Erkunden',
+        'demo.status.left': 'Top 50 von 108 ausgewählten Knoten · 3.928 / 4.000 Token · 96,7% gespart',
         'perf.label': '// performance',
         'perf.h2': 'Auf Geschwindigkeit gebaut.',
-        'perf.p': 'Optimiert in v0.7.0 — gemessen an einer echten Codebase mit 2.111 Knoten.',
-        'perf.th.opt': 'Optimierung',
-        'perf.th.before': 'Vorher',
-        'perf.th.after': 'Nachher',
-        'perf.th.gain': 'Verbesserung',
-        'perf.row.pagerank': 'PageRank-Cache',
-        'perf.row.tokencache': 'Token-Zähl-Cache',
-        'perf.row.heap': 'Greedy-Heap (O(n log n))',
-        'perf.row.latency': 'End-to-End-Latenz',
-        'perf.row.staleness': 'Veralteter Graph',
-        'perf.silent': 'stillschweigend',
-        'perf.autoreload': 'Auto-Reload',
+        'perf.p': 'Latenz eines slurp_query-Aufrufs über den MCP-Server bei Budget 4.000 — graphify-Graph von PrismaStats (2.111 Knoten), Mittel aus zehn Anfragen nach einem Aufwärmdurchlauf. Gemessen für v1.1.0 auf einem Apple M4, Python 3.12; drei Läufe, Spanne angegeben.',
         'perf.note': 'Graph-Änderungen werden automatisch erkannt — kein Server-Neustart nötig.',
         'how.label': "// so funktioniert's",
         'how.h2': 'Von null auf optimiert in Minuten.',
         'how.step1.h3': 'slurp installieren',
-        'how.step1.p': 'Ein Befehl, keine Abhängigkeiten außer Python.',
+        'how.step1.p': 'Ein Befehl. Erfordert Python 3.12+.',
         'how.step2.h3': 'Projekt lokal indizieren',
         'how.step2.p': 'slurp index . analysiert deinen Code mit reiner statischer Analyse — keine LLMs, keine APIs, keine Kosten.',
-        'how.update.note': 'Graph aktuell halten: <code>slurp index .</code> nach wichtigen Änderungen erneut ausführen · <code>slurp index . --watch</code> für automatisches Re-Indizieren im Hintergrund · als Schritt in GitHub Actions für CI/CD hinzufügen.',
+        'how.update.note': 'Graph aktuell halten: <code>slurp index .</code> nach wichtigen Änderungen erneut ausführen · <code>slurp index . --watch</code> für automatisches Re-Indizieren im Hintergrund.',
         'how.step3.h3': 'MCP einmal konfigurieren, fertig',
-        'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es bei jeder Anfrage automatisch auf.',
-        'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft slurp bei jeder Anfrage auf — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
-        'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json.',
+        'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es automatisch auf.',
+        'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft die Tools von slurp auf, wenn es sie braucht — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
+        'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json — und slurp index fragt, bevor es ihn ersetzt (-o graphify-out/slurp-graph.json behält beide, --force ersetzt ihn).',
         'how.mcp.global': 'Globale Installation:',
         'how.mcp.uv': 'Python-Projekt mit uv:',
         'zerodeps.label': '// null abhängigkeiten',
@@ -2585,25 +2478,29 @@ slurp index .
         'install.note': 'Kein Python-Projekt (JS, Go, TypeScript...)? Nutze <code>uv tool install</code> oder <code>pip install</code> — nicht <code>uv add</code>.',
         'features.label': '// funktionen',
         'features.h2': 'Anders gebaut.',
-        'features.hero.sub': '16 Sprachen. Null Abhängigkeiten. Keine APIs. Keine Kosten.',
-        'features.mcp.sub': 'Einmal konfigurieren. Claude Code erledigt den Rest.',
         'features.viz.line': 'Interaktiver Teilgraph-Explorer',
         'features.diff.line': 'Graphen-Snapshots vergleichen',
         'features.benchmark.line': 'Token-Einsparungen messen',
         'features.inject.line': 'Quellcode an Knoten anhängen',
-        'features.init.line': 'Setup mit einem Befehl. Erkennt die Sprache, indiziert, konfiguriert MCP.',
-        'features.session.line': 'Jede von slurp verarbeitete Query in Echtzeit sehen.',
-        'features.vizoutput.line': 'Das Visualisierungs-HTML zum Teilen oder späteren Prüfen speichern.',
-        'features.pricemodel.line': 'Echte Kosten in Dollar, nicht nur Prozentwerte — bei jetzt 8,1× schnelleren Queries.',
-        'features.smart.line': 'Git-bewusstes inkrementelles Neuindizieren. 21× schneller bei geänderten Dateien.',
+        'features.smart.line': 'Git-bewusstes inkrementelles Neuindizieren. Erzeugt denselben Graphen wie eine vollständige Indizierung und ist schneller, wenn sich nur Funktionsrümpfe ändern.',
         'features.advisor.line': 'Empfiehlt das optimale Token-Budget aus deinem Query-Verlauf.',
         'features.federation.title': 'Multi-Graph-Föderation',
         'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen.',
-        'features.explain.line': 'LLM-gestützte Erklärungen. Was ein Knoten tut, seine Architektur und das Risiko einer Änderung. Funktioniert mit jedem LLM-Anbieter.',
-        'how.explain.note': 'Willst du einen beliebigen Teil deiner Codebase verstehen? <code>slurp explain "functionName" --graph graph.json</code> erklärt ihn in normaler Sprache mit deinem LLM.',
-        'install.explain.note': 'Für <code>slurp explain</code>: setze <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, oder verweise auf eine lokale Ollama-Instanz. Kein LLM? Nutze <code>--no-llm</code> für strukturelle Analyse.',
+        'install.explain.note': 'Für <code>slurp explain</code>: setze <code>ANTHROPIC_API_KEY</code> oder <code>OPENAI_API_KEY</code>, starte Ollama lokal oder verweise auf einen beliebigen OpenAI-kompatiblen Endpoint. Kein LLM? Nutze <code>--no-llm</code> für strukturelle Analyse.',
         'how.smart.note': 'Schon indiziert? Nutze <code>slurp index . --smart</code>, um nur geänderte Dateien zu aktualisieren.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
+        'benchmark.note': 'Gleiche Ersparnis für alle drei Anfragen — „auth flow“, „prisma schema“, „database pool“. Beide Seiten sind der Text, der gesendet würde, gezählt mit tiktoken.',
+        'benchmark.recall.title': 'Abrufqualität',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misst den Recall: den Anteil der markierten Knoten jeder Frage, der im Teilgraphen landet. Kein LLM, keine Kosten, reproduzierbar. 31 Fragen bei <code>--budget 4000</code>: die 15 eingebauten auf dem <code>slurp index</code>-Graphen von PrismaStats (1.582 Knoten) und 16 auf slurps eigenem Graphen (4.165 Knoten).',
+        'benchmark.recall.th.graph': 'Graph',
+        'benchmark.recall.why': 'Was sich in v1.2 geändert hat: Tests und Import-Knoten belegen keine Plätze mehr im Teilgraphen (<code>--include-tests</code> und <code>--include-imports</code> lassen sie wieder zu), und ein Knoten gibt seinen Nachbar-Boost an höchstens zehn Nachbarn weiter, sodass die Aufrufer eines Hubs das Budget nicht mehr füllen.',
+        'benchmark.recall.holdout': 'Auf der Hälfte der Fragen, die nicht zum Abstimmen von v1.2 verwendet wurde (mittlerer Recall in Markdown und JSON bei 4.000 und 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Die 16 Fragen von slurp hat dasselbe Tool markiert, das v1.2 abgestimmt hat — Richtwerte, keine unabhängige Referenz. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Alle Details im README →</a>',
+        'zerodeps.speed': 'v1.1.1 hat <code>slurp index</code> beschleunigt: Es überspringt die Build-Ausgabe von Web-Frameworks (<code>.next/</code> u. Ä.) und lässt ausgeschlossene Ordner aus, statt sie zu durchlaufen — PrismaStats 4,9 s → 0,5 s.',
+        'perf.th.version': 'Version',
+        'perf.th.mean': 'Mittel aus 10 warmen Anfragen',
+        'perf.th.published': 'Damals veröffentlicht',
+        'perf.row.v065': 'vor den Caches und dem Heap',
+        'perf.slower': 'v1.1.0 ist pro Anfrage etwa 1,5 ms langsamer als v0.7.0 und leistet mehr dafür: Das Budget zählt Beziehungen ebenso wie Knoten, und der Text wird vor dem Senden gerendert und gezählt.',
       },
     };
 
