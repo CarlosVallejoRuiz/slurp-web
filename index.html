@@ -717,7 +717,7 @@
     }
     .recall-intro code,
     .recall-why code,
-    .recall-fine code { color: var(--orange); font-family: var(--mono); font-size: 0.9em; }
+    .recall-fine code { color: var(--orange); font-family: var(--mono); font-size: 0.9em; white-space: nowrap; }
 
     .recall-table { margin: 22px 0; }
     .recall-table .recall-ver { color: var(--text-dim); text-transform: none; letter-spacing: 0; white-space: nowrap; }
@@ -848,6 +848,9 @@
       z-index: 1;
     }
 
+    /* flex item: without min-width:0 a long code line would widen the step past the viewport
+       instead of scrolling inside its .code-block */
+    .step-body { min-width: 0; }
     .step-body h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; padding-top: 8px; }
     .step-body p { font-size: 0.9rem; margin-bottom: 8px; }
 
@@ -860,6 +863,7 @@
       font-size: 0.82rem;
       line-height: 1.7;
       color: var(--text-muted);
+      white-space: pre;
       overflow-x: auto;
       margin-top: 8px;
     }
@@ -1181,6 +1185,12 @@
       .hero-bg-logo { width: 280px; height: 280px; }
 
       .install-block { flex-direction: column; align-items: stretch; }
+
+      /* At 375px the unbreakable command plus the French and German header words
+         ("D'UTILISATION", "ANWENDUNGSFALL") overflowed; tighter metrics fit all five. */
+      .install-table th, .install-table td { padding: 10px 8px; }
+      .install-table th { letter-spacing: 0.05em; }
+      .install-table td code { font-size: 0.75em; padding: 2px 5px; }
       .install-cmd { text-align: center; }
       .copy-btn { border-left: none; border-top: 1px solid var(--border); justify-content: center; padding: 12px; }
 
