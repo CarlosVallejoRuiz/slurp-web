@@ -1,0 +1,91 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C — the ramen counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#16110c;--cream:#f4ead8;--mu:#b3a793;--or:#f97316;--ink:#1a120a;--d:'Bricolage Grotesque',sans-serif;--m:'DM Mono',monospace}
+body{background:var(--bg);color:var(--cream);font:400 17px/1.55 var(--d);-webkit-font-smoothing:antialiased}
+.w{max-width:1200px;margin:0 auto;padding:0 36px}
+.top{display:flex;align-items:center;gap:24px;padding:18px 0;font:500 13px var(--m);text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+.top .sp{flex:1}.top .cta{background:var(--or);color:var(--ink);padding:9px 14px;border-radius:99px}
+.hero{position:relative;padding:20px 0 0;overflow:hidden}
+.word{font:800 300px/.78 var(--d);font-stretch:75%;letter-spacing:-.02em;color:var(--cream);margin-left:-10px}
+.bowl{position:absolute;right:-30px;top:-6px;width:430px;height:430px}
+.hrow{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:end;margin-top:38px;padding-bottom:56px}
+.tag{font:600 40px/1.08 var(--d);letter-spacing:-.02em}.tag em{font-style:normal;color:var(--or)}
+.sub{color:var(--mu);margin-top:14px;font-size:18px}
+.ticket{background:var(--cream);color:var(--ink);font:400 14px/1.5 var(--m);padding:20px 22px 22px;transform:rotate(-1.4deg);position:relative}
+.ticket::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:linear-gradient(135deg,var(--cream) 5px,transparent 0) 0 0/10px 10px,linear-gradient(225deg,var(--cream) 5px,transparent 0) 0 0/10px 10px}
+.ticket .t{display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;border-bottom:1px dashed #7c6f5c;padding-bottom:8px;margin-bottom:10px;text-transform:uppercase;font-size:12px;letter-spacing:.06em}
+.ticket .l{display:flex;justify-content:space-between;gap:10px}.ticket .l b{font-weight:500}
+.ticket .l s{color:#7c6f5c}
+.ticket .tot{border-top:1px dashed #7c6f5c;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font:800 30px/1 var(--d);letter-spacing:-.02em}
+.ticket .pip{margin-top:14px;background:var(--ink);color:var(--cream);padding:11px 12px;display:flex;justify-content:space-between;font-size:14px}.ticket .pip i{color:var(--or);font-style:normal}
+.band{background:var(--or);color:var(--ink);padding:70px 0 76px}
+.k{font:500 13px var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+h2{font:800 76px/.92 var(--d);font-stretch:78%;letter-spacing:-.035em;max-width:9em}
+.band .in{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.lede{font-size:17px;line-height:1.5;margin-top:22px;max-width:32em}
+.lede code,.lim code{font:500 .86em var(--m)}
+.big3{display:grid;grid-template-columns:repeat(3,auto);gap:26px;margin-top:34px;justify-content:start}
+.big3 .v{font:800 96px/.82 var(--d);font-stretch:75%;letter-spacing:-.04em}
+.big3 p{font:500 14px/1.35 var(--d);max-width:13em;margin-top:10px}
+.bowls{display:flex;gap:4px;margin-top:12px}.bowls i{width:15px;height:8px;border-radius:0 0 9px 9px;background:var(--ink)}.bowls i.o{background:none;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.lim{background:var(--ink);color:var(--cream);padding:24px 26px 14px;transform:rotate(.8deg)}
+.lim .k{color:var(--or)}
+.lim p{font-size:15px;line-height:1.5;color:#d9cdb8;margin-bottom:12px;padding-left:16px;border-left:2px solid var(--or)}.lim p b{color:var(--cream);font-weight:700}
+.menu{padding:76px 0 84px}
+.menu .in{display:grid;grid-template-columns:1fr 1.5fr;gap:56px;align-items:start}
+.menu h2{color:var(--cream)}.menu .k{color:var(--or)}.menu .lede{color:var(--mu)}
+.board{border-top:3px solid var(--cream)}
+.board .hd,.it{display:grid;grid-template-columns:auto 1fr auto auto;align-items:baseline;gap:12px}
+.board .hd{font:500 12px var(--m);text-transform:uppercase;letter-spacing:.08em;color:var(--mu);padding:10px 0 4px}
+.it{padding:9px 0;border-bottom:1px solid #33291f}
+.it .nm{font:700 27px/1.1 var(--d);font-stretch:85%;letter-spacing:-.01em}
+.it .dt{border-bottom:2px dotted #5a4c3c;transform:translateY(-6px)}
+.it .a{font:400 16px var(--m);color:var(--mu);text-decoration:line-through;text-decoration-color:#7a6a55}
+.it .b{font:800 34px/1 var(--d);font-stretch:80%;color:var(--or);min-width:96px;text-align:right;font-variant-numeric:tabular-nums}
+.it.mean{border-bottom:0;border-top:3px solid var(--cream);margin-top:-1px;padding-top:14px}.it.mean .b{font-size:52px}.it.mean .nm{font-size:34px}
+.hd span:nth-child(3){min-width:52px;text-align:right}.hd span:nth-child(4){min-width:96px;text-align:right}
+@media(max-width:700px){.w{padding:0 18px}.top .hid{display:none}.word{font-size:124px;margin-left:-4px}.bowl{width:190px;height:190px;right:-34px;top:-14px}.hrow{grid-template-columns:1fr;gap:30px;margin-top:22px;padding-bottom:44px}.tag{font-size:28px}.sub{font-size:16px}.band{padding:44px 0 52px}h2{font-size:46px}.band .in,.menu .in{grid-template-columns:1fr;gap:28px}.big3{grid-template-columns:1fr;gap:18px}.big3>div{display:grid;grid-template-columns:118px 1fr;align-items:center;column-gap:10px}.big3 .v{font-size:70px;grid-row:span 2}.big3 p{margin:0 0 6px}.bowls{margin:0}.menu{padding:48px 0 56px}.it .nm{font-size:20px}.it .b{font-size:26px;min-width:70px}.it .a{font-size:13px}.it.mean .b{font-size:36px}.it.mean .nm{font-size:24px}.hd span:nth-child(4){min-width:70px}}
+</style></head><body>
+<div class="w"><div class="top"><span>v1.4.0 — A better ranking, measured</span><span class="sp"></span><span class="hid">Install</span><span class="hid">Benchmark</span><span class="hid">How it works</span><span class="hid">Features</span><span class="hid">EN ▾</span><span class="cta">GitHub →</span></div>
+<div class="hero"><img class="bowl" src="../../../assets/SlurpLogo_SinFondo.png" alt=""><div class="word">slurp</div>
+<div class="hrow"><div><p class="tag">Your codebase is the bowl. slurp serves <em>exactly the noodles</em> your LLM needs.</p><p class="sub">Understands your codebase architecture. 16 languages. Works standalone or with graphify.</p></div>
+<div class="ticket"><div class="t"><span>PrismaStats · 2,111 nodes</span><span>budget 4,000</span></div>
+<div class="l"><span>full graph (tokens)</span><s>117,828</s></div>
+<div class="l"><span>slurp budget (tokens)</span><b>4,000</b></div>
+<div class="l"><span>extra LLM calls</span><b>0</b></div>
+<div class="tot"><span>saved</span><span>96.7%</span></div>
+<div class="pip"><span><i>$</i> pip install slurp-graph</span><span>copy</span></div></div></div></div></div>
+
+<div class="band"><div class="w"><div class="in"><div>
+<p class="k">How it works</p><h2>Measured with agents</h2>
+<p class="lede">Before the v1.3.0 release, ten <code>claude -p</code> sessions (Claude Code 2.1.331, Claude Opus 5.5) each did one task in a fresh clone set up with <code>slurp init --yes</code> — five on slurp itself, five on PrismaStats. No prompt mentioned slurp. Against a criterion fixed before measuring (8 of 10 sessions needed):</p>
+<div class="big3">
+<div><div class="v">9/10</div><p>sessions called slurp on their own, all 9 before their first edit</p><div class="bowls"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i></div></div>
+<div><div class="v">0</div><p>approvals: no slurp tool was denied</p><div class="bowls"></div></div>
+<div><div class="v">10/10</div><p>tasks completed: the project's checks pass and the diff does what the task asked</p><div class="bowls"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+</div></div>
+<div class="lim"><p class="k">Its limits</p>
+<p><b>n = 10, from a single run</b>, and the model varies from one run to the next.</p>
+<p><b>The one session without slurp</b> had a prompt that named both symbols to change and the component they live in. The agent grepped for them: with the names given, the task was finding them, not working out where the code lives, which is what <code>slurp_query</code> is for.</p>
+<p><b>The refresh was barely exercised.</b> Agents call slurp when they start, before editing: 15 of the 16 calls found the graph current and one refreshed it, in 325 ms.</p>
+<p>Only 4 of the 26 files edited had a <code>slurp_impact</code> or <code>slurp_explain</code> first.</p></div>
+</div></div></div>
+
+<div class="menu"><div class="w"><div class="in"><div>
+<p class="k">Benchmark</p><h2>The v1.4 ranking</h2>
+<p class="lede">Recall at --budget 4000 in markdown, on six projects the ranking was not chosen on. Same tokens: the answers use the same ~98% of the budget as before. Commit subjects are not an agent's questions.</p></div>
+<div class="board"><div class="hd"><span>Project</span><span></span><span>v1.3</span><span>v1.4.0</span></div>
+<div class="it"><span class="nm">gin</span><span class="dt"></span><span class="a">0.779</span><span class="b">0.824</span></div>
+<div class="it"><span class="nm">click</span><span class="dt"></span><span class="a">0.610</span><span class="b">0.775</span></div>
+<div class="it"><span class="nm">ripgrep</span><span class="dt"></span><span class="a">0.421</span><span class="b">0.587</span></div>
+<div class="it"><span class="nm">excalidraw</span><span class="dt"></span><span class="a">0.428</span><span class="b">0.583</span></div>
+<div class="it"><span class="nm">commons-lang</span><span class="dt"></span><span class="a">0.678</span><span class="b">0.740</span></div>
+<div class="it"><span class="nm">prometheus</span><span class="dt"></span><span class="a">0.344</span><span class="b">0.535</span></div>
+<div class="it mean"><span class="nm">Mean</span><span class="dt"></span><span class="a">0.543</span><span class="b">0.674</span></div>
+</div></div></div></div>
+
+</body></html>

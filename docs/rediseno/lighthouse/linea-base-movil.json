@@ -1,0 +1,55 @@
+{
+  "url": "https://imjuank.dev/slurp-web/",
+  "fecha": "2026-11-28",
+  "commit": "32ed687",
+  "runs": [
+    {
+      "categorias": {
+        "performance": 73,
+        "accessibility": 94,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "2.1 s",
+      "LCP": "16.3 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "SpeedIndex": "2.1 s",
+      "peso": "Total size was 2,804 KiB"
+    },
+    {
+      "categorias": {
+        "performance": 73,
+        "accessibility": 94,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "2.2 s",
+      "LCP": "16.3 s",
+      "TBT": "0 ms",
+      "CLS": "0.006",
+      "SpeedIndex": "2.2 s",
+      "peso": "Total size was 2,805 KiB"
+    },
+    {
+      "categorias": {
+        "performance": 73,
+        "accessibility": 94,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "2.1 s",
+      "LCP": "16.1 s",
+      "TBT": "0 ms",
+      "CLS": "0.006",
+      "SpeedIndex": "2.1 s",
+      "peso": "Total size was 2,805 KiB"
+    }
+  ],
+  "lighthouse": "13.6.0",
+  "formFactor": "mobile",
+  "throttling": "simulate"
+}

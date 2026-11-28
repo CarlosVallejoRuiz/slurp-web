@@ -1,0 +1,104 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A — the page is the output</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--pane:#111110;--line:#2c2a26;--tx:#dcd7cc;--mu:#958f84;--or:#f97316;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
+body{background:var(--bg);color:var(--tx);font:400 15px/1.6 var(--mono);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.bar{display:flex;gap:22px;align-items:center;border-bottom:1px solid var(--line);padding:14px 0;font-size:13px;color:var(--mu)}
+.bar img{width:26px;height:26px}.bar b{color:var(--tx);font-weight:600;margin-right:6px}.bar .sp{flex:1}.bar a{color:var(--mu);text-decoration:none}
+.bar .ver{color:var(--or)}
+.hero{display:grid;grid-template-columns:5fr 6fr;gap:48px;padding:72px 0 80px;align-items:start}
+h1{font:600 44px/1.12 var(--mono);letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--or)}
+.sub{font:400 17px/1.6 var(--sans);color:var(--mu);margin:22px 0 30px;max-width:30em}
+.cmd{display:flex;border:1px solid var(--line);background:var(--pane);font-size:16px}
+.cmd span{padding:14px 16px;flex:1}.cmd i{font-style:normal;color:var(--or);margin-right:10px}
+.cmd button{font:500 12px var(--mono);letter-spacing:.08em;background:var(--or);color:#0a0a0a;border:0;padding:0 18px;text-transform:uppercase}
+.links{margin-top:16px;font-size:13px;color:var(--mu)}.links a{color:var(--tx);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px;margin-right:18px}
+.term{border:1px solid var(--line);background:var(--pane);font-size:13px;line-height:1.55}
+.term .tt{border-bottom:1px solid var(--line);padding:8px 14px;color:var(--mu);font-size:12px;display:flex;justify-content:space-between}
+.term pre{font:inherit;padding:16px 14px;white-space:pre;overflow:hidden;color:var(--mu)}
+.term pre b{color:var(--tx);font-weight:500}.term pre em{color:var(--or);font-style:normal}
+.meter{padding:0 14px 18px}
+.meter .row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mu);margin-top:8px}
+.meter .row span:first-child{width:104px}.meter .row span:last-child{width:70px;text-align:right;color:var(--tx)}
+.meter .tr{flex:1;height:10px;background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 4px)}
+.meter .tr.full{background:repeating-linear-gradient(90deg,#6b665d 0 2px,transparent 2px 4px)}
+.meter .tr i{display:block;height:100%;width:3.4%;background:var(--or)}
+.meter .sv{color:var(--or);margin-top:12px;font-size:13px}
+section{border-top:1px solid var(--line);padding:64px 0}
+.h{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.h .n{color:var(--or);font-size:13px}.h h2{font:600 26px/1.2 var(--mono);letter-spacing:-.02em}
+.lede{font:400 16px/1.65 var(--sans);color:var(--mu);max-width:44em;margin-bottom:28px}
+.lede code,.note code{font-family:var(--mono);font-size:.9em;color:var(--tx)}
+.runs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+.run{padding:22px 22px 24px;border-right:1px solid var(--line)}.run:last-child{border-right:0}
+.run .big{font:600 46px/1 var(--mono);letter-spacing:-.04em}
+.run .big small{font-size:20px;color:var(--mu);font-weight:400}
+.sq{display:flex;gap:5px;margin:14px 0 12px}.sq i{width:16px;height:16px;background:var(--or)}.sq i.o{background:none;border:1px solid var(--mu)}.sq i.z{background:none;border:1px dashed var(--line)}
+.run p{font:400 14px/1.5 var(--sans);color:var(--mu)}
+.notes{margin-top:22px;border-left:2px solid var(--line);padding-left:18px}
+.notes .t{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:8px}
+.note{font:400 14.5px/1.6 var(--sans);color:var(--mu);margin-bottom:8px;display:flex;gap:10px}
+.note::before{content:"#";font-family:var(--mono);color:var(--or)}.note b{color:var(--tx);font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--line)}
+th{font-weight:500;font-size:12px;color:var(--mu);text-align:left;padding:10px 16px;border-bottom:1px solid var(--line);letter-spacing:.04em}
+td{padding:9px 16px;border-bottom:1px solid #1b1a18}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;width:86px}
+td.v3{color:var(--mu)}td.v4{color:var(--or);font-weight:600}
+td.g{width:44%}.g div{position:relative;height:10px;background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 4px)}
+.g i{position:absolute;left:0;top:0;height:100%;background:#6b665d;width:calc(var(--a)*100%)}
+.g u{position:absolute;top:0;height:100%;background:var(--or);left:calc(var(--a)*100%);width:calc((var(--b) - var(--a))*100%)}
+tr.mean td{border-top:1px solid var(--line);border-bottom:0;color:var(--tx);font-weight:600}tr.mean td.v4{color:var(--or)}
+.cap{font:400 13px/1.55 var(--sans);color:var(--mu);margin-top:12px;max-width:52em}
+@media(max-width:700px){.wrap{padding:0 18px}.bar{gap:12px;font-size:12px}.bar .hid{display:none}.hero{grid-template-columns:1fr;gap:32px;padding:40px 0 48px}h1{font-size:29px}.sub{font-size:16px}.cmd{font-size:14px}.term{font-size:9.6px;overflow:hidden}.meter .row{font-size:11px}.meter .row span:first-child{width:78px}.meter .row span:last-child{width:54px}.ax{display:none}.term pre{padding:12px 10px}section{padding:44px 0}.h h2{font-size:21px}.runs{grid-template-columns:1fr}.run{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:center;padding:16px}.run:last-child{border-bottom:0}.run .big{font-size:34px;grid-row:span 2}.sq{margin:0 0 6px}.sq i{width:11px;height:11px}.sq{gap:3px}.run p{font-size:13.5px}td,th{padding:9px 10px}td.g{width:30%}td.num,th.num{width:58px}table{font-size:13px}}
+</style></head><body><div class="wrap">
+<div class="bar"><img src="../../../assets/SlurpLogo_SinFondo.png" alt=""><span><b>slurp</b><span class="ver">v1.4.0</span></span><span class="hid">3,082 tests</span><span class="hid">MIT</span><span class="hid">Python 3.12+</span><span class="sp"></span><a class="hid">install</a><a class="hid">benchmark</a><a class="hid">how it works</a><a>GitHub ↗</a><a>EN ▾</a></div>
+<div class="hero"><div>
+<h1>Your codebase is the bowl. slurp serves <em>exactly the noodles</em> your LLM needs.</h1>
+<p class="sub">Understands your codebase architecture. 16 languages. Works standalone or with graphify.</p>
+<div class="cmd"><span><i>$</i>pip install slurp-graph</span><button>copy</button></div>
+<p class="links"><a>GitHub →</a><a>PyPI →</a></p>
+</div>
+<div class="term"><div class="tt"><span>slurp — player stats</span><span>PrismaStats · graphify graph</span></div>
+<pre><b>$ slurp "player stats" --budget 4000</b>
+
+╭─ Slurp — Subgraph for: "player stats" ──────────────╮
+│ Selected <em>103</em>/2111 nodes · <em>3,926</em>/4,000 tokens used  │
+╰─────────────────────────────────────────────────────╯</pre>
+<div class="meter"><div class="row"><span>full graph</span><div class="tr full"></div><span>117,828</span></div>
+<div class="row"><span>slurp budget</span><div class="tr"><i></i></div><span>4,000</span></div>
+<p class="sv">96.7% saved · 0 extra LLM calls</p></div></div></div>
+
+<section><div class="h"><span class="n">$ agents</span><h2>Measured with agents</h2></div>
+<p class="lede">Before the v1.3.0 release, ten <code>claude -p</code> sessions (Claude Code 2.1.331, Claude Opus 5.5) each did one task in a fresh clone set up with <code>slurp init --yes</code> — five on slurp itself, five on PrismaStats. No prompt mentioned slurp. Against a criterion fixed before measuring (8 of 10 sessions needed):</p>
+<div class="runs">
+<div class="run"><div class="big">9<small>/10</small></div><div><div class="sq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i></div><p>sessions called slurp on their own, all 9 before their first edit</p></div></div>
+<div class="run"><div class="big">0</div><div><div class="sq"><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i><i class="z"></i></div><p>approvals: no slurp tool was denied</p></div></div>
+<div class="run"><div class="big">10<small>/10</small></div><div><div class="sq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p>tasks completed: the project's checks pass and the diff does what the task asked</p></div></div>
+</div>
+<div class="notes"><p class="t">Its limits</p>
+<p class="note"><span><b>n = 10, from a single run</b>, and the model varies from one run to the next.</span></p>
+<p class="note"><span><b>The one session without slurp</b> had a prompt that named both symbols to change and the component they live in. The agent grepped for them: with the names given, the task was finding them, not working out where the code lives, which is what <code>slurp_query</code> is for.</span></p>
+<p class="note"><span><b>The refresh was barely exercised.</b> Agents call slurp when they start, before editing: 15 of the 16 calls found the graph current and one refreshed it, in 325 ms.</span></p>
+<p class="note"><span>Only 4 of the 26 files edited had a <code>slurp_impact</code> or <code>slurp_explain</code> first.</span></p></div>
+</section>
+
+<section><div class="h"><span class="n">$ eval</span><h2>The v1.4 ranking</h2></div>
+<p class="lede">Recall at <code>--budget 4000</code> in markdown, on six projects the ranking was not chosen on.</p>
+<table><thead><tr><th>project</th><th class="num">v1.3</th><th class="num">v1.4.0</th><th><span class="ax">0 ─────────────── 1</span></th></tr></thead><tbody>
+<tr><td>gin</td><td class="num v3">0.779</td><td class="num v4">0.824</td><td class="g"><div style="--a:.779;--b:.824"><i></i><u></u></div></td></tr>
+<tr><td>click</td><td class="num v3">0.610</td><td class="num v4">0.775</td><td class="g"><div style="--a:.610;--b:.775"><i></i><u></u></div></td></tr>
+<tr><td>ripgrep</td><td class="num v3">0.421</td><td class="num v4">0.587</td><td class="g"><div style="--a:.421;--b:.587"><i></i><u></u></div></td></tr>
+<tr><td>excalidraw</td><td class="num v3">0.428</td><td class="num v4">0.583</td><td class="g"><div style="--a:.428;--b:.583"><i></i><u></u></div></td></tr>
+<tr><td>commons-lang</td><td class="num v3">0.678</td><td class="num v4">0.740</td><td class="g"><div style="--a:.678;--b:.740"><i></i><u></u></div></td></tr>
+<tr><td>prometheus</td><td class="num v3">0.344</td><td class="num v4">0.535</td><td class="g"><div style="--a:.344;--b:.535"><i></i><u></u></div></td></tr>
+<tr class="mean"><td>Mean</td><td class="num v3">0.543</td><td class="num v4">0.674</td><td class="g"><div style="--a:.543;--b:.674"><i></i><u></u></div></td></tr>
+</tbody></table>
+<p class="cap">Same tokens: the answers use the same ~98% of the budget as before. Commit subjects are not an agent's questions, so the release criterion, fixed before measuring, also required the labelled architecture questions below not to lose more than one question at 4000 in markdown.</p>
+</section></div>
+
+</body></html>
