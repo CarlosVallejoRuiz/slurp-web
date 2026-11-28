@@ -880,8 +880,8 @@ Las auditorías de `canonical`, `hreflang` y `llms.txt` de Lighthouse pasan.
 
 **Lo que queda pendiente o conviene saber**
 
-- **`index.html` de la raíz sigue en la rama**: es la web anterior, para que el sitio no se
-  quede sin página si se fusiona antes de cambiar el origen de Pages. Se borra después.
+- **El `index.html` de la raíz ya no existe**: se borró cuando Pages empezó a publicar desde
+  GitHub Actions.
 - **Las carátulas del visualizador y `og.png` son capturas con cifras**: si la demo o los
   números cambian, hay que rehacerlas.
 - **`lastmod` del sitemap** es la fecha del último commit que tocó `src/`, `assets/` o

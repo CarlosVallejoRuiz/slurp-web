@@ -128,8 +128,7 @@ antes de cada respuesta. El usuario no hace nada diferente.
 - **`dist/` no se versiona** y es lo único que se publica: `CLAUDE.md`, `docs/` y `src/` no.
 - **La página funciona sin JavaScript.** El JS solo añade los botones de copiar, las estrellas
   de GitHub y la carga del visualizador dentro de la página.
-- **`index.html` de la raíz** es la web anterior. Se conserva solo hasta que GitHub Pages
-  publique desde GitHub Actions; después se borra.
+- **No hay `index.html` en la raíz.** Las páginas solo existen en `dist/`, generadas.
 
 ## URLs
 
