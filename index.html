@@ -723,6 +723,35 @@
     .recall-table .recall-ver { color: var(--text-dim); text-transform: none; letter-spacing: 0; white-space: nowrap; }
     .recall-table .recall-from { color: var(--text-dim); white-space: nowrap; }
     .recall-table .recall-to { color: var(--orange); font-weight: 600; }
+    /* a value that got worse: plain text, never the orange of a gain */
+    .recall-table .recall-down { color: var(--text); font-weight: 600; }
+    .recall-table .recall-same { color: var(--text-dim); }
+    .recall-table tr.recall-mean td { border-top: 1px solid var(--border); }
+
+    .quality-bench .bench-summary { margin: 24px 0 8px; gap: 28px 40px; }
+    .quality-bench .bench-stat { flex: 1 1 180px; text-align: left; }
+
+    .limits-title {
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .limits-list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .limits-list li { margin-bottom: 6px; }
+    .limits-list strong { color: var(--text); font-weight: 600; }
+    .limits-list code { color: var(--orange); font-family: var(--mono); font-size: 0.9em; }
+
+    .step-optional-tag.step-rec-tag { color: var(--orange); }
+    .step-body > p code { color: var(--orange); font-family: var(--mono); font-size: 0.85em; }
 
     .recall-fine {
       margin-top: 12px;
@@ -1208,6 +1237,8 @@
       .recall-table { font-size: 0.8rem; }
       .recall-table th, .recall-table td { padding: 10px 8px; }
       .recall-table .recall-ver { display: block; white-space: normal; }
+      /* four columns at 375px: "from" and "to" on two lines */
+      .labelled-table .recall-from { display: block; }
 
       .bench-summary { gap: 20px; }
       .steps::before { display: none; }
@@ -1301,8 +1332,8 @@
       <p class="hero-tagline" data-i18n-html="hero.tagline">
         Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>
       </p>
-      <p><span class="hero-badge" data-i18n="hero.badge">v1.2.0 — Better selection, measured</span></p>
-      <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works with any codebase.</p>
+      <p><span class="hero-badge" data-i18n="hero.badge">v1.4.0 — A better ranking, measured</span></p>
+      <p class="hero-subtagline" data-i18n="hero.subtagline">Understands your codebase architecture. 16 languages. Works standalone or with graphify.</p>
 
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="install-block">
@@ -1383,7 +1414,7 @@
       <p class="section-label" data-i18n="problem.label">// the problem</p>
       <h2 data-i18n="problem.h2">Your LLM doesn't need the whole bowl</h2>
       <p data-i18n-html="problem.p1">slurp index maps your entire codebase into a knowledge graph using pure static analysis — no LLMs, no APIs. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it'll never use.</p>
-      <p data-i18n="problem.p2">slurp scores each node against your query using PageRank + TF-IDF — zero LLM calls, zero extra tokens spent — and serves only what fits inside your budget.</p>
+      <p data-i18n="problem.p2">slurp scores each node against your query — TF-IDF over its name, file path and scope, plus a PageRank personalised on the query — with zero LLM calls and zero extra tokens spent, and serves only what fits inside your budget.</p>
 
       <div class="token-viz">
         <div class="token-num before">
@@ -1460,33 +1491,70 @@
       </div>
 
       <div class="quality-bench">
-        <p class="quality-title" data-i18n="benchmark.recall.title">Retrieval quality</p>
-        <p class="recall-intro" data-i18n-html="benchmark.recall.intro"><code>slurp eval --retrieval</code> measures recall: the share of each question's labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 questions at <code>--budget 4000</code>: 15 built-in on PrismaStats's <code>slurp index</code> graph (1,582 nodes), 16 on slurp's own graph (4,165 nodes).</p>
+        <p class="quality-title" data-i18n="benchmark.rank.title">The v1.4 ranking</p>
+        <p class="recall-intro" data-i18n-html="benchmark.rank.intro">v1.4.0 changes the order in which slurp ranks nodes, so the same budget holds more of what a question needs. The semantic score reads the terms of a node's file path and of the class or module that holds it, at the weight of its name; the structural score is a PageRank personalised on the query. It was chosen on a bank of 1,525 questions taken from the commit history of 14 open-source projects — a commit's subject as the question, the definitions it changed as the answer — compared on 7 projects and then checked once on the other 6. Recall at <code>--budget 4000</code> in markdown, on those six:</p>
 
         <table class="bench-table recall-table">
           <thead>
             <tr>
+              <th data-i18n="benchmark.rank.th.project">Project</th>
+              <th>v1.3</th>
+              <th>v1.4.0</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="query">gin</td><td class="recall-same">0.779</td><td><strong class="recall-to">0.824</strong></td></tr>
+            <tr><td class="query">click</td><td class="recall-same">0.610</td><td><strong class="recall-to">0.775</strong></td></tr>
+            <tr><td class="query">ripgrep</td><td class="recall-same">0.421</td><td><strong class="recall-to">0.587</strong></td></tr>
+            <tr><td class="query">excalidraw</td><td class="recall-same">0.428</td><td><strong class="recall-to">0.583</strong></td></tr>
+            <tr><td class="query">commons-lang</td><td class="recall-same">0.678</td><td><strong class="recall-to">0.740</strong></td></tr>
+            <tr><td class="query">prometheus</td><td class="recall-same">0.344</td><td><strong class="recall-to">0.535</strong></td></tr>
+            <tr class="recall-mean"><td class="query" data-i18n="benchmark.rank.mean">Mean</td><td class="recall-same">0.543</td><td><strong class="recall-to">0.674</strong></td></tr>
+          </tbody>
+        </table>
+
+        <p class="recall-fine" data-i18n-html="benchmark.rank.fine">Same tokens: the answers use the same ~98% of the budget as before. Commit subjects are not an agent's questions, so the release criterion, fixed before measuring, also required the labelled architecture questions below not to lose more than one question at 4000 in markdown. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Validation record, in Spanish →</a></p>
+      </div>
+
+      <div class="quality-bench">
+        <p class="quality-title" data-i18n="benchmark.recall.title">The 31 labelled questions</p>
+        <p class="recall-intro" data-i18n-html="benchmark.recall.intro"><code>slurp eval --retrieval</code> measures recall: the share of each question's labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 architecture questions: 15 built-in on PrismaStats's <code>slurp index</code> graph (1,582 nodes), 16 on slurp's own graph (4,165 nodes). From v1.3 to v1.4.0, what improves and what gets worse:</p>
+
+        <table class="bench-table recall-table labelled-table">
+          <thead>
+            <tr>
               <th data-i18n="benchmark.recall.th.graph">Graph</th>
-              <th>Markdown <span class="recall-ver">v1.1.1 &rarr; v1.2.0</span></th>
-              <th>JSON <span class="recall-ver">v1.1.1 &rarr; v1.2.0</span></th>
+              <th>Markdown 4000 <span class="recall-ver">v1.3 &rarr; v1.4.0</span></th>
+              <th>JSON 4000 <span class="recall-ver">v1.3 &rarr; v1.4.0</span></th>
+              <th>Markdown 16000 <span class="recall-ver">v1.3 &rarr; v1.4.0</span></th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="query">PrismaStats</td>
-              <td><span class="recall-from">0.867 &rarr;</span> <strong class="recall-to">0.967</strong></td>
-              <td><span class="recall-from">0.589 &rarr;</span> <strong class="recall-to">0.900</strong></td>
+              <td><span class="recall-from">0.967 &rarr;</span> <span class="recall-same">0.967</span></td>
+              <td><span class="recall-from">0.900 &rarr;</span> <span class="recall-down">0.867</span></td>
+              <td><span class="recall-from">0.967 &rarr;</span> <span class="recall-same">0.967</span></td>
             </tr>
             <tr>
               <td class="query">slurp</td>
-              <td><span class="recall-from">0.688 &rarr;</span> <strong class="recall-to">0.875</strong></td>
-              <td><span class="recall-from">0.562 &rarr;</span> <strong class="recall-to">0.812</strong></td>
+              <td><span class="recall-from">0.875 &rarr;</span> <strong class="recall-to">0.938</strong></td>
+              <td><span class="recall-from">0.812 &rarr;</span> <span class="recall-down">0.750</span></td>
+              <td><span class="recall-from">1.000 &rarr;</span> <span class="recall-down">0.938</span></td>
             </tr>
           </tbody>
         </table>
 
-        <p class="recall-why" data-i18n-html="benchmark.recall.why">What changed in v1.2: tests and import nodes no longer take places in the subgraph (<code>--include-tests</code> and <code>--include-imports</code> let them back), and a node lends its neighbour boost to at most ten neighbours, so a hub's callers no longer fill the budget.</p>
-        <p class="recall-fine" data-i18n-html="benchmark.recall.holdout">On the half of the questions not used to tune v1.2 (mean recall in markdown and JSON at 4,000 and 8,000): PrismaStats 0.780 &rarr; 0.893, slurp 0.562 &rarr; 0.750. slurp's 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Full detail in the README &rarr;</a></p>
+        <p class="recall-why" data-i18n-html="benchmark.recall.why">What gets worse: in JSON at 4000, PrismaStats falls from 0.900 to 0.867 (the equivalent of half a question) and slurp from 0.812 to 0.750 (one question); in markdown at 16000, slurp falls from 1.000 to 0.938 (one question). PrismaStats's MRR falls from 0.405 to 0.337: the first relevant node ranks lower on average, though at 4000 no question finds fewer of its labelled nodes. In markdown at 4000 — what <code>slurp QUERY</code> prints by default and the only format the MCP server sends — no question is worse.</p>
+        <p class="recall-fine" data-i18n-html="benchmark.recall.holdout">slurp's 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Full detail in the README →</a></p>
+
+      </div>
+
+      <div class="quality-bench">
+        <p class="quality-title" data-i18n="benchmark.budget.title">Choosing a budget</p>
+        <p class="recall-intro" data-i18n-html="benchmark.budget.p1">A study with slurp v1.3.0, on the same 1,525 questions from the commit history of 14 open-source projects, looked for the budget past which more tokens find nothing new. For pinning down the specific function a change touches, it found none: recall keeps growing, about 10 points per doubling, up to 32000 with no plateau, in projects with more than about 2,000 candidate nodes (those slurp may return: no tests, no imports). There, in markdown and with v1.3.0, 4000 finds 34–68% of the changed definitions, 16000 finds 52–75% and 32000 finds 59–81%.</p>
+        <p class="recall-why" style="margin-top:12px;" data-i18n-html="benchmark.budget.p2">So the default stays 4000 — doubling the context for ten points is a trade-off, not an optimum — and what v1.4 improved is the ranking. As a guide: for architecture questions, the default is enough; for pinning down one specific function in a large project, pass 16000–32000. <code>slurp_query</code>'s description tells the agent the same.</p>
+        <p class="recall-fine" data-i18n-html="benchmark.budget.link"><a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Study conclusions, in Spanish →</a></p>
 
         <p class="quality-callgraph" data-i18n="benchmark.quality.callgraph">Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution</p>
         <p class="quality-callgraph" style="margin-top:6px;" data-i18n-html="benchmark.quality.edges">PrismaStats · createAdminClient: <strong>97</strong> callers</p>
@@ -1540,7 +1608,7 @@ slurp index .
           scrolling="no"
           loading="lazy"></iframe>
         <div class="demo-status">
-          <span class="left" data-i18n="demo.status.left">Top 50 of 108 selected nodes · 3,928 / 4,000 tokens · 96.7% saved</span>
+          <span class="left" data-i18n="demo.status.left">Top 50 of 103 selected nodes · 3,926 / 4,000 tokens · 96.7% saved</span>
           <span class="right" data-i18n="demo.status.hint">Click any node to inspect · Drag to explore</span>
         </div>
       </div>
@@ -1559,23 +1627,23 @@ slurp index .
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.callgraph.title">Call graph</p>
-          <p class="arch-col-line" data-i18n="arch.callgraph.line">5 languages with cross-file resolution. Return type propagation within a file. 2,694 tests.</p>
+          <p class="arch-col-line" data-i18n="arch.callgraph.line">5 languages with cross-file resolution. Return type propagation within a file. 3,082 tests.</p>
           <div class="arch-code">recalcularPlayerStats()<br>&rarr; 3 production callers<br><span class="risk">RISK: MEDIUM</span></div>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp explain</p>
-          <p class="arch-col-line" data-i18n="arch.explain.line">Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed.</p>
+          <p class="arch-col-line" data-i18n="arch.explain.line">Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed. Since v1.4.0 it finds a graphify function by its name.</p>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title">slurp eval</p>
-          <p class="arch-col-line" data-i18n="arch.eval.line">Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.875 on slurp's own graph at budget 4,000. An LLM-judge mode is also available.</p>
+          <p class="arch-col-line" data-i18n="arch.eval.line">Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.938 on slurp's own graph at budget 4,000. An LLM-judge mode is also available.</p>
         </div>
 
         <div class="arch-col">
           <p class="arch-col-title" data-i18n="arch.mcp.title">MCP tools</p>
-          <p class="arch-col-line" data-i18n-html="arch.mcp.line">5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically.</p>
+          <p class="arch-col-line" data-i18n-html="arch.mcp.line">5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically — after <code>slurp init</code>, without asking for approval.</p>
         </div>
 
       </div>
@@ -1619,7 +1687,14 @@ slurp index .
       </table>
 
       <p class="perf-note" style="margin-top:0;" data-i18n="perf.slower">v1.1.0 is about 1.5 ms slower per query than v0.7.0, and does more for it: the budget costs relationships as well as nodes, and the text is rendered and counted before it is sent.</p>
-      <p class="perf-note" data-i18n="perf.note">Graph changes detected automatically — no server restart needed.</p>
+
+      <div class="quality-bench">
+        <p class="quality-title" data-i18n="perf.v14.title">v1.4.0 against v1.3</p>
+        <p class="recall-intro" data-i18n-html="perf.v14.p">Measured with another method than the table above, so the figures cannot be compared with it: six reference graphs, v1.4.0 beside v1.3 in the same session, with the encoder loaded. Warm queries (the median of 20) take 0.31–0.71× v1.3's time on hono, slurp, tokio, prometheus and sqlalchemy (sqlalchemy, 59,518 nodes: 278 → 87 ms); on PrismaStats, the smallest, they are slower: 10.2 → 14.4 ms. The first query on a freshly loaded graph is slower too, up to 1.54× (hono: 41.9 → 64.4 ms): the new ranking builds once per graph the terms of every name and path, which is what makes every later query faster. The release criterion allowed 1.5× on that first query; the author's rule, fixed before measuring again, accepts up to 1.67× on it alone. The first <code>slurp_query</code> after the MCP server refreshes the graph takes 1.03–1.45× v1.3's.</p>
+        <p class="recall-fine" data-i18n-html="perf.v14.link"><a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Latency record, in Spanish →</a></p>
+      </div>
+
+      <p class="perf-note" data-i18n="perf.note">The graph follows your working tree: before each call the server checks it and refreshes slurp's own graph if something changed — no re-indexing by hand, no server restart.</p>
     </div>
   </section>
 
@@ -1632,11 +1707,11 @@ slurp index .
       <h2 data-i18n="how.h2">From zero to optimized in minutes.</h2>
 
       <div class="steps">
-        <div class="step step-optional">
+        <div class="step">
           <div class="step-num">0</div>
           <div class="step-body">
-            <h3><span data-i18n="how.step0.h3">New to slurp?</span><span class="step-optional-tag" data-i18n="how.step0.tag">optional</span></h3>
-            <p data-i18n-html="how.step0.p">Run <code>slurp init</code> — detects your language, indexes your codebase, and configures the MCP server in one step.</p>
+            <h3><span data-i18n="how.step0.h3">New to slurp?</span><span class="step-optional-tag step-rec-tag" data-i18n="how.step0.tag">recommended</span></h3>
+            <p data-i18n-html="how.step0.p">With slurp installed (step 1), run <code>slurp init</code> in your project root. It shows the whole plan and asks before writing anything: it builds a graph that keeps itself current, registers the MCP server in <code>.mcp.json</code>, approves it for Claude Code so the agent does not ask for approval, and tells your agent when to use slurp. Then restart your AI coding assistant — steps 2 and 3 are already done.</p>
             <div class="code-block"><span class="c"># guided one-command setup</span>
 slurp init</div>
           </div>
@@ -1655,13 +1730,13 @@ pip install slurp-graph</div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
-            <h3 data-i18n="how.step2.h3">Index your project locally</h3>
+            <h3><span data-i18n="how.step2.h3">Index your project locally</span><span class="step-optional-tag" data-i18n="how.manual.tag">manual setup</span></h3>
             <p data-i18n="how.step2.p">slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.</p>
             <div class="code-block"><span class="c"># generates the graph locally</span>
 slurp index .
 <span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span></div>
-            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing.</span></p>
-            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">Already indexed? Use <code>slurp index . --smart</code> to update only changed files.</span></p>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.update.note">The graph keeps itself current: before every answer — each MCP call and the query commands in the terminal — slurp checks the working tree (0.4 ms per call on PrismaStats) and refreshes its own graph if a file changed: 30 ms for an edit inside function bodies, 0.29 s for a full index, on PrismaStats. A call waits at most 2 seconds for a refresh.</span></p>
+            <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.smart.note">So you no longer re-index by hand. <code>slurp index . --watch</code> is only needed for tools that read <code>graph.json</code> outside slurp, and no longer depends on watchdog; <code>slurp index . --smart</code> re-parses only the files that changed, with no git needed.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.explain2.note">Want to understand your codebase? <code>slurp explain "functionName"</code> explains any function in plain language.</span></p>
             <p class="update-note"><span class="update-note-icon">ℹ</span><span data-i18n-html="how.impact.note">Before editing a file, run <code>slurp impact &lt;file&gt;</code> to see what might break.</span></p>
           </div>
@@ -1670,8 +1745,8 @@ slurp index .
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-body">
-            <h3 data-i18n="how.step3.h3">Configure MCP once, done forever</h3>
-            <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically.</p>
+            <h3><span data-i18n="how.step3.h3">Configure MCP once, done forever</span><span class="step-optional-tag" data-i18n="how.manual.tag">manual setup</span></h3>
+            <p data-i18n-html="how.step3.p">Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically. Set up by hand, Claude Code asks once for the server and before each call unless you answer “don't ask again”; <code>slurp init</code> writes that approval for you.</p>
             <p class="mcp-variant-label" data-i18n="how.mcp.global">Global install:</p>
             <div class="code-block">{
   <span class="k">"mcpServers"</span>: {
@@ -1694,10 +1769,37 @@ slurp index .
         </div>
       </div>
 
-      <div class="mcp-note" data-i18n-html="how.mcp">
-        <strong>Fully automatic after step 3.</strong> Claude Code calls slurp's tools when it needs them — no extra commands, no prompt engineering. You work exactly as before, just cheaper.
+      <div class="mcp-note" data-i18n-html="how.mcp"><strong>Fully automatic after <code>slurp init</code>.</strong> Claude Code calls slurp's tools when it needs them, without asking for approval, and the graph refreshes itself before each answer — no extra commands, no prompt engineering. You work exactly as before, just cheaper.</div>
+      <p class="graphify-compat-note" data-i18n="how.graphify.note">Already using graphify? slurp works with your existing graph.json out of the box, read-only: it never rebuilds or rewrites it, and answers say when files it covers changed after it was built. slurp init builds slurp's own graph beside it (graphify-out/slurp-graph.json), which auto-discovery picks first; slurp index asks before replacing graphify's (--force replaces it).</p>
+
+      <div class="quality-bench" id="agents">
+        <p class="quality-title" data-i18n="agents.title">Measured with agents</p>
+        <p class="recall-intro" data-i18n-html="agents.intro">Before the v1.3.0 release, ten <code>claude -p</code> sessions (Claude Code 2.1.331, Claude Opus 5.5) each did one task in a fresh clone set up with <code>slurp init --yes</code> — five on slurp itself, five on PrismaStats. No prompt mentioned slurp. Against a criterion fixed before measuring (8 of 10 sessions needed):</p>
+
+        <div class="bench-summary">
+          <div class="bench-stat">
+            <span class="val">9/10</span>
+            <span class="desc" data-i18n="agents.stat.used">sessions called slurp on their own, all 9 before their first edit</span>
+          </div>
+          <div class="bench-stat">
+            <span class="val">0</span>
+            <span class="desc" data-i18n="agents.stat.approvals">approvals: no slurp tool was denied</span>
+          </div>
+          <div class="bench-stat">
+            <span class="val">10/10</span>
+            <span class="desc" data-i18n="agents.stat.done">tasks completed: the project's checks pass and the diff does what the task asked</span>
+          </div>
+        </div>
+
+        <p class="limits-title" data-i18n="agents.limits.title">Its limits</p>
+        <ul class="limits-list">
+          <li data-i18n-html="agents.l1"><strong>n = 10, from a single run</strong>, and the model varies from one run to the next.</li>
+          <li data-i18n-html="agents.l2"><strong>The one session without slurp</strong> had a prompt that named both symbols to change and the component they live in. The agent grepped for them: with the names given, the task was finding them, not working out where the code lives, which is what <code>slurp_query</code> is for.</li>
+          <li data-i18n-html="agents.l3"><strong>The refresh was barely exercised.</strong> Agents call slurp when they start, before editing: 15 of the 16 calls found the graph current and one refreshed it, in 325 ms.</li>
+          <li data-i18n-html="agents.l4">Only 4 of the 26 files edited had a <code>slurp_impact</code> or <code>slurp_explain</code> first.</li>
+        </ul>
+        <p class="recall-fine" data-i18n-html="agents.link"><a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Per-session table and the rest of the findings, in Spanish →</a></p>
       </div>
-      <p class="graphify-compat-note" data-i18n="how.graphify.note">Already using graphify? slurp works with your existing graph.json out of the box — and slurp index asks before replacing it (-o graphify-out/slurp-graph.json keeps both, --force replaces it).</p>
     </div>
   </section>
 
@@ -1747,7 +1849,7 @@ slurp index .
               </svg>
             </div>
             <p class="bento-medium-title">slurp index --smart</p>
-            <p class="bento-medium-sub" data-i18n="features.smart.line">Git-aware incremental re-indexing. Produces the same graph as a full index, and is faster when only function bodies change.</p>
+            <p class="bento-medium-sub" data-i18n="features.smart.line">Incremental re-indexing from a manifest in graph.json, no git needed. Produces the same graph as a full index, and is faster when only function bodies change.</p>
           </div>
 
           <div class="bento-medium">
@@ -1877,13 +1979,13 @@ slurp index .
   ══════════════════════════════ -->
   <section id="milestone">
     <div class="container reveal">
-      <p class="section-label" data-i18n="v1.label">// 1.2.0</p>
-      <h2 class="milestone-h2" data-i18n="v1.h2">Better selection, measured.</h2>
-      <p class="milestone-p" data-i18n-html="v1.p">slurp 1.2.0 keeps tests and import nodes out of the subgraph and caps the neighbour boost at ten neighbours: recall at <code>--budget 4000</code> in markdown goes from 0.867 to 0.967 on PrismaStats and from 0.688 to 0.875 on slurp's own graph. <code>slurp explain</code>, <code>slurp impact</code> and <code>slurp diff</code> now count production callers only, with tests shown apart.</p>
+      <p class="section-label" data-i18n="v1.label">// 1.4.0</p>
+      <h2 class="milestone-h2" data-i18n="v1.h2">A better ranking, measured.</h2>
+      <p class="milestone-p" data-i18n-html="v1.p">slurp 1.4.0 ranks better: the score reads a node's path and scope as well as its name, and the PageRank is personalised on the query — recall at <code>--budget 4000</code> goes from 0.543 to 0.674 on six held-out projects, with the same tokens. And since 1.3.0 slurp runs on its own: the graph follows the working tree, and <code>slurp init</code> sets Claude Code up to call it without asking for approval — measured with agents, 9 of 10 sessions called slurp unprompted (n = 10, a single run).</p>
 
       <div class="milestone-stats">
         <div class="milestone-stat">
-          <span class="val">2,694</span>
+          <span class="val">3,082</span>
           <span class="desc" data-i18n="v1.stat.tests">tests</span>
         </div>
         <div class="milestone-stat">
@@ -1906,7 +2008,7 @@ slurp index .
         <span class="footer-sep">·</span>
         <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <span class="footer-sep">·</span>
-        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.2.0</span>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);">v1.4.0</span>
       </div>
       <p class="footer-credit" data-i18n-html="footer.credit">
         Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona
@@ -1927,15 +2029,15 @@ slurp index .
         'nav.how': 'How it works',
         'nav.features': 'Features',
         'hero.tagline': 'Your codebase is the bowl. slurp serves exactly the noodles your LLM needs. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works with any codebase.',
-        'hero.badge': 'v1.2.0 — Better selection, measured',
+        'hero.subtagline': 'Understands your codebase architecture. 16 languages. Works standalone or with graphify.',
+        'hero.badge': 'v1.4.0 — A better ranking, measured',
         'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> callers',
         'how.step0.h3': 'New to slurp?',
-        'how.step0.tag': 'optional',
-        'how.step0.p': 'Run <code>slurp init</code> — detects your language, indexes your codebase, and configures the MCP server in one step.',
-        'v1.label': '// 1.2.0',
-        'v1.h2': 'Better selection, measured.',
-        'v1.p': 'slurp 1.2.0 keeps tests and import nodes out of the subgraph and caps the neighbour boost at ten neighbours: recall at <code>--budget 4000</code> in markdown goes from 0.867 to 0.967 on PrismaStats and from 0.688 to 0.875 on slurp\'s own graph. <code>slurp explain</code>, <code>slurp impact</code> and <code>slurp diff</code> now count production callers only, with tests shown apart.',
+        'how.step0.tag': 'recommended',
+        'how.step0.p': 'With slurp installed (step 1), run <code>slurp init</code> in your project root. It shows the whole plan and asks before writing anything: it builds a graph that keeps itself current, registers the MCP server in <code>.mcp.json</code>, approves it for Claude Code so the agent does not ask for approval, and tells your agent when to use slurp. Then restart your AI coding assistant — steps 2 and 3 are already done.',
+        'v1.label': '// 1.4.0',
+        'v1.h2': 'A better ranking, measured.',
+        'v1.p': 'slurp 1.4.0 ranks better: the score reads a node\'s path and scope as well as its name, and the PageRank is personalised on the query — recall at <code>--budget 4000</code> goes from 0.543 to 0.674 on six held-out projects, with the same tokens. And since 1.3.0 slurp runs on its own: the graph follows the working tree, and <code>slurp init</code> sets Claude Code up to call it without asking for approval — measured with agents, 9 of 10 sessions called slurp unprompted (n = 10, a single run).',
         'v1.stat.tests': 'tests',
         'v1.stat.langs': 'call-graph languages',
         'benchmark.quality.callgraph': 'Call graph: Python, TypeScript/JS, Go, Java and Rust with cross-file resolution',
@@ -1946,20 +2048,20 @@ slurp index .
         'arch.label': '// architecture intelligence',
         'arch.h2': 'slurp understands your code, not just your files',
         'arch.callgraph.title': 'Call graph',
-        'arch.callgraph.line': '5 languages with cross-file resolution. Return type propagation within a file. 2,694 tests.',
-        'arch.explain.line': 'Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed.',
-        'arch.eval.line': 'Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.875 on slurp\'s own graph at budget 4,000. An LLM-judge mode is also available.',
+        'arch.callgraph.line': '5 languages with cross-file resolution. Return type propagation within a file. 3,082 tests.',
+        'arch.explain.line': 'Architectural role, risk percentage, explore further suggestions. Risk counts production callers only; tests are shown apart. Structural mode, no LLM needed. Since v1.4.0 it finds a graphify function by its name.',
+        'arch.eval.line': 'Recall with no LLM and no cost (--retrieval): 0.967 on PrismaStats and 0.938 on slurp\'s own graph at budget 4,000. An LLM-judge mode is also available.',
         'features.impact.line': 'Pre-edit blast radius analysis. Know what breaks before you touch a file.',
         'features.suggest.line': 'Query recommendations from the graph frontier. Know what to explore next.',
         'arch.mcp.title': 'MCP tools',
-        'arch.mcp.line': '5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically.',
+        'arch.mcp.line': '5 tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code calls them automatically — after <code>slurp init</code>, without asking for approval.',
         'how.impact.note': 'Before editing a file, run <code>slurp impact &lt;file&gt;</code> to see what might break.',
         'how.explain2.note': 'Want to understand your codebase? <code>slurp explain \"functionName\"</code> explains any function in plain language.',
         'nav.architecture': 'Architecture',
         'problem.label': '// the problem',
         'problem.h2': "Your LLM doesn't need the whole bowl",
         'problem.p1': 'slurp index maps your entire codebase into a knowledge graph using pure static analysis — no LLMs, no APIs. But injecting <em>every node</em> into every query is wasteful — your LLM spends most of its context budget on nodes it\'ll never use.',
-        'problem.p2': "slurp scores each node against your query using PageRank + TF-IDF — zero LLM calls, zero extra tokens spent — and serves only what fits inside your budget.",
+        'problem.p2': 'slurp scores each node against your query — TF-IDF over its name, file path and scope, plus a PageRank personalised on the query — with zero LLM calls and zero extra tokens spent, and serves only what fits inside your budget.',
         'problem.before.label': 'full graph (tokens)',
         'problem.after.label': 'slurp budget (tokens)',
         'problem.saving': '96.7% saved',
@@ -1979,22 +2081,22 @@ slurp index .
         'demo.p': 'The interactive visualizer shows the subgraph slurp selected — and how much you saved.',
         'demo.note': 'Live demo — real PrismaStats codebase, real data. Orange = functions, Blue = classes, Purple = modules.',
         'demo.status.hint': 'Click any node to inspect · Drag to explore',
-        'demo.status.left': 'Top 50 of 108 selected nodes · 3,928 / 4,000 tokens · 96.7% saved',
+        'demo.status.left': 'Top 50 of 103 selected nodes · 3,926 / 4,000 tokens · 96.7% saved',
         'perf.label': '// performance',
         'perf.h2': 'Built for speed.',
         'perf.p': 'Latency of one slurp_query call through the MCP server at budget 4,000 — PrismaStats graphify graph (2,111 nodes), mean of ten queries after a warm-up run. Measured for v1.1.0 on an Apple M4, Python 3.12; three runs, range shown.',
-        'perf.note': 'Graph changes detected automatically — no server restart needed.',
+        'perf.note': 'The graph follows your working tree: before each call the server checks it and refreshes slurp\'s own graph if something changed — no re-indexing by hand, no server restart.',
         'how.label': '// how it works',
         'how.h2': 'From zero to optimized in minutes.',
         'how.step1.h3': 'Install slurp',
         'how.step1.p': 'One command. Requires Python 3.12+.',
         'how.step2.h3': 'Index your project locally',
         'how.step2.p': 'slurp index . analyzes your code with pure static analysis — no LLMs, no APIs, no cost.',
-        'how.update.note': 'Keep the graph fresh: re-run <code>slurp index .</code> after big changes · <code>slurp index . --watch</code> for background auto-indexing.',
+        'how.update.note': 'The graph keeps itself current: before every answer — each MCP call and the query commands in the terminal — slurp checks the working tree (0.4 ms per call on PrismaStats) and refreshes its own graph if a file changed: 30 ms for an edit inside function bodies, 0.29 s for a full index, on PrismaStats. A call waits at most 2 seconds for a refresh.',
         'how.step3.h3': 'Configure MCP once, done forever',
-        'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically.',
-        'how.mcp': '<strong>Fully automatic after step 3.</strong> Claude Code calls slurp\'s tools when it needs them — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
-        'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box — and slurp index asks before replacing it (-o graphify-out/slurp-graph.json keeps both, --force replaces it).',
+        'how.step3.p': 'Add slurp to your <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code calls it automatically. Set up by hand, Claude Code asks once for the server and before each call unless you answer “don\'t ask again”; <code>slurp init</code> writes that approval for you.',
+        'how.mcp': '<strong>Fully automatic after <code>slurp init</code>.</strong> Claude Code calls slurp\'s tools when it needs them, without asking for approval, and the graph refreshes itself before each answer — no extra commands, no prompt engineering. You work exactly as before, just cheaper.',
+        'how.graphify.note': 'Already using graphify? slurp works with your existing graph.json out of the box, read-only: it never rebuilds or rewrites it, and answers say when files it covers changed after it was built. slurp init builds slurp\'s own graph beside it (graphify-out/slurp-graph.json), which auto-discovery picks first; slurp index asks before replacing graphify\'s (--force replaces it).',
         'how.mcp.global': 'Global install:',
         'how.mcp.uv': 'Python project with uv:',
         'zerodeps.label': '// zero dependencies',
@@ -2016,25 +2118,49 @@ slurp index .
         'features.diff.line': 'Compare graph snapshots',
         'features.benchmark.line': 'Measure token savings',
         'features.inject.line': 'Attach source code to nodes',
-        'features.smart.line': 'Git-aware incremental re-indexing. Produces the same graph as a full index, and is faster when only function bodies change.',
+        'features.smart.line': 'Incremental re-indexing from a manifest in graph.json, no git needed. Produces the same graph as a full index, and is faster when only function bodies change.',
         'features.advisor.line': 'Recommends optimal token budget from your query history.',
         'features.federation.title': 'Multi-graph federation',
         'features.federation.line': 'Query multiple codebases simultaneously.',
         'install.explain.note': 'For <code>slurp explain</code>: set <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>, run Ollama locally, or point it at any OpenAI-compatible endpoint. No LLM? Use <code>--no-llm</code> for structural analysis.',
-        'how.smart.note': 'Already indexed? Use <code>slurp index . --smart</code> to update only changed files.',
+        'how.smart.note': 'So you no longer re-index by hand. <code>slurp index . --watch</code> is only needed for tools that read <code>graph.json</code> outside slurp, and no longer depends on watchdog; <code>slurp index . --smart</code> re-parses only the files that changed, with no git needed.',
         'footer.credit': 'Built by <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
         'benchmark.note': 'Same savings for the three queries — "auth flow", "prisma schema", "database pool". Both sides are the text that would be sent, counted with tiktoken.',
-        'benchmark.recall.title': 'Retrieval quality',
-        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> measures recall: the share of each question\'s labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 questions at <code>--budget 4000</code>: 15 built-in on PrismaStats\'s <code>slurp index</code> graph (1,582 nodes), 16 on slurp\'s own graph (4,165 nodes).',
+        'benchmark.recall.title': 'The 31 labelled questions',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> measures recall: the share of each question\'s labelled nodes that land inside the subgraph. No LLM, no cost, reproducible. 31 architecture questions: 15 built-in on PrismaStats\'s <code>slurp index</code> graph (1,582 nodes), 16 on slurp\'s own graph (4,165 nodes). From v1.3 to v1.4.0, what improves and what gets worse:',
         'benchmark.recall.th.graph': 'Graph',
-        'benchmark.recall.why': 'What changed in v1.2: tests and import nodes no longer take places in the subgraph (<code>--include-tests</code> and <code>--include-imports</code> let them back), and a node lends its neighbour boost to at most ten neighbours, so a hub\'s callers no longer fill the budget.',
-        'benchmark.recall.holdout': 'On the half of the questions not used to tune v1.2 (mean recall in markdown and JSON at 4,000 and 8,000): PrismaStats 0.780 → 0.893, slurp 0.562 → 0.750. slurp\'s 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Full detail in the README →</a>',
+        'benchmark.recall.why': 'What gets worse: in JSON at 4000, PrismaStats falls from 0.900 to 0.867 (the equivalent of half a question) and slurp from 0.812 to 0.750 (one question); in markdown at 16000, slurp falls from 1.000 to 0.938 (one question). PrismaStats\'s MRR falls from 0.405 to 0.337: the first relevant node ranks lower on average, though at 4000 no question finds fewer of its labelled nodes. In markdown at 4000 — what <code>slurp QUERY</code> prints by default and the only format the MCP server sends — no question is worse.',
+        'benchmark.recall.holdout': 'slurp\'s 16 questions were labelled by the same tool that tuned v1.2 — indicative, not an independent ground truth. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Full detail in the README →</a>',
         'zerodeps.speed': 'v1.1.1 made <code>slurp index</code> faster: it skips the build output of web frameworks (<code>.next/</code> and the like) and prunes skipped folders instead of walking them — PrismaStats 4.9 s → 0.5 s.',
         'perf.th.version': 'Version',
         'perf.th.mean': 'Mean of 10 hot queries',
         'perf.th.published': 'Published then',
         'perf.row.v065': 'before the caches and the heap',
         'perf.slower': 'v1.1.0 is about 1.5 ms slower per query than v0.7.0, and does more for it: the budget costs relationships as well as nodes, and the text is rendered and counted before it is sent.',
+        'benchmark.rank.title': 'The v1.4 ranking',
+        'benchmark.rank.intro': 'v1.4.0 changes the order in which slurp ranks nodes, so the same budget holds more of what a question needs. The semantic score reads the terms of a node\'s file path and of the class or module that holds it, at the weight of its name; the structural score is a PageRank personalised on the query. It was chosen on a bank of 1,525 questions taken from the commit history of 14 open-source projects — a commit\'s subject as the question, the definitions it changed as the answer — compared on 7 projects and then checked once on the other 6. Recall at <code>--budget 4000</code> in markdown, on those six:',
+        'benchmark.rank.th.project': 'Project',
+        'benchmark.rank.mean': 'Mean',
+        'benchmark.rank.fine': 'Same tokens: the answers use the same ~98% of the budget as before. Commit subjects are not an agent\'s questions, so the release criterion, fixed before measuring, also required the labelled architecture questions below not to lose more than one question at 4000 in markdown. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Validation record, in Spanish →</a>',
+        'benchmark.budget.title': 'Choosing a budget',
+        'benchmark.budget.p1': 'A study with slurp v1.3.0, on the same 1,525 questions from the commit history of 14 open-source projects, looked for the budget past which more tokens find nothing new. For pinning down the specific function a change touches, it found none: recall keeps growing, about 10 points per doubling, up to 32000 with no plateau, in projects with more than about 2,000 candidate nodes (those slurp may return: no tests, no imports). There, in markdown and with v1.3.0, 4000 finds 34–68% of the changed definitions, 16000 finds 52–75% and 32000 finds 59–81%.',
+        'benchmark.budget.p2': 'So the default stays 4000 — doubling the context for ten points is a trade-off, not an optimum — and what v1.4 improved is the ranking. As a guide: for architecture questions, the default is enough; for pinning down one specific function in a large project, pass 16000–32000. <code>slurp_query</code>\'s description tells the agent the same.',
+        'benchmark.budget.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Study conclusions, in Spanish →</a>',
+        'perf.v14.title': 'v1.4.0 against v1.3',
+        'perf.v14.p': 'Measured with another method than the table above, so the figures cannot be compared with it: six reference graphs, v1.4.0 beside v1.3 in the same session, with the encoder loaded. Warm queries (the median of 20) take 0.31–0.71× v1.3\'s time on hono, slurp, tokio, prometheus and sqlalchemy (sqlalchemy, 59,518 nodes: 278 → 87 ms); on PrismaStats, the smallest, they are slower: 10.2 → 14.4 ms. The first query on a freshly loaded graph is slower too, up to 1.54× (hono: 41.9 → 64.4 ms): the new ranking builds once per graph the terms of every name and path, which is what makes every later query faster. The release criterion allowed 1.5× on that first query; the author\'s rule, fixed before measuring again, accepts up to 1.67× on it alone. The first <code>slurp_query</code> after the MCP server refreshes the graph takes 1.03–1.45× v1.3\'s.',
+        'perf.v14.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Latency record, in Spanish →</a>',
+        'how.manual.tag': 'manual setup',
+        'agents.title': 'Measured with agents',
+        'agents.intro': 'Before the v1.3.0 release, ten <code>claude -p</code> sessions (Claude Code 2.1.331, Claude Opus 5.5) each did one task in a fresh clone set up with <code>slurp init --yes</code> — five on slurp itself, five on PrismaStats. No prompt mentioned slurp. Against a criterion fixed before measuring (8 of 10 sessions needed):',
+        'agents.stat.used': 'sessions called slurp on their own, all 9 before their first edit',
+        'agents.stat.approvals': 'approvals: no slurp tool was denied',
+        'agents.stat.done': 'tasks completed: the project\'s checks pass and the diff does what the task asked',
+        'agents.limits.title': 'Its limits',
+        'agents.l1': '<strong>n = 10, from a single run</strong>, and the model varies from one run to the next.',
+        'agents.l2': '<strong>The one session without slurp</strong> had a prompt that named both symbols to change and the component they live in. The agent grepped for them: with the names given, the task was finding them, not working out where the code lives, which is what <code>slurp_query</code> is for.',
+        'agents.l3': '<strong>The refresh was barely exercised.</strong> Agents call slurp when they start, before editing: 15 of the 16 calls found the graph current and one refreshed it, in 325 ms.',
+        'agents.l4': 'Only 4 of the 26 files edited had a <code>slurp_impact</code> or <code>slurp_explain</code> first.',
+        'agents.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Per-session table and the rest of the findings, in Spanish →</a>',
       },
       es: {
         flag: '🇪🇸', code: 'ES',
@@ -2046,15 +2172,15 @@ slurp index .
         'nav.how': 'Cómo funciona',
         'nav.features': 'Funcionalidades',
         'hero.tagline': 'Tu codebase es el bol. slurp sirve exactamente los noodles que necesita tu LLM. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona con cualquier codebase.',
-        'hero.badge': 'v1.2.0 — Mejor selección, medida',
+        'hero.subtagline': 'Entiende la arquitectura de tu codebase. 16 lenguajes. Funciona solo o con graphify.',
+        'hero.badge': 'v1.4.0 — Mejor orden, medido',
         'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> llamadores',
         'how.step0.h3': '¿Nuevo en slurp?',
-        'how.step0.tag': 'opcional',
-        'how.step0.p': 'Ejecuta <code>slurp init</code> — detecta tu lenguaje, indexa tu codebase y configura el servidor MCP en un solo paso.',
-        'v1.label': '// 1.2.0',
-        'v1.h2': 'Mejor selección, medida.',
-        'v1.p': 'slurp 1.2.0 deja los tests y los nodos import fuera del subgrafo y limita el impulso a diez vecinos: el recall a <code>--budget 4000</code> en markdown pasa de 0,867 a 0,967 en PrismaStats y de 0,688 a 0,875 en el grafo del propio slurp. <code>slurp explain</code>, <code>slurp impact</code> y <code>slurp diff</code> cuentan ahora solo llamadores de producción, con los tests aparte.',
+        'how.step0.tag': 'recomendado',
+        'how.step0.p': 'Con slurp instalado (paso 1), ejecuta <code>slurp init</code> en la raíz de tu proyecto. Muestra todo el plan y pregunta antes de escribir nada: crea un grafo que se mantiene al día solo, registra el servidor MCP en <code>.mcp.json</code>, lo aprueba para Claude Code para que el agente no pida aprobación y le indica a tu agente cuándo usar slurp. Después reinicia tu asistente de código — los pasos 2 y 3 ya están hechos.',
+        'v1.label': '// 1.4.0',
+        'v1.h2': 'Mejor orden, medido.',
+        'v1.p': 'slurp 1.4.0 ordena mejor: la puntuación lee la ruta y el ámbito de un nodo además de su nombre, y el PageRank es personalizado sobre la consulta — el recall a <code>--budget 4000</code> pasa de 0,543 a 0,674 en seis proyectos de validación, con los mismos tokens. Y desde la 1.3.0 slurp funciona solo: el grafo sigue el árbol de trabajo y <code>slurp init</code> deja Claude Code listo para llamarlo sin pedir aprobación — en la medición con agentes, 9 de 10 sesiones llamaron a slurp sin que nadie se lo pidiera (n = 10, una sola ejecución).',
         'v1.stat.tests': 'tests',
         'v1.stat.langs': 'lenguajes con grafo de llamadas',
         'benchmark.quality.callgraph': 'Grafo de llamadas: Python, TypeScript/JS, Go, Java y Rust con resolución entre archivos',
@@ -2065,20 +2191,20 @@ slurp index .
         'arch.label': '// inteligencia de arquitectura',
         'arch.h2': 'slurp entiende tu código, no solo tus archivos',
         'arch.callgraph.title': 'Grafo de llamadas',
-        'arch.callgraph.line': '5 lenguajes con resolución entre archivos. Propagación de tipos de retorno dentro de un archivo. 2.694 tests.',
-        'arch.explain.line': 'Rol arquitectónico, porcentaje de riesgo y sugerencias para seguir explorando. El riesgo cuenta solo llamadores de producción; los tests se muestran aparte. Modo estructural, sin necesidad de LLM.',
-        'arch.eval.line': 'Recall sin LLM y sin coste (--retrieval): 0,967 en PrismaStats y 0,875 en el grafo del propio slurp con presupuesto 4.000. También tiene un modo con juez LLM.',
+        'arch.callgraph.line': '5 lenguajes con resolución entre archivos. Propagación de tipos de retorno dentro de un archivo. 3.082 tests.',
+        'arch.explain.line': 'Rol arquitectónico, porcentaje de riesgo y sugerencias para seguir explorando. El riesgo cuenta solo llamadores de producción; los tests se muestran aparte. Modo estructural, sin necesidad de LLM. Desde la v1.4.0 encuentra una función de graphify por su nombre.',
+        'arch.eval.line': 'Recall sin LLM y sin coste (--retrieval): 0,967 en PrismaStats y 0,938 en el grafo del propio slurp con presupuesto 4.000. También tiene un modo con juez LLM.',
         'features.impact.line': 'Análisis del radio de impacto antes de editar. Sabe qué se rompe antes de tocar un archivo.',
         'features.suggest.line': 'Recomendaciones de queries desde la frontera del grafo. Sabe qué explorar a continuación.',
         'arch.mcp.title': 'Herramientas MCP',
-        'arch.mcp.line': '5 herramientas: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code las llama automáticamente.',
+        'arch.mcp.line': '5 herramientas: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code las llama automáticamente — tras <code>slurp init</code>, sin pedir aprobación.',
         'how.impact.note': 'Antes de editar un archivo, ejecuta <code>slurp impact &lt;archivo&gt;</code> para ver qué podría romperse.',
         'how.explain2.note': '¿Quieres entender tu codebase? <code>slurp explain \"functionName\"</code> explica cualquier función en lenguaje natural.',
         'nav.architecture': 'Arquitectura',
         'problem.label': '// el problema',
         'problem.h2': 'Tu LLM no necesita el bol entero',
         'problem.p1': 'slurp index mapea todo tu codebase en un grafo de conocimiento con análisis estático puro — sin LLMs, sin APIs. Pero inyectar <em>cada nodo</em> en cada consulta es ineficiente — tu LLM gasta la mayor parte de su presupuesto de contexto en nodos que nunca usará.',
-        'problem.p2': 'slurp puntúa cada nodo frente a tu consulta usando PageRank + TF-IDF — sin llamadas a ningún LLM, sin tokens extra gastados — y sirve solo lo que cabe dentro de tu presupuesto.',
+        'problem.p2': 'slurp puntúa cada nodo frente a tu consulta — TF-IDF sobre su nombre, la ruta de su fichero y su ámbito, más un PageRank personalizado sobre la consulta — sin llamadas a ningún LLM y sin tokens extra gastados, y sirve solo lo que cabe dentro de tu presupuesto.',
         'problem.before.label': 'grafo completo (tokens)',
         'problem.after.label': 'presupuesto slurp (tokens)',
         'problem.saving': '96,7% ahorrado',
@@ -2098,22 +2224,22 @@ slurp index .
         'demo.p': 'El visualizador interactivo muestra el subgrafo que slurp seleccionó — y cuánto has ahorrado.',
         'demo.note': 'Demo en vivo — codebase real de PrismaStats, datos reales. Naranja = funciones, Azul = clases, Morado = módulos.',
         'demo.status.hint': 'Haz clic en un nodo para inspeccionarlo · Arrastra para explorar',
-        'demo.status.left': '50 principales de 108 nodos seleccionados · 3.928 / 4.000 tokens · 96,7% ahorrado',
+        'demo.status.left': '50 principales de 103 nodos seleccionados · 3.926 / 4.000 tokens · 96,7% ahorrado',
         'perf.label': '// rendimiento',
         'perf.h2': 'Hecho para ir rápido.',
         'perf.p': 'Latencia de una llamada a slurp_query a través del servidor MCP con presupuesto 4.000 — grafo de graphify de PrismaStats (2.111 nodos), media de diez consultas tras una pasada de calentamiento. Medido para la v1.1.0 en un Apple M4 con Python 3.12; tres ejecuciones, se muestra el rango.',
-        'perf.note': 'Los cambios en el grafo se detectan automáticamente — sin reiniciar el servidor.',
+        'perf.note': 'El grafo sigue tu árbol de trabajo: antes de cada llamada el servidor lo comprueba y refresca el grafo propio de slurp si algo cambió — sin reindexar a mano, sin reiniciar el servidor.',
         'how.label': '// cómo funciona',
         'how.h2': 'De cero a optimizado en minutos.',
         'how.step1.h3': 'Instala slurp',
         'how.step1.p': 'Un comando. Requiere Python 3.12+.',
         'how.step2.h3': 'Indexa tu proyecto localmente',
         'how.step2.p': 'slurp index . analiza tu código con análisis estático puro — sin LLMs, sin APIs, sin coste.',
-        'how.update.note': 'Mantén el grafo actualizado: re-ejecuta <code>slurp index .</code> cuando haya cambios importantes · <code>slurp index . --watch</code> para re-indexado automático en segundo plano.',
+        'how.update.note': 'El grafo se mantiene al día solo: antes de cada respuesta — cada llamada MCP y los comandos de consulta en el terminal — slurp comprueba el árbol de trabajo (0,4 ms por llamada en PrismaStats) y refresca su propio grafo si cambió algún fichero: 30 ms para una edición dentro de cuerpos de funciones y 0,29 s para un índice completo, en PrismaStats. Una llamada espera como mucho 2 segundos a un refresco.',
         'how.step3.h3': 'Configura el MCP una vez, listo para siempre',
-        'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente.',
-        'how.mcp': '<strong>Completamente automático desde el paso 3.</strong> Claude Code llama a las herramientas de slurp cuando las necesita — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
-        'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional, y slurp index pregunta antes de reemplazarlo (-o graphify-out/slurp-graph.json conserva los dos, --force lo reemplaza).',
+        'how.step3.p': 'Añade slurp a tu <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo llama automáticamente. Configurado a mano, Claude Code pregunta una vez por el servidor y antes de cada llamada, salvo que respondas «no volver a preguntar»; <code>slurp init</code> escribe esa aprobación por ti.',
+        'how.mcp': '<strong>Completamente automático tras <code>slurp init</code>.</strong> Claude Code llama a las herramientas de slurp cuando las necesita, sin pedir aprobación, y el grafo se refresca solo antes de cada respuesta — sin comandos extra, sin ingeniería de prompts. Trabajas exactamente igual que antes, pero más barato.',
+        'how.graphify.note': '¿Ya usas graphify? slurp funciona con tu graph.json existente sin configuración adicional, en solo lectura: nunca lo reconstruye ni lo reescribe, y las respuestas avisan cuando los ficheros que cubre cambiaron después de generarlo. slurp init crea al lado el grafo propio de slurp (graphify-out/slurp-graph.json), que el autodescubrimiento elige primero; slurp index pregunta antes de reemplazar el de graphify (--force lo reemplaza).',
         'how.mcp.global': 'Instalación global:',
         'how.mcp.uv': 'Proyecto Python con uv:',
         'zerodeps.label': '// sin dependencias',
@@ -2135,25 +2261,49 @@ slurp index .
         'features.diff.line': 'Compara snapshots del grafo',
         'features.benchmark.line': 'Mide el ahorro de tokens',
         'features.inject.line': 'Adjunta código fuente a los nodos',
-        'features.smart.line': 'Re-indexado incremental consciente de git. Produce el mismo grafo que un índice completo y es más rápido cuando solo cambian cuerpos de funciones.',
+        'features.smart.line': 'Re-indexado incremental a partir de un manifiesto en graph.json, sin necesitar git. Produce el mismo grafo que un índice completo y es más rápido cuando solo cambian cuerpos de funciones.',
         'features.advisor.line': 'Recomienda el presupuesto de tokens óptimo a partir de tu historial de queries.',
         'features.federation.title': 'Federación multi-grafo',
         'features.federation.line': 'Consulta varios codebases simultáneamente.',
         'install.explain.note': 'Para <code>slurp explain</code>: define <code>ANTHROPIC_API_KEY</code> u <code>OPENAI_API_KEY</code>, ejecuta Ollama en local o apunta a cualquier endpoint compatible con OpenAI. ¿Sin LLM? Usa <code>--no-llm</code> para análisis estructural.',
-        'how.smart.note': '¿Ya lo has indexado? Usa <code>slurp index . --smart</code> para actualizar solo los archivos que cambiaron.',
+        'how.smart.note': 'Así que ya no hace falta reindexar a mano. <code>slurp index . --watch</code> solo hace falta para herramientas que leen <code>graph.json</code> fuera de slurp, y ya no depende de watchdog; <code>slurp index . --smart</code> vuelve a analizar solo los ficheros que cambiaron, sin necesitar git.',
         'footer.credit': 'Hecho por <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
         'benchmark.note': 'Mismo ahorro en las tres consultas — "auth flow", "prisma schema", "database pool". Los dos lados son el texto que se enviaría, contado con tiktoken.',
-        'benchmark.recall.title': 'Calidad de recuperación',
-        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mide el recall: la parte de los nodos etiquetados de cada pregunta que entra en el subgrafo. Sin LLM, sin coste, reproducible. 31 preguntas a <code>--budget 4000</code>: las 15 incluidas sobre el grafo <code>slurp index</code> de PrismaStats (1.582 nodos) y 16 sobre el grafo del propio slurp (4.165 nodos).',
+        'benchmark.recall.title': 'Las 31 preguntas etiquetadas',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mide el recall: la parte de los nodos etiquetados de cada pregunta que entra en el subgrafo. Sin LLM, sin coste, reproducible. 31 preguntas de arquitectura: las 15 incluidas sobre el grafo <code>slurp index</code> de PrismaStats (1.582 nodos) y 16 sobre el grafo del propio slurp (4.165 nodos). De la v1.3 a la v1.4.0, lo que mejora y lo que empeora:',
         'benchmark.recall.th.graph': 'Grafo',
-        'benchmark.recall.why': 'Qué cambió en la v1.2: los tests y los nodos import ya no ocupan plazas en el subgrafo (<code>--include-tests</code> e <code>--include-imports</code> los dejan volver) y un nodo presta su impulso a diez vecinos como mucho, así que los llamadores de un hub ya no llenan el presupuesto.',
-        'benchmark.recall.holdout': 'En la mitad de las preguntas que no se usó para ajustar la v1.2 (recall medio en markdown y JSON a 4.000 y 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Las 16 preguntas de slurp las etiquetó la misma herramienta que ajustó la v1.2: son orientativas, no una referencia independiente. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Detalle completo en el README →</a>',
+        'benchmark.recall.why': 'Lo que empeora: en JSON a 4000, PrismaStats baja de 0,900 a 0,867 (el equivalente a media pregunta) y slurp de 0,812 a 0,750 (una pregunta); en markdown a 16000, slurp baja de 1,000 a 0,938 (una pregunta). El MRR de PrismaStats baja de 0,405 a 0,337: el primer nodo relevante queda más abajo de media, aunque a 4000 ninguna pregunta encuentra menos de sus nodos etiquetados. En markdown a 4000 — lo que <code>slurp QUERY</code> imprime por defecto y el único formato que envía el servidor MCP — ninguna pregunta empeora.',
+        'benchmark.recall.holdout': 'Las 16 preguntas de slurp las etiquetó la misma herramienta que ajustó la v1.2: son orientativas, no una referencia independiente. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Todo el detalle en el README →</a>',
         'zerodeps.speed': 'La v1.1.1 aceleró <code>slurp index</code>: salta la salida de build de los frameworks web (<code>.next/</code> y similares) y poda las carpetas excluidas en vez de recorrerlas — PrismaStats 4,9 s → 0,5 s.',
         'perf.th.version': 'Versión',
         'perf.th.mean': 'Media de 10 consultas en caliente',
         'perf.th.published': 'Publicado entonces',
         'perf.row.v065': 'antes de las cachés y el heap',
         'perf.slower': 'La v1.1.0 es unos 1,5 ms más lenta por consulta que la v0.7.0, y hace más: el presupuesto cuenta las relaciones además de los nodos, y el texto se renderiza y se cuenta antes de enviarlo.',
+        'benchmark.rank.title': 'El orden de la v1.4',
+        'benchmark.rank.intro': 'La v1.4.0 cambia el orden en que slurp clasifica los nodos, así que el mismo presupuesto contiene más de lo que una pregunta necesita. La parte semántica lee los términos de la ruta del fichero de un nodo y de la clase o el módulo que lo contiene, con el peso de su nombre; la parte estructural es un PageRank personalizado sobre la consulta. Se eligió con un banco de 1.525 preguntas sacadas del historial de commits de 14 proyectos open source — el asunto del commit como pregunta, las definiciones que cambió como respuesta —, comparando en 7 proyectos y comprobando después una sola vez en los otros 6. Recall a <code>--budget 4000</code> en markdown, en esos seis:',
+        'benchmark.rank.th.project': 'Proyecto',
+        'benchmark.rank.mean': 'Media',
+        'benchmark.rank.fine': 'Con los mismos tokens: las respuestas usan el mismo ~98% del presupuesto que antes. Los asuntos de commit no son las preguntas de un agente, así que el criterio de la versión, fijado antes de medir, exigía además que las preguntas de arquitectura etiquetadas de abajo no perdieran más de una pregunta a 4000 en markdown. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Registro de la validación →</a>',
+        'benchmark.budget.title': 'Qué presupuesto elegir',
+        'benchmark.budget.p1': 'Un estudio con slurp v1.3.0, sobre las mismas 1.525 preguntas del historial de commits de 14 proyectos open source, buscó el presupuesto a partir del cual más tokens dejan de encontrar nada nuevo. Para localizar la función concreta que toca un cambio, no lo encontró: el recall sigue creciendo, unos 10 puntos por cada duplicación, hasta 32000 y sin meseta, en proyectos con más de unos 2.000 nodos candidatos (los que slurp puede devolver: ni tests ni imports). Ahí, en markdown y con la v1.3.0, 4000 encuentra el 34–68% de las definiciones cambiadas, 16000 el 52–75% y 32000 el 59–81%.',
+        'benchmark.budget.p2': 'Por eso el valor por defecto sigue en 4000 — duplicar el contexto por diez puntos es un compromiso, no un óptimo — y lo que mejoró la v1.4 fue el orden. Como guía: para preguntas de arquitectura basta el valor por defecto; para localizar una función concreta en un proyecto grande, pasa 16000–32000. La descripción de <code>slurp_query</code> le dice lo mismo al agente.',
+        'benchmark.budget.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Conclusiones del estudio →</a>',
+        'perf.v14.title': 'La v1.4.0 frente a la v1.3',
+        'perf.v14.p': 'Medido con otro método que la tabla de arriba, así que las cifras no se pueden comparar con ella: seis grafos de referencia, la v1.4.0 junto a la v1.3 en la misma sesión, con el codificador cargado. Las consultas en caliente (la mediana de 20) tardan 0,31–0,71× el tiempo de la v1.3 en hono, slurp, tokio, prometheus y sqlalchemy (sqlalchemy, 59.518 nodos: 278 → 87 ms); en PrismaStats, el más pequeño, son más lentas: 10,2 → 14,4 ms. La primera consulta sobre un grafo recién cargado también es más lenta, hasta 1,54× (hono: 41,9 → 64,4 ms): el orden nuevo construye una vez por grafo los términos de cada nombre y cada ruta, que es lo que hace más rápidas todas las consultas siguientes. El criterio de la versión permitía 1,5× en esa primera consulta; la regla del autor, fijada antes de volver a medir, acepta hasta 1,67× solo en ella. La primera <code>slurp_query</code> después de que el servidor MCP refresque el grafo tarda 1,03–1,45× lo que la v1.3.',
+        'perf.v14.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Registro de la latencia →</a>',
+        'how.manual.tag': 'vía manual',
+        'agents.title': 'Medido con agentes',
+        'agents.intro': 'Antes de publicar la v1.3.0, diez sesiones de <code>claude -p</code> (Claude Code 2.1.331, Claude Opus 5.5) hicieron cada una una tarea en un clon nuevo preparado con <code>slurp init --yes</code> — cinco sobre el propio slurp y cinco sobre PrismaStats. Ningún prompt mencionaba slurp. Frente a un criterio fijado antes de medir (hacían falta 8 de 10 sesiones):',
+        'agents.stat.used': 'sesiones llamaron a slurp por su cuenta, las 9 antes de su primera edición',
+        'agents.stat.approvals': 'aprobaciones: ninguna herramienta de slurp fue denegada',
+        'agents.stat.done': 'tareas completadas: los checks del proyecto pasan y el diff hace lo que pedía la tarea',
+        'agents.limits.title': 'Sus límites',
+        'agents.l1': '<strong>n = 10, de una sola ejecución</strong>, y el modelo varía de una ejecución a otra.',
+        'agents.l2': '<strong>La única sesión sin slurp</strong> tenía un prompt que nombraba los dos símbolos que había que cambiar y el componente donde están. El agente los buscó con grep: con los nombres dados, la tarea era encontrarlos, no averiguar dónde vive el código, que es para lo que sirve <code>slurp_query</code>.',
+        'agents.l3': '<strong>El refresco casi no se ejerció.</strong> Los agentes llaman a slurp al empezar, antes de editar: 15 de las 16 llamadas encontraron el grafo al día y una lo refrescó, en 325 ms.',
+        'agents.l4': 'Solo 4 de los 26 ficheros editados tuvieron antes un <code>slurp_impact</code> o un <code>slurp_explain</code>.',
+        'agents.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Tabla por sesión y el resto de hallazgos →</a>',
       },
       it: {
         flag: '🇮🇹', code: 'IT',
@@ -2165,15 +2315,15 @@ slurp index .
         'nav.how': 'Come funziona',
         'nav.features': 'Funzionalità',
         'hero.tagline': 'Il tuo codebase è la ciotola. slurp serve esattamente gli spaghetti di cui il tuo LLM ha bisogno. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona con qualsiasi codebase.',
-        'hero.badge': 'v1.2.0 — Selezione migliore, misurata',
+        'hero.subtagline': 'Comprende l\'architettura del tuo codebase. 16 linguaggi. Funziona da solo o con graphify.',
+        'hero.badge': 'v1.4.0 — Ordinamento migliore, misurato',
         'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> chiamanti',
         'how.step0.h3': 'Nuovo su slurp?',
-        'how.step0.tag': 'opzionale',
-        'how.step0.p': 'Esegui <code>slurp init</code> — rileva il linguaggio, indicizza il codebase e configura il server MCP in un solo passaggio.',
-        'v1.label': '// 1.2.0',
-        'v1.h2': 'Selezione migliore, misurata.',
-        'v1.p': 'slurp 1.2.0 tiene test e nodi import fuori dal sottografo e limita il boost a dieci vicini: il recall a <code>--budget 4000</code> in markdown passa da 0,867 a 0,967 su PrismaStats e da 0,688 a 0,875 sul grafo di slurp stesso. <code>slurp explain</code>, <code>slurp impact</code> e <code>slurp diff</code> ora contano solo i chiamanti di produzione, con i test a parte.',
+        'how.step0.tag': 'consigliato',
+        'how.step0.p': 'Con slurp installato (passo 1), esegui <code>slurp init</code> nella radice del progetto. Mostra l\'intero piano e chiede prima di scrivere qualsiasi cosa: crea un grafo che si mantiene aggiornato da solo, registra il server MCP in <code>.mcp.json</code>, lo approva per Claude Code così l\'agente non chiede approvazione e indica al tuo agente quando usare slurp. Poi riavvia il tuo assistente di codice — i passi 2 e 3 sono già fatti.',
+        'v1.label': '// 1.4.0',
+        'v1.h2': 'Ordinamento migliore, misurato.',
+        'v1.p': 'slurp 1.4.0 ordina meglio: il punteggio legge il percorso e l\'ambito di un nodo oltre al suo nome, e il PageRank è personalizzato sulla query — il recall a <code>--budget 4000</code> passa da 0,543 a 0,674 su sei progetti di validazione, con gli stessi token. E dalla 1.3.0 slurp funziona da solo: il grafo segue il working tree e <code>slurp init</code> prepara Claude Code a chiamarlo senza chiedere approvazione — nella misurazione con agenti, 9 sessioni su 10 hanno chiamato slurp spontaneamente (n = 10, una sola esecuzione).',
         'v1.stat.tests': 'test',
         'v1.stat.langs': 'linguaggi con grafo delle chiamate',
         'benchmark.quality.callgraph': 'Grafo delle chiamate: Python, TypeScript/JS, Go, Java e Rust con risoluzione tra file',
@@ -2184,20 +2334,20 @@ slurp index .
         'arch.label': '// intelligenza architetturale',
         'arch.h2': 'slurp capisce il tuo codice, non solo i tuoi file',
         'arch.callgraph.title': 'Grafo delle chiamate',
-        'arch.callgraph.line': '5 linguaggi con risoluzione tra file. Propagazione dei tipi di ritorno all\'interno di un file. 2.694 test.',
-        'arch.explain.line': 'Ruolo architetturale, percentuale di rischio e suggerimenti per approfondire. Il rischio conta solo i chiamanti di produzione; i test sono mostrati a parte. Modalità strutturale, nessun LLM necessario.',
-        'arch.eval.line': 'Recall senza LLM e senza costi (--retrieval): 0,967 su PrismaStats e 0,875 sul grafo di slurp stesso con budget 4.000. È disponibile anche una modalità con giudice LLM.',
+        'arch.callgraph.line': '5 linguaggi con risoluzione tra file. Propagazione dei tipi di ritorno all\'interno di un file. 3.082 test.',
+        'arch.explain.line': 'Ruolo architetturale, percentuale di rischio e suggerimenti per approfondire. Il rischio conta solo i chiamanti di produzione; i test sono mostrati a parte. Modalità strutturale, nessun LLM necessario. Dalla v1.4.0 trova una funzione di graphify dal suo nome.',
+        'arch.eval.line': 'Recall senza LLM e senza costi (--retrieval): 0,967 su PrismaStats e 0,938 sul grafo di slurp stesso con budget 4.000. È disponibile anche una modalità con giudice LLM.',
         'features.impact.line': 'Analisi del raggio d\'impatto prima di modificare. Sai cosa si rompe prima di toccare un file.',
         'features.suggest.line': 'Suggerimenti di query dalla frontiera del grafo. Sai cosa esplorare dopo.',
         'arch.mcp.title': 'Strumenti MCP',
-        'arch.mcp.line': '5 strumenti: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code li chiama automaticamente.',
+        'arch.mcp.line': '5 strumenti: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code li chiama automaticamente — dopo <code>slurp init</code>, senza chiedere approvazione.',
         'how.impact.note': 'Prima di modificare un file, esegui <code>slurp impact &lt;file&gt;</code> per vedere cosa potrebbe rompersi.',
         'how.explain2.note': 'Vuoi capire il tuo codebase? <code>slurp explain \"functionName\"</code> spiega qualsiasi funzione in linguaggio naturale.',
         'nav.architecture': 'Architettura',
         'problem.label': '// il problema',
         'problem.h2': "Il tuo LLM non ha bisogno dell'intera ciotola",
         'problem.p1': 'slurp index mappa l\'intero codebase in un knowledge graph con analisi statica pura — nessun LLM, nessuna API. Ma iniettare <em>ogni nodo</em> in ogni query è dispendioso — il tuo LLM spende la maggior parte del suo budget di contesto su nodi che non userà mai.',
-        'problem.p2': 'slurp valuta ogni nodo rispetto alla tua query usando PageRank + TF-IDF — zero chiamate LLM, zero token extra spesi — e serve solo ciò che rientra nel tuo budget.',
+        'problem.p2': 'slurp valuta ogni nodo rispetto alla tua query — TF-IDF sul nome, sul percorso del file e sull\'ambito, più un PageRank personalizzato sulla query — con zero chiamate LLM e zero token extra spesi, e serve solo ciò che rientra nel tuo budget.',
         'problem.before.label': 'grafo completo (token)',
         'problem.after.label': 'budget slurp (token)',
         'problem.saving': '96,7% risparmiato',
@@ -2217,22 +2367,22 @@ slurp index .
         'demo.p': 'Il visualizzatore interattivo mostra il sottografo selezionato da slurp — e quanto hai risparmiato.',
         'demo.note': 'Demo dal vivo — codebase reale di PrismaStats, dati reali. Arancione = funzioni, Blu = classi, Viola = moduli.',
         'demo.status.hint': 'Clicca un nodo per ispezionarlo · Trascina per esplorare',
-        'demo.status.left': 'I primi 50 di 108 nodi selezionati · 3.928 / 4.000 token · 96,7% risparmiato',
+        'demo.status.left': 'I primi 50 di 103 nodi selezionati · 3.926 / 4.000 token · 96,7% risparmiato',
         'perf.label': '// prestazioni',
         'perf.h2': 'Costruito per la velocità.',
         'perf.p': 'Latenza di una chiamata slurp_query tramite il server MCP con budget 4.000 — grafo graphify di PrismaStats (2.111 nodi), media di dieci query dopo un giro di riscaldamento. Misurata per la v1.1.0 su un Apple M4, Python 3.12; tre esecuzioni, è mostrato l\'intervallo.',
-        'perf.note': 'Le modifiche al grafo vengono rilevate automaticamente — nessun riavvio del server.',
+        'perf.note': 'Il grafo segue il tuo working tree: prima di ogni chiamata il server lo controlla e aggiorna il grafo di slurp se qualcosa è cambiato — nessuna re-indicizzazione manuale, nessun riavvio del server.',
         'how.label': '// come funziona',
         'how.h2': 'Da zero a ottimizzato in pochi minuti.',
         'how.step1.h3': 'Installa slurp',
         'how.step1.p': 'Un solo comando. Richiede Python 3.12+.',
         'how.step2.h3': 'Indicizza il tuo progetto localmente',
         'how.step2.p': 'slurp index . analizza il tuo codice con static analysis pura — nessun LLM, nessuna API, nessun costo.',
-        'how.update.note': 'Mantieni il grafo aggiornato: ri-esegui <code>slurp index .</code> dopo modifiche importanti · <code>slurp index . --watch</code> per il re-indicizzamento automatico in background.',
+        'how.update.note': 'Il grafo si mantiene aggiornato da solo: prima di ogni risposta — ogni chiamata MCP e i comandi di query nel terminale — slurp controlla il working tree (0,4 ms per chiamata su PrismaStats) e aggiorna il proprio grafo se un file è cambiato: 30 ms per una modifica dentro i corpi delle funzioni, 0,29 s per un\'indicizzazione completa, su PrismaStats. Una chiamata attende al massimo 2 secondi un aggiornamento.',
         'how.step3.h3': 'Configura MCP una volta, per sempre',
-        'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente.',
-        'how.mcp': '<strong>Completamente automatico dopo il passo 3.</strong> Claude Code chiama gli strumenti di slurp quando servono — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
-        'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive, e slurp index chiede prima di sostituirlo (-o graphify-out/slurp-graph.json li conserva entrambi, --force lo sostituisce).',
+        'how.step3.p': 'Aggiungi slurp al tuo <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code lo chiama automaticamente. Configurato a mano, Claude Code chiede una volta per il server e prima di ogni chiamata, a meno che tu non risponda «non chiedere più»; <code>slurp init</code> scrive quell\'approvazione al posto tuo.',
+        'how.mcp': '<strong>Completamente automatico dopo <code>slurp init</code>.</strong> Claude Code chiama gli strumenti di slurp quando servono, senza chiedere approvazione, e il grafo si aggiorna da solo prima di ogni risposta — nessun comando extra, nessun prompt engineering. Lavori esattamente come prima, ma a costo inferiore.',
+        'how.graphify.note': 'Usi già graphify? slurp funziona con il tuo graph.json esistente senza configurazioni aggiuntive, in sola lettura: non lo ricostruisce né lo riscrive mai, e le risposte segnalano quando i file che copre sono cambiati dopo la sua creazione. slurp init crea accanto il grafo di slurp (graphify-out/slurp-graph.json), che l\'auto-discovery sceglie per primo; slurp index chiede prima di sostituire quello di graphify (--force lo sostituisce).',
         'how.mcp.global': 'Installazione globale:',
         'how.mcp.uv': 'Progetto Python con uv:',
         'zerodeps.label': '// zero dipendenze',
@@ -2254,25 +2404,49 @@ slurp index .
         'features.diff.line': 'Confronta snapshot del grafo',
         'features.benchmark.line': 'Misura il risparmio di token',
         'features.inject.line': 'Allega codice sorgente ai nodi',
-        'features.smart.line': 'Re-indicizzazione incrementale git-aware. Produce lo stesso grafo di un\'indicizzazione completa ed è più veloce quando cambiano solo i corpi delle funzioni.',
+        'features.smart.line': 'Re-indicizzazione incrementale a partire da un manifest in graph.json, senza bisogno di git. Produce lo stesso grafo di un\'indicizzazione completa ed è più veloce quando cambiano solo i corpi delle funzioni.',
         'features.advisor.line': 'Consiglia il budget di token ottimale dalla cronologia delle tue query.',
         'features.federation.title': 'Federazione multi-grafo',
         'features.federation.line': 'Interroga più codebase simultaneamente.',
         'install.explain.note': 'Per <code>slurp explain</code>: imposta <code>ANTHROPIC_API_KEY</code> o <code>OPENAI_API_KEY</code>, esegui Ollama in locale, oppure punta a qualsiasi endpoint compatibile con OpenAI. Nessun LLM? Usa <code>--no-llm</code> per l\'analisi strutturale.',
-        'how.smart.note': 'Già indicizzato? Usa <code>slurp index . --smart</code> per aggiornare solo i file modificati.',
+        'how.smart.note': 'Quindi non serve più re-indicizzare a mano. <code>slurp index . --watch</code> serve solo agli strumenti che leggono <code>graph.json</code> al di fuori di slurp, e non dipende più da watchdog; <code>slurp index . --smart</code> rianalizza solo i file modificati, senza bisogno di git.',
         'footer.credit': 'Sviluppato da <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
         'benchmark.note': 'Stesso risparmio per le tre query — "auth flow", "prisma schema", "database pool". Entrambi i lati sono il testo che verrebbe inviato, contato con tiktoken.',
-        'benchmark.recall.title': 'Qualità del recupero',
-        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misura il recall: la quota dei nodi etichettati di ogni domanda che finisce nel sottografo. Nessun LLM, nessun costo, riproducibile. 31 domande a <code>--budget 4000</code>: le 15 predefinite sul grafo <code>slurp index</code> di PrismaStats (1.582 nodi) e 16 sul grafo di slurp stesso (4.165 nodi).',
+        'benchmark.recall.title': 'Le 31 domande etichettate',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misura il recall: la quota dei nodi etichettati di ogni domanda che finisce nel sottografo. Nessun LLM, nessun costo, riproducibile. 31 domande di architettura: le 15 predefinite sul grafo <code>slurp index</code> di PrismaStats (1.582 nodi) e 16 sul grafo di slurp stesso (4.165 nodi). Dalla v1.3 alla v1.4.0, cosa migliora e cosa peggiora:',
         'benchmark.recall.th.graph': 'Grafo',
-        'benchmark.recall.why': 'Cosa è cambiato nella v1.2: i test e i nodi import non occupano più posti nel sottografo (<code>--include-tests</code> e <code>--include-imports</code> li riammettono) e un nodo presta il suo boost al massimo a dieci vicini, così i chiamanti di un hub non riempiono più il budget.',
-        'benchmark.recall.holdout': 'Sulla metà delle domande non usata per tarare la v1.2 (recall medio in markdown e JSON a 4.000 e 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Le 16 domande di slurp sono state etichettate dallo stesso strumento che ha tarato la v1.2: indicative, non un riferimento indipendente. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Tutti i dettagli nel README →</a>',
+        'benchmark.recall.why': 'Cosa peggiora: in JSON a 4000, PrismaStats scende da 0,900 a 0,867 (l\'equivalente di mezza domanda) e slurp da 0,812 a 0,750 (una domanda); in markdown a 16000, slurp scende da 1,000 a 0,938 (una domanda). L\'MRR di PrismaStats scende da 0,405 a 0,337: il primo nodo rilevante si classifica in media più in basso, anche se a 4000 nessuna domanda trova meno dei suoi nodi etichettati. In markdown a 4000 — ciò che <code>slurp QUERY</code> stampa di default e l\'unico formato inviato dal server MCP — nessuna domanda peggiora.',
+        'benchmark.recall.holdout': 'Le 16 domande di slurp sono state etichettate dallo stesso strumento che ha regolato la v1.2: indicative, non un riferimento indipendente. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Tutti i dettagli nel README →</a>',
         'zerodeps.speed': 'La v1.1.1 ha reso <code>slurp index</code> più veloce: salta l\'output di build dei framework web (<code>.next/</code> e simili) e pota le cartelle escluse invece di attraversarle — PrismaStats 4,9 s → 0,5 s.',
         'perf.th.version': 'Versione',
         'perf.th.mean': 'Media di 10 query a caldo',
         'perf.th.published': 'Pubblicato allora',
         'perf.row.v065': 'prima delle cache e dell\'heap',
         'perf.slower': 'La v1.1.0 è circa 1,5 ms più lenta per query rispetto alla v0.7.0, e fa di più: il budget conta le relazioni oltre ai nodi, e il testo viene generato e contato prima dell\'invio.',
+        'benchmark.rank.title': 'L\'ordinamento della v1.4',
+        'benchmark.rank.intro': 'La v1.4.0 cambia l\'ordine in cui slurp classifica i nodi, così lo stesso budget contiene più di ciò che serve a una domanda. La parte semantica legge i termini del percorso del file di un nodo e della classe o del modulo che lo contiene, con il peso del suo nome; la parte strutturale è un PageRank personalizzato sulla query. È stato scelto su un banco di 1.525 domande tratte dalla cronologia dei commit di 14 progetti open source — l\'oggetto del commit come domanda, le definizioni che ha modificato come risposta — confrontando su 7 progetti e verificando poi una sola volta sugli altri 6. Recall a <code>--budget 4000</code> in markdown, su quei sei:',
+        'benchmark.rank.th.project': 'Progetto',
+        'benchmark.rank.mean': 'Media',
+        'benchmark.rank.fine': 'Con gli stessi token: le risposte usano lo stesso ~98% del budget di prima. Gli oggetti dei commit non sono le domande di un agente, quindi il criterio di rilascio, fissato prima di misurare, richiedeva anche che le domande di architettura etichettate qui sotto non perdessero più di una domanda a 4000 in markdown. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Registro della validazione, in spagnolo →</a>',
+        'benchmark.budget.title': 'Quale budget scegliere',
+        'benchmark.budget.p1': 'Uno studio con slurp v1.3.0, sulle stesse 1.525 domande tratte dalla cronologia dei commit di 14 progetti open source, ha cercato il budget oltre il quale più token non trovano nulla di nuovo. Per individuare la funzione specifica toccata da una modifica, non l\'ha trovato: il recall continua a crescere, circa 10 punti a ogni raddoppio, fino a 32000 e senza plateau, nei progetti con più di circa 2.000 nodi candidati (quelli che slurp può restituire: né test né import). Lì, in markdown e con la v1.3.0, 4000 trova il 34–68% delle definizioni modificate, 16000 il 52–75% e 32000 il 59–81%.',
+        'benchmark.budget.p2': 'Per questo il valore predefinito resta 4000 — raddoppiare il contesto per dieci punti è un compromesso, non un ottimo — e ciò che la v1.4 ha migliorato è l\'ordinamento. Come guida: per le domande di architettura basta il valore predefinito; per individuare una funzione specifica in un progetto grande, passa 16000–32000. La descrizione di <code>slurp_query</code> dice lo stesso all\'agente.',
+        'benchmark.budget.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Conclusioni dello studio, in spagnolo →</a>',
+        'perf.v14.title': 'La v1.4.0 rispetto alla v1.3',
+        'perf.v14.p': 'Misurato con un metodo diverso da quello della tabella qui sopra, quindi le cifre non sono confrontabili con essa: sei grafi di riferimento, la v1.4.0 accanto alla v1.3 nella stessa sessione, con l\'encoder caricato. Le query a caldo (la mediana di 20) impiegano 0,31–0,71× il tempo della v1.3 su hono, slurp, tokio, prometheus e sqlalchemy (sqlalchemy, 59.518 nodi: 278 → 87 ms); su PrismaStats, il più piccolo, sono più lente: 10,2 → 14,4 ms. Anche la prima query su un grafo appena caricato è più lenta, fino a 1,54× (hono: 41,9 → 64,4 ms): il nuovo ordinamento costruisce una volta per grafo i termini di ogni nome e percorso, ed è questo che rende più veloce ogni query successiva. Il criterio di rilascio consentiva 1,5× su quella prima query; la regola dell\'autore, fissata prima di misurare di nuovo, accetta fino a 1,67× solo su di essa. La prima <code>slurp_query</code> dopo che il server MCP ha aggiornato il grafo impiega 1,03–1,45× il tempo della v1.3.',
+        'perf.v14.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Registro della latenza, in spagnolo →</a>',
+        'how.manual.tag': 'via manuale',
+        'agents.title': 'Misurato con agenti',
+        'agents.intro': 'Prima del rilascio della v1.3.0, dieci sessioni <code>claude -p</code> (Claude Code 2.1.331, Claude Opus 5.5) hanno svolto ciascuna un compito in un clone nuovo preparato con <code>slurp init --yes</code> — cinque su slurp stesso, cinque su PrismaStats. Nessun prompt menzionava slurp. Rispetto a un criterio fissato prima di misurare (servivano 8 sessioni su 10):',
+        'agents.stat.used': 'sessioni hanno chiamato slurp da sole, tutte e 9 prima della prima modifica',
+        'agents.stat.approvals': 'approvazioni: nessuno strumento di slurp è stato negato',
+        'agents.stat.done': 'compiti completati: i controlli del progetto passano e il diff fa ciò che il compito chiedeva',
+        'agents.limits.title': 'I suoi limiti',
+        'agents.l1': '<strong>n = 10, da una sola esecuzione</strong>, e il modello varia da un\'esecuzione all\'altra.',
+        'agents.l2': '<strong>L\'unica sessione senza slurp</strong> aveva un prompt che nominava entrambi i simboli da modificare e il componente in cui si trovano. L\'agente li ha cercati con grep: con i nomi già dati, il compito era trovarli, non capire dove vive il codice, che è ciò a cui serve <code>slurp_query</code>.',
+        'agents.l3': '<strong>L\'aggiornamento è stato messo alla prova pochissimo.</strong> Gli agenti chiamano slurp all\'inizio, prima di modificare: 15 delle 16 chiamate hanno trovato il grafo aggiornato e una lo ha aggiornato, in 325 ms.',
+        'agents.l4': 'Solo 4 dei 26 file modificati hanno avuto prima un <code>slurp_impact</code> o un <code>slurp_explain</code>.',
+        'agents.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Tabella per sessione e gli altri risultati, in spagnolo →</a>',
       },
       fr: {
         flag: '🇫🇷', code: 'FR',
@@ -2284,15 +2458,15 @@ slurp index .
         'nav.how': 'Comment ça marche',
         'nav.features': 'Fonctionnalités',
         'hero.tagline': 'Votre codebase est le bol. slurp sert exactement les nouilles dont votre LLM a besoin. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne avec n\'importe quel codebase.',
-        'hero.badge': 'v1.2.0 — Meilleure sélection, mesurée',
+        'hero.subtagline': 'Comprend l\'architecture de votre codebase. 16 langages. Fonctionne seul ou avec graphify.',
+        'hero.badge': 'v1.4.0 — Meilleur classement, mesuré',
         'benchmark.quality.edges': 'PrismaStats · createAdminClient : <strong>97</strong> appelants',
         'how.step0.h3': 'Nouveau sur slurp ?',
-        'how.step0.tag': 'optionnel',
-        'how.step0.p': 'Lancez <code>slurp init</code> — détecte votre langage, indexe votre codebase et configure le serveur MCP en une seule étape.',
-        'v1.label': '// 1.2.0',
-        'v1.h2': 'Meilleure sélection, mesurée.',
-        'v1.p': 'slurp 1.2.0 garde les tests et les nœuds import hors du sous-graphe et limite le boost à dix voisins : le rappel à <code>--budget 4000</code> en markdown passe de 0,867 à 0,967 sur PrismaStats et de 0,688 à 0,875 sur le graphe de slurp lui-même. <code>slurp explain</code>, <code>slurp impact</code> et <code>slurp diff</code> ne comptent plus que les appelants de production, tests à part.',
+        'how.step0.tag': 'recommandé',
+        'how.step0.p': 'Une fois slurp installé (étape 1), lancez <code>slurp init</code> à la racine de votre projet. Il montre tout le plan et demande avant d\'écrire quoi que ce soit : il construit un graphe qui se maintient à jour tout seul, enregistre le serveur MCP dans <code>.mcp.json</code>, l\'approuve pour Claude Code afin que l\'agent ne demande pas d\'approbation, et indique à votre agent quand utiliser slurp. Redémarrez ensuite votre assistant de code — les étapes 2 et 3 sont déjà faites.',
+        'v1.label': '// 1.4.0',
+        'v1.h2': 'Meilleur classement, mesuré.',
+        'v1.p': 'slurp 1.4.0 classe mieux : le score lit le chemin et la portée d\'un nœud en plus de son nom, et le PageRank est personnalisé sur la requête — le rappel à <code>--budget 4000</code> passe de 0,543 à 0,674 sur six projets de validation, avec les mêmes tokens. Et depuis la 1.3.0, slurp fonctionne tout seul : le graphe suit l\'arbre de travail et <code>slurp init</code> prépare Claude Code à l\'appeler sans demander d\'approbation — dans la mesure avec des agents, 9 sessions sur 10 ont appelé slurp spontanément (n = 10, une seule exécution).',
         'v1.stat.tests': 'tests',
         'v1.stat.langs': 'langages avec graphe d\'appels',
         'benchmark.quality.callgraph': 'Graphe d\'appels : Python, TypeScript/JS, Go, Java et Rust avec résolution inter-fichiers',
@@ -2303,20 +2477,20 @@ slurp index .
         'arch.label': '// intelligence d\'architecture',
         'arch.h2': 'slurp comprend votre code, pas seulement vos fichiers',
         'arch.callgraph.title': 'Graphe d\'appels',
-        'arch.callgraph.line': '5 langages avec résolution inter-fichiers. Propagation des types de retour au sein d\'un fichier. 2 694 tests.',
-        'arch.explain.line': 'Rôle architectural, pourcentage de risque et suggestions pour aller plus loin. Le risque ne compte que les appelants de production ; les tests sont affichés à part. Mode structurel, aucun LLM requis.',
-        'arch.eval.line': 'Rappel sans LLM et sans coût (--retrieval) : 0,967 sur PrismaStats et 0,875 sur le graphe de slurp lui-même avec un budget de 4 000. Un mode avec juge LLM est aussi disponible.',
+        'arch.callgraph.line': '5 langages avec résolution inter-fichiers. Propagation des types de retour au sein d\'un fichier. 3 082 tests.',
+        'arch.explain.line': 'Rôle architectural, pourcentage de risque et suggestions pour aller plus loin. Le risque ne compte que les appelants de production ; les tests sont affichés à part. Mode structurel, aucun LLM requis. Depuis la v1.4.0, il trouve une fonction de graphify par son nom.',
+        'arch.eval.line': 'Rappel sans LLM et sans coût (--retrieval) : 0,967 sur PrismaStats et 0,938 sur le graphe de slurp lui-même avec un budget de 4 000. Un mode avec juge LLM est aussi disponible.',
         'features.impact.line': 'Analyse du rayon d\'impact avant édition. Sachez ce qui casse avant de toucher un fichier.',
         'features.suggest.line': 'Recommandations de requêtes depuis la frontière du graphe. Sachez quoi explorer ensuite.',
         'arch.mcp.title': 'Outils MCP',
-        'arch.mcp.line': '5 outils : <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code les appelle automatiquement.',
+        'arch.mcp.line': '5 outils : <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code les appelle automatiquement — après <code>slurp init</code>, sans demander d\'approbation.',
         'how.impact.note': 'Avant de modifier un fichier, lancez <code>slurp impact &lt;fichier&gt;</code> pour voir ce qui pourrait casser.',
         'how.explain2.note': 'Envie de comprendre votre codebase ? <code>slurp explain \"functionName\"</code> explique n\'importe quelle fonction en langage naturel.',
         'nav.architecture': 'Architecture',
         'problem.label': '// le problème',
         'problem.h2': "Votre LLM n'a pas besoin du bol entier",
         'problem.p1': 'slurp index cartographie l\'intégralité de votre codebase en un graphe de connaissances avec de l\'analyse statique pure — aucun LLM, aucune API. Mais injecter <em>chaque nœud</em> dans chaque requête est inefficace — votre LLM dépense la majeure partie de son budget de contexte sur des nœuds qu\'il n\'utilisera jamais.',
-        'problem.p2': "slurp évalue chaque nœud par rapport à votre requête en utilisant PageRank + TF-IDF — zéro appel LLM, zéro token supplémentaire dépensé — et ne sert que ce qui rentre dans votre budget.",
+        'problem.p2': 'slurp évalue chaque nœud par rapport à votre requête — TF-IDF sur son nom, le chemin de son fichier et sa portée, plus un PageRank personnalisé sur la requête — avec zéro appel LLM et zéro token supplémentaire dépensé, et ne sert que ce qui rentre dans votre budget.',
         'problem.before.label': 'graphe complet (tokens)',
         'problem.after.label': 'budget slurp (tokens)',
         'problem.saving': '96,7% économisé',
@@ -2336,22 +2510,22 @@ slurp index .
         'demo.p': 'Le visualiseur interactif montre le sous-graphe sélectionné par slurp — et combien vous avez économisé.',
         'demo.note': 'Démo en direct — codebase réel de PrismaStats, données réelles. Orange = fonctions, Bleu = classes, Violet = modules.',
         'demo.status.hint': 'Cliquez sur un nœud pour l\'inspecter · Faites glisser pour explorer',
-        'demo.status.left': 'Les 50 premiers des 108 nœuds sélectionnés · 3 928 / 4 000 tokens · 96,7% économisé',
+        'demo.status.left': 'Les 50 premiers des 103 nœuds sélectionnés · 3 926 / 4 000 tokens · 96,7% économisé',
         'perf.label': '// performances',
         'perf.h2': 'Conçu pour la vitesse.',
         'perf.p': 'Latence d\'un appel slurp_query via le serveur MCP avec un budget de 4 000 — graphe graphify de PrismaStats (2 111 nœuds), moyenne de dix requêtes après un passage de chauffe. Mesuré pour la v1.1.0 sur un Apple M4, Python 3.12 ; trois exécutions, plage affichée.',
-        'perf.note': 'Les changements du graphe sont détectés automatiquement — aucun redémarrage du serveur.',
+        'perf.note': 'Le graphe suit votre arbre de travail : avant chaque appel, le serveur le vérifie et rafraîchit le graphe de slurp si quelque chose a changé — aucune ré-indexation à la main, aucun redémarrage du serveur.',
         'how.label': "// comment ça marche",
         'how.h2': 'De zéro à optimisé en quelques minutes.',
         'how.step1.h3': 'Installer slurp',
         'how.step1.p': 'Une seule commande. Nécessite Python 3.12+.',
         'how.step2.h3': 'Indexer votre projet localement',
         'how.step2.p': 'slurp index . analyse votre code avec de l\'analyse statique pure — sans LLM, sans API, sans coût.',
-        'how.update.note': 'Gardez le graphe à jour : ré-exécutez <code>slurp index .</code> après des changements importants · <code>slurp index . --watch</code> pour la ré-indexation automatique en arrière-plan.',
+        'how.update.note': 'Le graphe se maintient à jour tout seul : avant chaque réponse — chaque appel MCP et les commandes de requête dans le terminal — slurp vérifie l\'arbre de travail (0,4 ms par appel sur PrismaStats) et rafraîchit son propre graphe si un fichier a changé : 30 ms pour une modification dans des corps de fonctions, 0,29 s pour une indexation complète, sur PrismaStats. Un appel attend au plus 2 secondes un rafraîchissement.',
         'how.step3.h3': 'Configurer MCP une fois, c\'est réglé',
-        'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement.',
-        'how.mcp': '<strong>Entièrement automatique après l\'étape 3.</strong> Claude Code appelle les outils de slurp quand il en a besoin — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.',
-        'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire, et slurp index demande avant de le remplacer (-o graphify-out/slurp-graph.json garde les deux, --force le remplace).',
+        'how.step3.p': 'Ajoutez slurp à votre <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code>. Claude Code l\'appelle automatiquement. Configuré à la main, Claude Code demande une fois pour le serveur et avant chaque appel, sauf si vous répondez « ne plus demander » ; <code>slurp init</code> écrit cette approbation pour vous.',
+        'how.mcp': '<strong>Entièrement automatique après <code>slurp init</code>.</strong> Claude Code appelle les outils de slurp quand il en a besoin, sans demander d\'approbation, et le graphe se rafraîchit tout seul avant chaque réponse — aucune commande supplémentaire, aucune ingénierie de prompt. Vous travaillez exactement comme avant, mais à moindre coût.',
+        'how.graphify.note': 'Vous utilisez déjà graphify ? slurp fonctionne avec votre graph.json existant sans configuration supplémentaire, en lecture seule : il ne le reconstruit ni ne le réécrit jamais, et les réponses signalent quand des fichiers qu\'il couvre ont changé après sa création. slurp init construit à côté le graphe de slurp (graphify-out/slurp-graph.json), que l\'auto-découverte choisit en premier ; slurp index demande avant de remplacer celui de graphify (--force le remplace).',
         'how.mcp.global': 'Installation globale :',
         'how.mcp.uv': 'Projet Python avec uv :',
         'zerodeps.label': '// zéro dépendances',
@@ -2373,25 +2547,49 @@ slurp index .
         'features.diff.line': 'Comparer les instantanés du graphe',
         'features.benchmark.line': 'Mesurer les économies de tokens',
         'features.inject.line': 'Attacher le code source aux nœuds',
-        'features.smart.line': 'Ré-indexation incrémentale compatible git. Produit le même graphe qu\'une indexation complète, et va plus vite quand seuls des corps de fonctions changent.',
+        'features.smart.line': 'Ré-indexation incrémentale à partir d\'un manifeste dans graph.json, sans avoir besoin de git. Produit le même graphe qu\'une indexation complète, et va plus vite quand seuls des corps de fonctions changent.',
         'features.advisor.line': 'Recommande le budget de tokens optimal à partir de votre historique de requêtes.',
         'features.federation.title': 'Fédération multi-graphe',
         'features.federation.line': 'Interrogez plusieurs codebases simultanément.',
         'install.explain.note': 'Pour <code>slurp explain</code> : définissez <code>ANTHROPIC_API_KEY</code> ou <code>OPENAI_API_KEY</code>, lancez Ollama en local, ou pointez vers n\'importe quel endpoint compatible OpenAI. Pas de LLM ? Utilisez <code>--no-llm</code> pour l\'analyse structurelle.',
-        'how.smart.note': 'Déjà indexé ? Utilisez <code>slurp index . --smart</code> pour ne mettre à jour que les fichiers modifiés.',
+        'how.smart.note': 'Plus besoin, donc, de ré-indexer à la main. <code>slurp index . --watch</code> n\'est utile qu\'aux outils qui lisent <code>graph.json</code> en dehors de slurp, et ne dépend plus de watchdog ; <code>slurp index . --smart</code> ne ré-analyse que les fichiers modifiés, sans avoir besoin de git.',
         'footer.credit': 'Développé par <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
         'benchmark.note': 'Même économie pour les trois requêtes — « auth flow », « prisma schema », « database pool ». Les deux côtés sont le texte qui serait envoyé, compté avec tiktoken.',
-        'benchmark.recall.title': 'Qualité de récupération',
-        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mesure le rappel : la part des nœuds étiquetés de chaque question qui entrent dans le sous-graphe. Aucun LLM, aucun coût, reproductible. 31 questions à <code>--budget 4000</code> : les 15 intégrées sur le graphe <code>slurp index</code> de PrismaStats (1 582 nœuds) et 16 sur le graphe de slurp lui-même (4 165 nœuds).',
+        'benchmark.recall.title': 'Les 31 questions étiquetées',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> mesure le rappel : la part des nœuds étiquetés de chaque question qui entrent dans le sous-graphe. Aucun LLM, aucun coût, reproductible. 31 questions d\'architecture : les 15 intégrées sur le graphe <code>slurp index</code> de PrismaStats (1 582 nœuds) et 16 sur le graphe de slurp lui-même (4 165 nœuds). De la v1.3 à la v1.4.0, ce qui s\'améliore et ce qui se dégrade :',
         'benchmark.recall.th.graph': 'Graphe',
-        'benchmark.recall.why': 'Ce qui a changé en v1.2 : les tests et les nœuds import n\'occupent plus de place dans le sous-graphe (<code>--include-tests</code> et <code>--include-imports</code> les réintègrent), et un nœud prête son boost à dix voisins au plus, si bien que les appelants d\'un hub ne remplissent plus le budget.',
-        'benchmark.recall.holdout': 'Sur la moitié des questions non utilisée pour régler la v1.2 (rappel moyen en markdown et JSON à 4 000 et 8 000) : PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Les 16 questions de slurp ont été étiquetées par le même outil qui a réglé la v1.2 : indicatives, pas une référence indépendante. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Tous les détails dans le README →</a>',
+        'benchmark.recall.why': 'Ce qui se dégrade : en JSON à 4000, PrismaStats passe de 0,900 à 0,867 (l\'équivalent d\'une demi-question) et slurp de 0,812 à 0,750 (une question) ; en markdown à 16000, slurp passe de 1,000 à 0,938 (une question). Le MRR de PrismaStats passe de 0,405 à 0,337 : le premier nœud pertinent est classé plus bas en moyenne, même si à 4000 aucune question ne trouve moins de ses nœuds étiquetés. En markdown à 4000 — ce que <code>slurp QUERY</code> imprime par défaut et le seul format qu\'envoie le serveur MCP — aucune question ne se dégrade.',
+        'benchmark.recall.holdout': 'Les 16 questions de slurp ont été étiquetées par le même outil qui a réglé la v1.2 : indicatives, pas une référence indépendante. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Tous les détails dans le README →</a>',
         'zerodeps.speed': 'La v1.1.1 a accéléré <code>slurp index</code> : il ignore la sortie de build des frameworks web (<code>.next/</code> et similaires) et élague les dossiers exclus au lieu de les parcourir — PrismaStats 4,9 s → 0,5 s.',
         'perf.th.version': 'Version',
         'perf.th.mean': 'Moyenne de 10 requêtes à chaud',
         'perf.th.published': 'Publié à l\'époque',
         'perf.row.v065': 'avant les caches et le tas',
         'perf.slower': 'La v1.1.0 est environ 1,5 ms plus lente par requête que la v0.7.0, et en fait plus : le budget compte les relations en plus des nœuds, et le texte est rendu et compté avant d\'être envoyé.',
+        'benchmark.rank.title': 'Le classement de la v1.4',
+        'benchmark.rank.intro': 'La v1.4.0 change l\'ordre dans lequel slurp classe les nœuds : le même budget contient donc davantage de ce dont une question a besoin. La partie sémantique lit les termes du chemin du fichier d\'un nœud et de la classe ou du module qui le contient, au poids de son nom ; la partie structurelle est un PageRank personnalisé sur la requête. Il a été choisi sur une banque de 1 525 questions tirées de l\'historique des commits de 14 projets open source — le sujet du commit comme question, les définitions qu\'il a modifiées comme réponse —, en comparant sur 7 projets puis en vérifiant une seule fois sur les 6 autres. Rappel à <code>--budget 4000</code> en markdown, sur ces six :',
+        'benchmark.rank.th.project': 'Projet',
+        'benchmark.rank.mean': 'Moyenne',
+        'benchmark.rank.fine': 'Avec les mêmes tokens : les réponses utilisent les mêmes ~98% du budget qu\'avant. Les sujets de commit ne sont pas les questions d\'un agent : le critère de sortie, fixé avant de mesurer, exigeait donc aussi que les questions d\'architecture étiquetées ci-dessous ne perdent pas plus d\'une question à 4000 en markdown. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Compte rendu de la validation, en espagnol →</a>',
+        'benchmark.budget.title': 'Quel budget choisir',
+        'benchmark.budget.p1': 'Une étude avec slurp v1.3.0, sur les mêmes 1 525 questions tirées de l\'historique des commits de 14 projets open source, a cherché le budget au-delà duquel plus de tokens ne trouvent plus rien de nouveau. Pour localiser la fonction précise que touche un changement, elle n\'en a pas trouvé : le rappel continue de croître, d\'environ 10 points à chaque doublement, jusqu\'à 32000 et sans plateau, dans les projets de plus d\'environ 2 000 nœuds candidats (ceux que slurp peut renvoyer : ni tests ni imports). Là, en markdown et avec la v1.3.0, 4000 trouve 34–68% des définitions modifiées, 16000 en trouve 52–75% et 32000 en trouve 59–81%.',
+        'benchmark.budget.p2': 'La valeur par défaut reste donc 4000 — doubler le contexte pour dix points est un compromis, pas un optimum — et ce que la v1.4 a amélioré, c\'est le classement. Comme repère : pour les questions d\'architecture, la valeur par défaut suffit ; pour localiser une fonction précise dans un grand projet, passez 16000–32000. La description de <code>slurp_query</code> dit la même chose à l\'agent.',
+        'benchmark.budget.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Conclusions de l\'étude, en espagnol →</a>',
+        'perf.v14.title': 'La v1.4.0 face à la v1.3',
+        'perf.v14.p': 'Mesuré avec une autre méthode que le tableau ci-dessus : les chiffres ne lui sont donc pas comparables. Six graphes de référence, la v1.4.0 à côté de la v1.3 dans la même session, encodeur chargé. Les requêtes à chaud (la médiane de 20) prennent 0,31–0,71× le temps de la v1.3 sur hono, slurp, tokio, prometheus et sqlalchemy (sqlalchemy, 59 518 nœuds : 278 → 87 ms) ; sur PrismaStats, le plus petit, elles sont plus lentes : 10,2 → 14,4 ms. La première requête sur un graphe fraîchement chargé est plus lente aussi, jusqu\'à 1,54× (hono : 41,9 → 64,4 ms) : le nouveau classement construit une fois par graphe les termes de chaque nom et de chaque chemin, et c\'est ce qui rend plus rapides toutes les requêtes suivantes. Le critère de sortie autorisait 1,5× sur cette première requête ; la règle de l\'auteur, fixée avant de mesurer à nouveau, accepte jusqu\'à 1,67× sur elle seule. Le premier <code>slurp_query</code> après un rafraîchissement du graphe par le serveur MCP prend 1,03–1,45× le temps de la v1.3.',
+        'perf.v14.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Compte rendu de la latence, en espagnol →</a>',
+        'how.manual.tag': 'voie manuelle',
+        'agents.title': 'Mesuré avec des agents',
+        'agents.intro': 'Avant la sortie de la v1.3.0, dix sessions <code>claude -p</code> (Claude Code 2.1.331, Claude Opus 5.5) ont chacune effectué une tâche dans un clone neuf préparé avec <code>slurp init --yes</code> — cinq sur slurp lui-même, cinq sur PrismaStats. Aucun prompt ne mentionnait slurp. Face à un critère fixé avant de mesurer (il fallait 8 sessions sur 10) :',
+        'agents.stat.used': 'sessions ont appelé slurp d\'elles-mêmes, les 9 avant leur première modification',
+        'agents.stat.approvals': 'approbation : aucun outil de slurp n\'a été refusé',
+        'agents.stat.done': 'tâches accomplies : les vérifications du projet passent et le diff fait ce que la tâche demandait',
+        'agents.limits.title': 'Ses limites',
+        'agents.l1': '<strong>n = 10, sur une seule exécution</strong>, et le modèle varie d\'une exécution à l\'autre.',
+        'agents.l2': '<strong>La seule session sans slurp</strong> avait un prompt qui nommait les deux symboles à modifier et le composant où ils se trouvent. L\'agent les a cherchés avec grep : les noms étant donnés, la tâche consistait à les trouver, pas à comprendre où vit le code, ce à quoi sert <code>slurp_query</code>.',
+        'agents.l3': '<strong>Le rafraîchissement n\'a presque pas été sollicité.</strong> Les agents appellent slurp au début, avant de modifier : 15 des 16 appels ont trouvé le graphe à jour et un seul l\'a rafraîchi, en 325 ms.',
+        'agents.l4': 'Seuls 4 des 26 fichiers modifiés ont eu d\'abord un <code>slurp_impact</code> ou un <code>slurp_explain</code>.',
+        'agents.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Tableau par session et le reste des constats, en espagnol →</a>',
       },
       de: {
         flag: '🇩🇪', code: 'DE',
@@ -2403,15 +2601,15 @@ slurp index .
         'nav.how': "So funktioniert's",
         'nav.features': 'Funktionen',
         'hero.tagline': 'Deine Codebase ist die Schüssel. slurp serviert genau die Nudeln, die dein LLM braucht. <span class="emoji">🍜</span>',
-        'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert mit jeder Codebase.',
-        'hero.badge': 'v1.2.0 — Bessere Auswahl, gemessen',
+        'hero.subtagline': 'Versteht die Architektur deiner Codebase. 16 Sprachen. Funktioniert allein oder mit graphify.',
+        'hero.badge': 'v1.4.0 — Besseres Ranking, gemessen',
         'benchmark.quality.edges': 'PrismaStats · createAdminClient: <strong>97</strong> Aufrufer',
         'how.step0.h3': 'Neu bei slurp?',
-        'how.step0.tag': 'optional',
-        'how.step0.p': 'Führe <code>slurp init</code> aus — erkennt deine Sprache, indiziert deine Codebase und konfiguriert den MCP-Server in einem Schritt.',
-        'v1.label': '// 1.2.0',
-        'v1.h2': 'Bessere Auswahl, gemessen.',
-        'v1.p': 'slurp 1.2.0 hält Tests und Import-Knoten aus dem Teilgraphen heraus und begrenzt den Nachbar-Boost auf zehn Nachbarn: Der Recall bei <code>--budget 4000</code> in Markdown steigt von 0,867 auf 0,967 bei PrismaStats und von 0,688 auf 0,875 auf slurps eigenem Graphen. <code>slurp explain</code>, <code>slurp impact</code> und <code>slurp diff</code> zählen jetzt nur Produktions-Aufrufer, Tests getrennt.',
+        'how.step0.tag': 'empfohlen',
+        'how.step0.p': 'Ist slurp installiert (Schritt 1), führe <code>slurp init</code> im Projektstamm aus. Es zeigt den ganzen Plan und fragt, bevor es etwas schreibt: Es baut einen Graphen, der sich selbst aktuell hält, registriert den MCP-Server in <code>.mcp.json</code>, gibt ihn für Claude Code frei, damit der Agent nicht um Freigabe bittet, und sagt deinem Agenten, wann er slurp nutzen soll. Starte danach deinen Coding-Assistenten neu — die Schritte 2 und 3 sind dann schon erledigt.',
+        'v1.label': '// 1.4.0',
+        'v1.h2': 'Besseres Ranking, gemessen.',
+        'v1.p': 'slurp 1.4.0 ordnet besser: Der Score liest neben dem Namen eines Knotens auch seinen Pfad und Scope, und der PageRank ist auf die Anfrage personalisiert — der Recall bei <code>--budget 4000</code> steigt auf sechs Validierungsprojekten von 0,543 auf 0,674, mit denselben Token. Und seit 1.3.0 läuft slurp von allein: Der Graph folgt dem Arbeitsverzeichnis, und <code>slurp init</code> richtet Claude Code so ein, dass es slurp ohne Freigabe-Nachfrage aufruft — in der Messung mit Agenten riefen 9 von 10 Sitzungen slurp unaufgefordert auf (n = 10, ein einziger Lauf).',
         'v1.stat.tests': 'Tests',
         'v1.stat.langs': 'Sprachen mit Aufrufgraph',
         'benchmark.quality.callgraph': 'Aufrufgraph: Python, TypeScript/JS, Go, Java und Rust mit dateiübergreifender Auflösung',
@@ -2422,20 +2620,20 @@ slurp index .
         'arch.label': '// architektur-intelligenz',
         'arch.h2': 'slurp versteht deinen Code, nicht nur deine Dateien',
         'arch.callgraph.title': 'Aufrufgraph',
-        'arch.callgraph.line': '5 Sprachen mit dateiübergreifender Auflösung. Rückgabetyp-Propagierung innerhalb einer Datei. 2.694 Tests.',
-        'arch.explain.line': 'Architektonische Rolle, Risikoprozentsatz und Vorschläge zum Weiterforschen. Das Risiko zählt nur Produktions-Aufrufer; Tests werden getrennt gezeigt. Struktureller Modus, kein LLM nötig.',
-        'arch.eval.line': 'Recall ohne LLM und ohne Kosten (--retrieval): 0,967 bei PrismaStats und 0,875 auf slurps eigenem Graphen bei Budget 4.000. Ein Modus mit LLM-Richter ist ebenfalls verfügbar.',
+        'arch.callgraph.line': '5 Sprachen mit dateiübergreifender Auflösung. Rückgabetyp-Propagierung innerhalb einer Datei. 3.082 Tests.',
+        'arch.explain.line': 'Architektonische Rolle, Risikoprozentsatz und Vorschläge zum Weiterforschen. Das Risiko zählt nur Produktions-Aufrufer; Tests werden getrennt gezeigt. Struktureller Modus, kein LLM nötig. Seit v1.4.0 findet es eine graphify-Funktion über ihren Namen.',
+        'arch.eval.line': 'Recall ohne LLM und ohne Kosten (--retrieval): 0,967 bei PrismaStats und 0,938 auf slurps eigenem Graphen bei Budget 4.000. Ein Modus mit LLM-Richter ist ebenfalls verfügbar.',
         'features.impact.line': 'Wirkungsradius-Analyse vor dem Bearbeiten. Wisse, was bricht, bevor du eine Datei anfasst.',
         'features.suggest.line': 'Query-Empfehlungen von der Graph-Grenze. Wisse, was als Nächstes zu erkunden ist.',
         'arch.mcp.title': 'MCP-Tools',
-        'arch.mcp.line': '5 Tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code ruft sie automatisch auf.',
+        'arch.mcp.line': '5 Tools: <code>slurp_query</code>, <code>slurp_explain</code>, <code>slurp_impact</code>, <code>slurp_diff</code>, <code>slurp_suggest</code>. Claude Code ruft sie automatisch auf — nach <code>slurp init</code>, ohne um Freigabe zu bitten.',
         'how.impact.note': 'Führe vor dem Bearbeiten einer Datei <code>slurp impact &lt;Datei&gt;</code> aus, um zu sehen, was brechen könnte.',
         'how.explain2.note': 'Willst du deine Codebase verstehen? <code>slurp explain \"functionName\"</code> erklärt jede Funktion in normaler Sprache.',
         'nav.architecture': 'Architektur',
         'problem.label': '// das Problem',
         'problem.h2': 'Dein LLM braucht nicht die ganze Schüssel',
         'problem.p1': 'slurp index bildet dein gesamtes Codebase mit reiner statischer Analyse in einem Wissensgraphen ab — keine LLMs, keine APIs. Aber <em>jeden Knoten</em> in jede Anfrage zu injizieren ist verschwenderisch — dein LLM gibt den Großteil seines Kontextbudgets für Knoten aus, die es nie verwenden wird.',
-        'problem.p2': 'slurp bewertet jeden Knoten anhand deiner Anfrage mit PageRank + TF-IDF — null LLM-Aufrufe, null zusätzliche Token verbraucht — und liefert nur das, was in dein Budget passt.',
+        'problem.p2': 'slurp bewertet jeden Knoten anhand deiner Anfrage — TF-IDF über seinen Namen, seinen Dateipfad und seinen Scope, dazu ein auf die Anfrage personalisierter PageRank — mit null LLM-Aufrufen und null zusätzlich verbrauchten Token, und liefert nur das, was in dein Budget passt.',
         'problem.before.label': 'Gesamtgraph (Token)',
         'problem.after.label': 'slurp-Budget (Token)',
         'problem.saving': '96,7% gespart',
@@ -2455,22 +2653,22 @@ slurp index .
         'demo.p': 'Der interaktive Visualisierer zeigt den von slurp ausgewählten Teilgraphen — und wie viel du gespart hast.',
         'demo.note': 'Live-Demo — echte PrismaStats-Codebase, echte Daten. Orange = Funktionen, Blau = Klassen, Lila = Module.',
         'demo.status.hint': 'Auf einen Knoten klicken zum Inspizieren · Ziehen zum Erkunden',
-        'demo.status.left': 'Top 50 von 108 ausgewählten Knoten · 3.928 / 4.000 Token · 96,7% gespart',
+        'demo.status.left': 'Top 50 von 103 ausgewählten Knoten · 3.926 / 4.000 Token · 96,7% gespart',
         'perf.label': '// performance',
         'perf.h2': 'Auf Geschwindigkeit gebaut.',
         'perf.p': 'Latenz eines slurp_query-Aufrufs über den MCP-Server bei Budget 4.000 — graphify-Graph von PrismaStats (2.111 Knoten), Mittel aus zehn Anfragen nach einem Aufwärmdurchlauf. Gemessen für v1.1.0 auf einem Apple M4, Python 3.12; drei Läufe, Spanne angegeben.',
-        'perf.note': 'Graph-Änderungen werden automatisch erkannt — kein Server-Neustart nötig.',
+        'perf.note': 'Der Graph folgt deinem Arbeitsverzeichnis: Vor jedem Aufruf prüft der Server es und aktualisiert slurps eigenen Graphen, wenn sich etwas geändert hat — kein manuelles Neuindizieren, kein Server-Neustart.',
         'how.label': "// so funktioniert's",
         'how.h2': 'Von null auf optimiert in Minuten.',
         'how.step1.h3': 'slurp installieren',
         'how.step1.p': 'Ein Befehl. Erfordert Python 3.12+.',
         'how.step2.h3': 'Projekt lokal indizieren',
         'how.step2.p': 'slurp index . analysiert deinen Code mit reiner statischer Analyse — keine LLMs, keine APIs, keine Kosten.',
-        'how.update.note': 'Graph aktuell halten: <code>slurp index .</code> nach wichtigen Änderungen erneut ausführen · <code>slurp index . --watch</code> für automatisches Re-Indizieren im Hintergrund.',
+        'how.update.note': 'Der Graph hält sich selbst aktuell: Vor jeder Antwort — bei jedem MCP-Aufruf und den Abfragebefehlen im Terminal — prüft slurp das Arbeitsverzeichnis (0,4 ms pro Aufruf bei PrismaStats) und aktualisiert seinen eigenen Graphen, wenn sich eine Datei geändert hat: 30 ms für eine Änderung in Funktionsrümpfen, 0,29 s für eine vollständige Indizierung, bei PrismaStats. Ein Aufruf wartet höchstens 2 Sekunden auf eine Aktualisierung.',
         'how.step3.h3': 'MCP einmal konfigurieren, fertig',
-        'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es automatisch auf.',
-        'how.mcp': '<strong>Vollautomatisch nach Schritt 3.</strong> Claude Code ruft die Tools von slurp auf, wenn es sie braucht — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
-        'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json — und slurp index fragt, bevor es ihn ersetzt (-o graphify-out/slurp-graph.json behält beide, --force ersetzt ihn).',
+        'how.step3.p': 'Füge slurp zu deiner <code style="font-family:var(--mono);font-size:0.85em;color:var(--orange)">.mcp.json</code> hinzu. Claude Code ruft es automatisch auf. Von Hand eingerichtet, fragt Claude Code einmal nach dem Server und vor jedem Aufruf, außer du antwortest „nicht mehr fragen“; <code>slurp init</code> schreibt diese Freigabe für dich.',
+        'how.mcp': '<strong>Vollautomatisch nach <code>slurp init</code>.</strong> Claude Code ruft die Tools von slurp auf, wenn es sie braucht, ohne um Freigabe zu bitten, und der Graph aktualisiert sich vor jeder Antwort selbst — keine zusätzlichen Befehle, kein Prompt-Engineering. Du arbeitest genau wie zuvor, nur günstiger.',
+        'how.graphify.note': 'Nutzt du bereits graphify? slurp funktioniert direkt mit deinem bestehenden graph.json, nur lesend: Es baut oder schreibt ihn nie neu, und die Antworten sagen, wenn sich abgedeckte Dateien nach seiner Erstellung geändert haben. slurp init baut slurps eigenen Graphen daneben (graphify-out/slurp-graph.json), den die Auto-Erkennung zuerst wählt; slurp index fragt, bevor es den von graphify ersetzt (--force ersetzt ihn).',
         'how.mcp.global': 'Globale Installation:',
         'how.mcp.uv': 'Python-Projekt mit uv:',
         'zerodeps.label': '// null abhängigkeiten',
@@ -2492,25 +2690,49 @@ slurp index .
         'features.diff.line': 'Graphen-Snapshots vergleichen',
         'features.benchmark.line': 'Token-Einsparungen messen',
         'features.inject.line': 'Quellcode an Knoten anhängen',
-        'features.smart.line': 'Git-bewusstes inkrementelles Neuindizieren. Erzeugt denselben Graphen wie eine vollständige Indizierung und ist schneller, wenn sich nur Funktionsrümpfe ändern.',
+        'features.smart.line': 'Inkrementelles Neuindizieren anhand eines Manifests in graph.json, ganz ohne git. Erzeugt denselben Graphen wie eine vollständige Indizierung und ist schneller, wenn sich nur Funktionsrümpfe ändern.',
         'features.advisor.line': 'Empfiehlt das optimale Token-Budget aus deinem Query-Verlauf.',
         'features.federation.title': 'Multi-Graph-Föderation',
         'features.federation.line': 'Mehrere Codebases gleichzeitig abfragen.',
         'install.explain.note': 'Für <code>slurp explain</code>: setze <code>ANTHROPIC_API_KEY</code> oder <code>OPENAI_API_KEY</code>, starte Ollama lokal oder verweise auf einen beliebigen OpenAI-kompatiblen Endpoint. Kein LLM? Nutze <code>--no-llm</code> für strukturelle Analyse.',
-        'how.smart.note': 'Schon indiziert? Nutze <code>slurp index . --smart</code>, um nur geänderte Dateien zu aktualisieren.',
+        'how.smart.note': 'Du musst also nicht mehr von Hand neu indizieren. <code>slurp index . --watch</code> braucht es nur für Tools, die <code>graph.json</code> außerhalb von slurp lesen, und es hängt nicht mehr von watchdog ab; <code>slurp index . --smart</code> parst nur die geänderten Dateien neu, ganz ohne git.',
         'footer.credit': 'Entwickelt von <a href="https://github.com/CarlosVallejoRuiz" target="_blank" rel="noopener">Carlos Vallejo</a> · Terrassa, Barcelona',
         'benchmark.note': 'Gleiche Ersparnis für alle drei Anfragen — „auth flow“, „prisma schema“, „database pool“. Beide Seiten sind der Text, der gesendet würde, gezählt mit tiktoken.',
-        'benchmark.recall.title': 'Abrufqualität',
-        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misst den Recall: den Anteil der markierten Knoten jeder Frage, der im Teilgraphen landet. Kein LLM, keine Kosten, reproduzierbar. 31 Fragen bei <code>--budget 4000</code>: die 15 eingebauten auf dem <code>slurp index</code>-Graphen von PrismaStats (1.582 Knoten) und 16 auf slurps eigenem Graphen (4.165 Knoten).',
+        'benchmark.recall.title': 'Die 31 markierten Fragen',
+        'benchmark.recall.intro': '<code>slurp eval --retrieval</code> misst den Recall: den Anteil der markierten Knoten jeder Frage, der im Teilgraphen landet. Kein LLM, keine Kosten, reproduzierbar. 31 Architekturfragen: die 15 eingebauten auf dem <code>slurp index</code>-Graphen von PrismaStats (1.582 Knoten) und 16 auf slurps eigenem Graphen (4.165 Knoten). Von v1.3 zu v1.4.0, was besser und was schlechter wird:',
         'benchmark.recall.th.graph': 'Graph',
-        'benchmark.recall.why': 'Was sich in v1.2 geändert hat: Tests und Import-Knoten belegen keine Plätze mehr im Teilgraphen (<code>--include-tests</code> und <code>--include-imports</code> lassen sie wieder zu), und ein Knoten gibt seinen Nachbar-Boost an höchstens zehn Nachbarn weiter, sodass die Aufrufer eines Hubs das Budget nicht mehr füllen.',
-        'benchmark.recall.holdout': 'Auf der Hälfte der Fragen, die nicht zum Abstimmen von v1.2 verwendet wurde (mittlerer Recall in Markdown und JSON bei 4.000 und 8.000): PrismaStats 0,780 → 0,893, slurp 0,562 → 0,750. Die 16 Fragen von slurp hat dasselbe Tool markiert, das v1.2 abgestimmt hat — Richtwerte, keine unabhängige Referenz. <a href="https://github.com/CarlosVallejoRuiz/slurp#choosing-a-budget" target="_blank" rel="noopener">Alle Details im README →</a>',
+        'benchmark.recall.why': 'Was schlechter wird: In JSON bei 4000 fällt PrismaStats von 0,900 auf 0,867 (das Äquivalent einer halben Frage) und slurp von 0,812 auf 0,750 (eine Frage); in Markdown bei 16000 fällt slurp von 1,000 auf 0,938 (eine Frage). Der MRR von PrismaStats fällt von 0,405 auf 0,337: Der erste relevante Knoten liegt im Mittel weiter hinten, auch wenn bei 4000 keine Frage weniger ihrer markierten Knoten findet. In Markdown bei 4000 — was <code>slurp QUERY</code> standardmäßig ausgibt und das einzige Format, das der MCP-Server sendet — wird keine Frage schlechter.',
+        'benchmark.recall.holdout': 'Die 16 Fragen von slurp hat dasselbe Tool markiert, das v1.2 abgestimmt hat — Richtwerte, keine unabhängige Referenz. <a href="https://github.com/CarlosVallejoRuiz/slurp#upgrading-to-v140" target="_blank" rel="noopener">Alle Details im README →</a>',
         'zerodeps.speed': 'v1.1.1 hat <code>slurp index</code> beschleunigt: Es überspringt die Build-Ausgabe von Web-Frameworks (<code>.next/</code> u. Ä.) und lässt ausgeschlossene Ordner aus, statt sie zu durchlaufen — PrismaStats 4,9 s → 0,5 s.',
         'perf.th.version': 'Version',
         'perf.th.mean': 'Mittel aus 10 warmen Anfragen',
         'perf.th.published': 'Damals veröffentlicht',
         'perf.row.v065': 'vor den Caches und dem Heap',
         'perf.slower': 'v1.1.0 ist pro Anfrage etwa 1,5 ms langsamer als v0.7.0 und leistet mehr dafür: Das Budget zählt Beziehungen ebenso wie Knoten, und der Text wird vor dem Senden gerendert und gezählt.',
+        'benchmark.rank.title': 'Das Ranking von v1.4',
+        'benchmark.rank.intro': 'v1.4.0 ändert die Reihenfolge, in der slurp Knoten einstuft, sodass dasselbe Budget mehr von dem enthält, was eine Frage braucht. Der semantische Teil liest die Begriffe aus dem Dateipfad eines Knotens und aus der Klasse oder dem Modul, das ihn enthält, mit dem Gewicht seines Namens; der strukturelle Teil ist ein auf die Anfrage personalisierter PageRank. Gewählt wurde es anhand von 1.525 Fragen aus der Commit-Historie von 14 Open-Source-Projekten — der Betreff eines Commits als Frage, die von ihm geänderten Definitionen als Antwort —, verglichen auf 7 Projekten und danach ein einziges Mal auf den anderen 6 geprüft. Recall bei <code>--budget 4000</code> in Markdown, auf diesen sechs:',
+        'benchmark.rank.th.project': 'Projekt',
+        'benchmark.rank.mean': 'Mittel',
+        'benchmark.rank.fine': 'Mit denselben Token: Die Antworten nutzen wie zuvor ~98% des Budgets. Commit-Betreffs sind nicht die Fragen eines Agenten; deshalb verlangte das vor der Messung festgelegte Release-Kriterium außerdem, dass die markierten Architekturfragen unten bei 4000 in Markdown nicht mehr als eine Frage verlieren. <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/validacion.md" target="_blank" rel="noopener">Validierungsprotokoll, auf Spanisch →</a>',
+        'benchmark.budget.title': 'Welches Budget wählen',
+        'benchmark.budget.p1': 'Eine Studie mit slurp v1.3.0, auf denselben 1.525 Fragen aus der Commit-Historie von 14 Open-Source-Projekten, suchte das Budget, ab dem mehr Token nichts Neues mehr finden. Für das Auffinden der konkreten Funktion, die eine Änderung berührt, fand sie keines: Der Recall wächst weiter, um etwa 10 Punkte pro Verdopplung, bis 32000 und ohne Plateau, in Projekten mit mehr als etwa 2.000 Kandidatenknoten (die slurp zurückgeben kann: keine Tests, keine Imports). Dort findet 4000, in Markdown und mit v1.3.0, 34–68% der geänderten Definitionen, 16000 findet 52–75% und 32000 findet 59–81%.',
+        'benchmark.budget.p2': 'Deshalb bleibt der Standard bei 4000 — den Kontext für zehn Punkte zu verdoppeln ist ein Kompromiss, kein Optimum —, und verbessert hat v1.4 das Ranking. Als Richtwert: Für Architekturfragen reicht der Standard; um eine konkrete Funktion in einem großen Projekt zu finden, übergib 16000–32000. Die Beschreibung von <code>slurp_query</code> sagt dem Agenten dasselbe.',
+        'benchmark.budget.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/presupuesto-optimo/resultados/conclusiones.md" target="_blank" rel="noopener">Schlussfolgerungen der Studie, auf Spanisch →</a>',
+        'perf.v14.title': 'v1.4.0 gegenüber v1.3',
+        'perf.v14.p': 'Mit einer anderen Methode gemessen als die Tabelle oben, die Zahlen sind also nicht mit ihr vergleichbar: sechs Referenzgraphen, v1.4.0 neben v1.3 in derselben Sitzung, mit geladenem Encoder. Warme Anfragen (der Median aus 20) brauchen 0,31–0,71× der Zeit von v1.3 bei hono, slurp, tokio, prometheus und sqlalchemy (sqlalchemy, 59.518 Knoten: 278 → 87 ms); bei PrismaStats, dem kleinsten, sind sie langsamer: 10,2 → 14,4 ms. Auch die erste Anfrage auf einem frisch geladenen Graphen ist langsamer, bis zu 1,54× (hono: 41,9 → 64,4 ms): Das neue Ranking baut einmal pro Graph die Begriffe aller Namen und Pfade auf, und genau das macht jede spätere Anfrage schneller. Das Release-Kriterium erlaubte 1,5× für diese erste Anfrage; die Regel des Autors, vor der erneuten Messung festgelegt, akzeptiert bis zu 1,67× nur für sie. Der erste <code>slurp_query</code>-Aufruf, nachdem der MCP-Server den Graphen aktualisiert hat, braucht 1,03–1,45× der Zeit von v1.3.',
+        'perf.v14.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/docs/design/orden-v1.4/resultados/latencia-optimizada.md" target="_blank" rel="noopener">Latenzprotokoll, auf Spanisch →</a>',
+        'how.manual.tag': 'manueller Weg',
+        'agents.title': 'Mit Agenten gemessen',
+        'agents.intro': 'Vor dem Release von v1.3.0 erledigten zehn <code>claude -p</code>-Sitzungen (Claude Code 2.1.331, Claude Opus 5.5) je eine Aufgabe in einem frischen Klon, eingerichtet mit <code>slurp init --yes</code> — fünf an slurp selbst, fünf an PrismaStats. Kein Prompt erwähnte slurp. Gemessen an einem vorab festgelegten Kriterium (8 von 10 Sitzungen nötig):',
+        'agents.stat.used': 'Sitzungen riefen slurp von sich aus auf, alle 9 vor ihrer ersten Änderung',
+        'agents.stat.approvals': 'Freigaben: kein slurp-Tool wurde abgelehnt',
+        'agents.stat.done': 'Aufgaben erledigt: Die Checks des Projekts laufen durch und der Diff tut, was die Aufgabe verlangte',
+        'agents.limits.title': 'Die Grenzen',
+        'agents.l1': '<strong>n = 10, aus einem einzigen Lauf</strong>, und das Modell variiert von Lauf zu Lauf.',
+        'agents.l2': '<strong>Die eine Sitzung ohne slurp</strong> hatte einen Prompt, der beide zu ändernden Symbole und die Komponente nannte, in der sie liegen. Der Agent suchte sie mit grep: Mit den Namen in der Hand ging es darum, sie zu finden, nicht herauszufinden, wo der Code liegt — und dafür ist <code>slurp_query</code> da.',
+        'agents.l3': '<strong>Die Aktualisierung wurde kaum beansprucht.</strong> Agenten rufen slurp zu Beginn auf, vor dem Bearbeiten: 15 der 16 Aufrufe fanden den Graphen aktuell vor, einer aktualisierte ihn, in 325 ms.',
+        'agents.l4': 'Nur 4 der 26 bearbeiteten Dateien hatten vorher ein <code>slurp_impact</code> oder <code>slurp_explain</code>.',
+        'agents.link': '<a href="https://github.com/CarlosVallejoRuiz/slurp/blob/v1.3.0/docs/design/mcp-autonomo/resultados/conclusiones.md" target="_blank" rel="noopener">Tabelle pro Sitzung und die übrigen Befunde, auf Spanisch →</a>',
       },
     };
 
