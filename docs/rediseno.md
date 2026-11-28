@@ -895,3 +895,24 @@ Las auditorías de `canonical`, `hreflang` y `llms.txt` de Lighthouse pasan.
 
 Capturas: una selección en `docs/rediseno/fase2/`; las diez páginas completas en
 `.capturas/rediseno/` (sin versionar).
+
+### 6.3 Publicado (commit `e563210`)
+
+GitHub Pages publica `dist/` desde GitHub Actions. `CLAUDE.md`, `docs/`, `src/` y `build.mjs`
+dan 404; las cinco páginas, `sitemap.xml`, `llms.txt` y la clave de IndexNow, 200.
+
+Lighthouse 13.6.0, móvil, sobre la web publicada:
+
+| | Línea base (`32ed687`) | Mejoras rápidas (`a0d1a56`) | Rediseño, EN (3 ejecuciones) | Rediseño, DE |
+|---|---|---|---|---|
+| Rendimiento | 73 | 97 / 98 / 90 | 100 / 100 / 100 | 100 |
+| Accesibilidad | 94 | 100 | 100 | 100 |
+| Buenas prácticas | 96 | 100 | 100 | 100 |
+| SEO | 100 | 100 | 100 | 100 |
+| LCP | 16,1–16,3 s | 2,0–3,4 s | 1,0–1,2 s | 1,1 s |
+| FCP | 2,1–2,2 s | 2,0–2,2 s | 1,0–1,2 s | 1,1 s |
+| CLS | 0–0,006 | 0,002–0,007 | 0–0,036 | 0,05 |
+| Peso total | 2.805 KiB | 207 KiB | 201 KiB | 202 KiB |
+
+El CLS sube algo (hasta 0,05; el umbral de «bueno» es 0,1): es el cambio de la fuente de
+reserva a Bricolage Grotesque al cargar.

@@ -1,0 +1,71 @@
+{
+  "url": "https://imjuank.dev/slurp-web/",
+  "commit": "e563210",
+  "fecha": "2026-11-28",
+  "runs": [
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "1.2 s",
+      "LCP": "1.2 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "SI": "1.3 s",
+      "peso": "Total size was 201 KiB"
+    },
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "1.0 s",
+      "LCP": "1.0 s",
+      "TBT": "0 ms",
+      "CLS": "0.036",
+      "SI": "1.0 s",
+      "peso": "Total size was 201 KiB"
+    },
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "1.0 s",
+      "LCP": "1.0 s",
+      "TBT": "0 ms",
+      "CLS": "0.036",
+      "SI": "1.0 s",
+      "peso": "Total size was 201 KiB"
+    },
+    {
+      "pagina": "de",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "1.1 s",
+      "LCP": "1.1 s",
+      "TBT": "10 ms",
+      "CLS": "0.05",
+      "SI": "1.1 s",
+      "peso": "Total size was 202 KiB"
+    }
+  ]
+}
