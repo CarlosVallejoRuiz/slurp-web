@@ -204,14 +204,17 @@ writeFileSync(
   join(DIST, 'llms.txt'),
   `# slurp
 
-> Token-budget-aware graph navigation for AI coding agents. slurp scores every node of a codebase knowledge graph against a query and selects the highest-relevance subgraph that fits within a token budget. It is an open-source (MIT) Python CLI and MCP server; install it with \`pip install slurp-graph\` (Python 3.12+).
+> Token-budget-aware graph navigation for AI coding agents. slurp scores every node of a codebase knowledge graph against a query and selects the highest-relevance subgraph that fits within a token budget. It is an open-source (MIT) Python CLI and MCP server; install it with \`pip install slurp-graph\` (Python 3.12+; 4 dependencies: click, networkx, rich and tiktoken).
 
 slurp works standalone (\`slurp index\` builds the graph with static analysis, no LLM) or as a companion to graphify. The current version is ${site.version}. This site is a landing page; the README is the reference for every command, flag and measured figure.
+
+Since 1.5.0, a JSX usage of a React component (\`<Button />\`) is a \`renders\` edge, components wrapped in \`forwardRef\` or \`memo\` included, so the components that render it count as its dependants in \`slurp explain\`, \`slurp impact\` and \`slurp diff\`. \`slurp explain\` with Anthropic models needs the extra: \`pip install "slurp-graph[llm-anthropic]"\`; with OpenAI models, \`pip install "slurp-graph[llm-openai]"\`. Ollama and OpenAI-compatible endpoints need no extra, and with no provider it answers from the graph alone.
 
 ## Docs
 
 - [README](${raw}/README.md): commands, flags, benchmark, MCP integration and upgrade notes
 - [Usage guide](${raw}/USAGE.md): automatic MCP mode and manual CLI use
+- [Upgrading to v1.5.0](${site.github}#upgrading-to-v150): what changes for existing users
 
 ## Project
 
@@ -225,6 +228,8 @@ slurp works standalone (\`slurp index\` builds the graph with static analysis, n
 - [Budget study](${blob}/docs/design/presupuesto-optimo/resultados/conclusiones.md): conclusions, in Spanish
 - [v1.4 ranking validation](${blob}/docs/design/orden-v1.4/resultados/validacion.md): in Spanish
 - [v1.4 latency](${blob}/docs/design/orden-v1.4/resultados/latencia-optimizada.md): in Spanish
+- [v1.5 JSX design](${blob}/docs/design/jsx-v1.5.md): in Spanish
+- [v1.5 bank results](${blob}/docs/design/jsx-v1.5/resultados/banco-real.md): in Spanish
 `,
 );
 

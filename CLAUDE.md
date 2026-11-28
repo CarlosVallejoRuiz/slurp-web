@@ -27,8 +27,9 @@ del `README.md` de slurp (`~/Desktop/Slurp/slurp/`) en el tag de la versión pub
 documentos que ese README enlaza en `docs/design/`. Antes de tocar una cifra, léela allí; si
 algo de la web no tiene respaldo en el README, se quita o se pregunta al autor.
 
-La web está al día con **slurp v1.4.0**. Las cifras de abajo son las de ese README, como
-referencia rápida; si el README cambia, manda el README.
+La web está al día con **slurp v1.5.0**. Las cifras de abajo son las de ese README (y de las
+notas de la versión, `~/slurp-bench/v15/notas-v1.5.0.md`), como referencia rápida; si el README
+cambia, manda el README.
 
 ## El problema que resuelve
 
@@ -41,7 +42,7 @@ referencia rápida; si el README cambia, manda el README.
 
 ---
 
-## Números reales (README de slurp v1.4.0)
+## Números reales (README de slurp v1.5.0)
 
 **Ahorro** (`slurp benchmark`, grafo de graphify de PrismaStats, grafo completo 117.828 tokens;
 las tres consultas — "auth flow", "prisma schema", "database pool" — dan el mismo ahorro):
@@ -56,15 +57,27 @@ las tres consultas — "auth flow", "prisma schema", "database pool" — dan el 
 
 **Orden de la v1.4** (recall a `--budget 4000` en markdown, seis proyectos de validación de un
 banco de 1.525 preguntas de commits de 14 proyectos): media 0,543 → 0,674 con los mismos tokens.
+**v1.5.0** (mismo banco, cada grafo reindexado): 0,674 → **0,677**, ningún proyecto baja —
+excalidraw 0,583 → 0,599, prometheus 0,535 → 0,539; gin, click, ripgrep y commons-lang iguales.
 
 **31 preguntas etiquetadas** (v1.3 → v1.4.0): markdown a 4000, PrismaStats 0,967 → 0,967 y
 slurp 0,875 → 0,938; JSON a 4000, 0,900 → 0,867 y 0,812 → 0,750; markdown a 16000,
-0,967 → 0,967 y 1,000 → 0,938; MRR de PrismaStats 0,405 → 0,337. Las pérdidas se muestran.
+0,967 → 0,967 y 1,000 → 0,938; MRR de PrismaStats 0,405 → 0,337. v1.4.0 → v1.5.0, solo markdown
+a 4000: PrismaStats 0,967 → 0,933 (pierde `arch-02`), slurp 0,938 → 0,938. Las pérdidas se muestran.
+
+**React/JSX** (v1.5.0): `<Button />` es una arista `renders`, también con `forwardRef`/`memo`.
+`slurp impact` sobre `Button` en PrismaStats (Next.js): LOW sin dependientes → HIGH con 32 de
+producción (registro en `docs/design/jsx-v1.5.md` §8). De PrismaStats no se enseña código.
+`slurp index` de PrismaStats con la v1.5.0: 1.638 nodos · 2.284 aristas · 185 ficheros.
+
+**Instalación** (v1.5.0): 4 dependencias (click, networkx, rich, tiktoken). `slurp explain` con
+Anthropic necesita `pip install "slurp-graph[llm-anthropic]"`; con OpenAI, `[llm-openai]`.
 
 **Medición con agentes** (v1.3.0): 9 de 10 sesiones llamaron a slurp por su cuenta, 0
 aprobaciones, 10 tareas completadas. Siempre con sus límites: n = 10, una sola ejecución.
 
-**Tests:** 3.082. **Visualizador de la demo** ("player stats", budget 4000, v1.4.0): 103/2111
+**Tests:** 3.264 (notas de la v1.5.0 y `pytest --collect-only` en el tag; el badge del README
+sigue diciendo 3082). **Visualizador de la demo** ("player stats", budget 4000, v1.4.0): 103/2111
 nodos, 3.926/4.000 tokens, 96,7% ahorrado.
 
 ---

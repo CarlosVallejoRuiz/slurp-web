@@ -101,6 +101,9 @@ code {
   overflow-wrap: anywhere;
 }
 .txt code, .fine code, .lede code, li code, td code { white-space: nowrap; }
+/* long install commands may wrap on narrow screens, only at their spaces */
+.fine code.cmd-wrap, td code.cmd-wrap { white-space: normal; }
+.cmd-wrap span { white-space: nowrap; }
 .txt a, .fine a, .lim a { color: var(--or); text-underline-offset: 3px; }
 
 /* ── sections ── */
@@ -224,7 +227,7 @@ code {
 .legend { font: 400 0.8125rem/1.6 var(--m); color: var(--mu); margin-top: 12px; display: flex; gap: 6px 18px; flex-wrap: wrap; }
 .legend span { display: inline-flex; gap: 6px; align-items: center; }
 
-/* v1.3 → v1.4 on a 0–1 scale */
+/* v1.3 → v1.5.0 on a 0–1 scale */
 .bar { position: relative; height: 12px; min-width: 120px; background: repeating-linear-gradient(90deg, var(--line) 0 2px, transparent 2px 5px); }
 .bar i { position: absolute; left: 0; top: 0; height: 100%; width: calc(var(--a) * 100%); background: #8a7c68; }
 .bar u { position: absolute; top: 0; height: 100%; left: calc(var(--a) * 100%); width: calc((var(--b) - var(--a)) * 100%); background: var(--or); }

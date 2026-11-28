@@ -97,8 +97,11 @@
           <tr><td class="name">{{{install.row1.case}}}</td><td><code>uv tool install slurp-graph</code></td></tr>
           <tr><td class="name">{{install.row2.case}}</td><td><code>uv add slurp-graph</code></td></tr>
           <tr><td class="name">{{install.row3.case}}</td><td><code>pip install slurp-graph</code></td></tr>
+          <tr><td class="name">{{install.row4.case}}</td><td><code class="cmd-wrap">pip install <span>"slurp-graph[llm-anthropic]"</span></code></td></tr>
+          <tr><td class="name">{{install.row5.case}}</td><td><code class="cmd-wrap">pip install <span>"slurp-graph[llm-openai]"</span></code></td></tr>
         </tbody>
       </table>
+      <p class="fine">{{{install.deps}}}</p>
       <p class="fine">{{{install.note}}}</p>
       <p class="fine">{{{install.explain.note}}}</p>
     </div>
@@ -165,18 +168,20 @@
             <th scope="col">{{benchmark.rank.th.project}}</th>
             <th scope="col" class="n">v1.3</th>
             <th scope="col" class="n">v1.4.0</th>
+            <th scope="col" class="n">v1.5.0</th>
             <th scope="col" class="barcell" aria-hidden="true"></th>
           </tr></thead>
           <tbody>
-            <tr><td class="name">gin</td><td class="n was">0.779</td><td class="n now">0.824 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.779;--b:.824"><i></i><u></u></div></td></tr>
-            <tr><td class="name">click</td><td class="n was">0.610</td><td class="n now">0.775 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.610;--b:.775"><i></i><u></u></div></td></tr>
-            <tr><td class="name">ripgrep</td><td class="n was">0.421</td><td class="n now">0.587 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.421;--b:.587"><i></i><u></u></div></td></tr>
-            <tr><td class="name">excalidraw</td><td class="n was">0.428</td><td class="n now">0.583 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.428;--b:.583"><i></i><u></u></div></td></tr>
-            <tr><td class="name">commons-lang</td><td class="n was">0.678</td><td class="n now">0.740 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.678;--b:.740"><i></i><u></u></div></td></tr>
-            <tr><td class="name">prometheus</td><td class="n was">0.344</td><td class="n now">0.535 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.344;--b:.535"><i></i><u></u></div></td></tr>
-            <tr class="mean"><td class="name">{{benchmark.rank.mean}}</td><td class="n was">0.543</td><td class="n now">0.674 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.543;--b:.674"><i></i><u></u></div></td></tr>
+            <tr><td class="name">gin</td><td class="n was">0.779</td><td class="n was">0.824 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.824 <span class="d eq">=<span class="vh"> {{ui.same}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.779;--b:.824"><i></i><u></u></div></td></tr>
+            <tr><td class="name">click</td><td class="n was">0.610</td><td class="n was">0.775 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.775 <span class="d eq">=<span class="vh"> {{ui.same}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.610;--b:.775"><i></i><u></u></div></td></tr>
+            <tr><td class="name">ripgrep</td><td class="n was">0.421</td><td class="n was">0.587 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.587 <span class="d eq">=<span class="vh"> {{ui.same}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.421;--b:.587"><i></i><u></u></div></td></tr>
+            <tr><td class="name">excalidraw</td><td class="n was">0.428</td><td class="n was">0.583 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.599 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.428;--b:.599"><i></i><u></u></div></td></tr>
+            <tr><td class="name">commons-lang</td><td class="n was">0.678</td><td class="n was">0.740 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.740 <span class="d eq">=<span class="vh"> {{ui.same}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.678;--b:.740"><i></i><u></u></div></td></tr>
+            <tr><td class="name">prometheus</td><td class="n was">0.344</td><td class="n was">0.535 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.539 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.344;--b:.539"><i></i><u></u></div></td></tr>
+            <tr class="mean"><td class="name">{{benchmark.rank.mean}}</td><td class="n was">0.543</td><td class="n was">0.674 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="n now">0.677 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.543;--b:.677"><i></i><u></u></div></td></tr>
           </tbody>
         </table>
+        <p class="legend" aria-hidden="true"><span><span class="d up">▲</span>{{ui.better}}</span><span><span class="d eq">=</span>{{ui.same}}</span></p>
         <p class="fine">{{{benchmark.rank.fine}}}</p>
       </div>
     </div>
@@ -210,8 +215,26 @@
             </tr>
           </tbody>
         </table>
+        <table class="tbl">
+          <caption>v1.4.0 → v1.5.0</caption>
+          <thead><tr>
+            <th scope="col">{{benchmark.recall.th.graph}}</th>
+            <th scope="col" class="n">Markdown 4000</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="name">PrismaStats</td>
+              <td class="n"><span class="ba"><span class="was">0.967</span><span class="arrow">→</span><span class="now">0.933</span><span class="d dn">▼<span class="vh"> {{ui.worse}}</span></span></span></td>
+            </tr>
+            <tr>
+              <td class="name">slurp</td>
+              <td class="n"><span class="ba"><span class="was">0.938</span><span class="arrow">→</span><span class="now">0.938</span><span class="d eq">=<span class="vh"> {{ui.same}}</span></span></span></td>
+            </tr>
+          </tbody>
+        </table>
         <p class="legend" aria-hidden="true"><span><span class="d up">▲</span>{{ui.better}}</span><span><span class="d dn">▼</span>{{ui.worse}}</span><span><span class="d eq">=</span>{{ui.same}}</span></p>
         <p class="txt">{{{benchmark.recall.why}}}</p>
+        <p class="txt">{{{benchmark.recall.v15}}}</p>
         <p class="fine">{{{benchmark.recall.holdout}}}</p>
       </div>
     </div>
@@ -247,10 +270,10 @@
       <p class="txt">{{zerodeps.p2}}</p>
       <div class="code" data-copy="slurp index ."><pre tabindex="0"><span class="c"># Index your project locally</span>
 slurp index .
-<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span>
+<span class="c"># Output on PrismaStats: 1638 nodes · 2284 edges · 185 files</span>
 <span class="c"># Next: slurp 'your query' --graph graphify-out/graph.json</span></pre></div>
       <p class="fine">{{{zerodeps.speed}}}</p>
-      <p class="fine">{{zerodeps.extras.label}} <code>uv sync --extra java</code> · <code>uv sync --extra rust</code> · <code>uv sync --extra all-languages</code></p>
+      <p class="fine">{{zerodeps.extras.label}} <code>pip install "slurp-graph[ts]"</code> · <code>pip install "slurp-graph[java]"</code> · <code>pip install "slurp-graph[rust]"</code> · <code>pip install "slurp-graph[all-languages]"</code></p>
     </div>
   </div>
 </section>
@@ -358,7 +381,7 @@ pip install slurp-graph</pre></div>
           <p class="txt">{{how.step2.p}}</p>
           <div class="code" data-copy="slurp index ."><pre tabindex="0"><span class="c"># generates the graph locally</span>
 slurp index .
-<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span></pre></div>
+<span class="c"># Output on PrismaStats: 1638 nodes · 2284 edges · 185 files</span></pre></div>
           <p class="note">{{{how.update.note}}}</p>
           <p class="note">{{{how.smart.note}}}</p>
           <p class="note">{{{how.explain2.note}}}</p>
@@ -433,6 +456,7 @@ slurp index .
       <div><dt class="cli">slurp advisor</dt><dd>{{features.advisor.line}}</dd></div>
       <div><dt>{{features.federation.title}}</dt><dd>{{features.federation.line}}</dd></div>
       <div><dt>{{features.callgraph.title}}</dt><dd>{{features.callgraph.line}}</dd></div>
+      <div><dt>{{features.react.title}}</dt><dd>{{{features.react.line}}}<span class="snip">slurp impact — Button<br />v1.4.0 → <b>RISK: LOW</b> · Direct: 0<br />v1.5.0 → <b>RISK: HIGH</b> · Direct: 32</span></dd></div>
       <div><dt class="cli">slurp impact</dt><dd>{{features.impact.line}}</dd></div>
       <div><dt class="cli">--suggest</dt><dd>{{features.suggest.line}}</dd></div>
       <div><dt class="cli">--viz</dt><dd>{{features.viz.line}}</dd></div>
@@ -452,7 +476,7 @@ slurp index .
     <div>
       <p class="txt" style="margin-top:0">{{{v1.p}}}</p>
       <div class="totals">
-        <div><span class="v">3,082</span><span class="l">{{v1.stat.tests}}</span></div>
+        <div><span class="v">3,264</span><span class="l">{{v1.stat.tests}}</span></div>
         <div><span class="v">5</span><span class="l">{{v1.stat.langs}}</span></div>
       </div>
     </div>
