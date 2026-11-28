@@ -775,3 +775,123 @@ npx -y lighthouse https://imjuank.dev/slurp-web/ --chrome-flags="--headless=new"
 8. **Secciones repetidas** («Architecture» y «Features» cuentan `explain`, `eval` y el grafo de
    llamadas dos veces): el rediseño puede mantener las dos tal cual o proponerte fusionarlas.
    Fusionar toca contenido, así que no lo haré sin que lo pidas.
+
+---
+
+## 6. Fase 2: lo que se ha hecho (2026-11-28)
+
+Decisiones del autor: dirección **C**, con las cifras por delante de la decoración y sin tachar
+el valor antiguo; títulos y descripciones aprobados; despliegue por GitHub Actions publicando
+solo `dist/`.
+
+### 6.1 Mejoras rápidas en `main` (commit `a0d1a56`, publicado)
+
+Logo a su tamaño real en WebP con versiones 2x y 3x, favicon, contraste AA del gris secundario
+y del botón naranja, y `<main>`. Sin cambios de texto ni de diseño.
+
+Lighthouse 13.6.0, móvil, sobre `https://imjuank.dev/slurp-web/`, tres ejecuciones:
+
+| | Antes (`32ed687`) | Después (`a0d1a56`) |
+|---|---|---|
+| Rendimiento | 73 / 73 / 73 | 97 / 98 / 90 |
+| Accesibilidad | 94 | 100 |
+| Buenas prácticas | 96 | 100 |
+| SEO | 100 | 100 |
+| LCP | 16,1–16,3 s | 2,0–3,4 s |
+| FCP | 2,1–2,2 s | 2,0–2,2 s |
+| Peso total | 2.805 KiB | 207 KiB |
+
+La tercera ejecución dio 90 con un LCP de 3,4 s; las otras dos, 2,0 y 2,1 s. Lo que queda por
+ganar son las dos hojas de Google Fonts que bloquean el pintado (unos 800 ms), que el rediseño
+elimina.
+
+### 6.2 El rediseño, en la rama `rediseno`
+
+- **Dirección C** en toda la página. Bandas naranjas en «Zero dependencies», «Measured with
+  agents» y el hito final; el ticket, solo en el hero.
+- **Tablas y mediciones planas.** Números a la derecha con cifras tabulares. La medición con
+  agentes lleva sus cuatro límites en una tarjeta al lado (debajo en móvil). El estudio de
+  presupuesto dibuja los tres rangos sobre un eje de 0 a 100 %.
+- **Antes y después, neutro.** En la tabla de las 31 preguntas cada celda es
+  `0.900 → 0.867 ▼`: ganancias ▲ en naranja, pérdidas ▼ en un recuadro claro, sin cambio `=`,
+  con leyenda. Nada tachado.
+- **Una página estática por idioma**, generada por `node build.mjs` desde una plantilla y
+  cinco ficheros de textos sacados del `index.html` anterior sin tocarlos.
+- **Funciona sin JavaScript**: nada nace oculto, el idioma se cambia con enlaces y el
+  visualizador es un enlace con carátula que, con JavaScript, se abre dentro de la página.
+- **SEO:** `canonical`, `hreflang` y `x-default`, título y descripción por idioma, Open Graph
+  y Twitter Card con `assets/og.png`, JSON-LD (`SoftwareApplication` + `SoftwareSourceCode`),
+  `sitemap.xml`, `llms.txt`, clave de IndexNow y workflow de despliegue.
+- **Fuentes autoalojadas**: sin peticiones a Google Fonts.
+
+**Comprobaciones**
+
+- Las cinco páginas a 375 px y a 1280 px: sin desbordamiento horizontal en ninguna.
+- Cifras: ningún número visible de la web anterior falta en la nueva. El único número nuevo es
+  el «100» del rótulo «100%» del eje de rangos.
+- El build falla si a un idioma le falta una clave o si sus cifras no coinciden con las del
+  inglés. Hoy pasa: 151 claves, mismas cifras en los cinco.
+- Contraste: los trece pares de color del diseño están entre 6,6:1 y 15,7:1 (AA pide 4,5:1),
+  incluido el texto sobre naranja (6,6:1). La auditoría de contraste de Lighthouse pasa en EN
+  y en DE.
+
+**Lighthouse del rediseño** (móvil, `dist/` servido en local, sin compresión):
+
+| | EN (3 ejecuciones) | DE |
+|---|---|---|
+| Rendimiento | 100 / 100 / 100 | 100 |
+| Accesibilidad | 100 | 100 |
+| Buenas prácticas | 96 | 96 |
+| SEO | 100 | 100 |
+| LCP | 0,9 s | 0,9 s |
+| Peso total | 240 KiB | 241 KiB |
+
+Dos avisos sobre esta medición:
+
+- **Es en local, no en la web publicada.** No hay latencia de red real, así que no es
+  comparable al milisegundo con la tabla de 6.1. Hay que repetirla sobre la URL pública tras
+  desplegar.
+- **El 96 de buenas prácticas es un 403 de la API de GitHub** al pedir el número de estrellas:
+  mi IP agotó hoy el límite de peticiones sin autenticar. La web publicada hace la misma
+  petición y sacó 100 unas horas antes. Es del entorno de medida, no de la página.
+
+Las auditorías de `canonical`, `hreflang` y `llms.txt` de Lighthouse pasan.
+
+**Textos nuevos** (los once, en los cinco idiomas, en `src/i18n/`):
+
+| Clave | EN | Para qué |
+|---|---|---|
+| `meta.title`, `meta.description` | los aprobados en 3.5 | `<title>`, descripción, Open Graph |
+| `ui.skip` | Skip to content | enlace de teclado |
+| `ui.sections`, `ui.lang` | Sections, Language | nombres de las dos navegaciones para lectores de pantalla |
+| `ui.copy`, `ui.copied` | Copy, Copied | botones de copiar |
+| `ui.demo.open` | Open the interactive demo | botón del visualizador |
+| `ui.better`, `ui.worse`, `ui.same` | better, worse, unchanged | leyenda de ▲ ▼ = |
+
+**Lo que cambia de sitio, sin cambiar de texto**
+
+- El badge de versión pasa de píldora a línea sobre el lema.
+- 117,828, 4,000, «extra LLM calls: 0» y «96.7% saved» aparecen también en el ticket del hero,
+  además de en «El problema» y en el benchmark, donde ya estaban.
+- La cabecera «v1.3 → v1.4.0» de la tabla de preguntas etiquetadas pasa a ser el título de la
+  tabla en vez de repetirse en cada columna.
+- «Architecture» y «Features» siguen siendo dos secciones con sus textos; pasan de tarjetas a
+  listas.
+
+**Lo que queda pendiente o conviene saber**
+
+- **`index.html` de la raíz sigue en la rama**: es la web anterior, para que el sitio no se
+  quede sin página si se fusiona antes de cambiar el origen de Pages. Se borra después.
+- **Las carátulas del visualizador y `og.png` son capturas con cifras**: si la demo o los
+  números cambian, hay que rehacerlas.
+- **`lastmod` del sitemap** es la fecha del último commit que tocó `src/`, `assets/` o
+  `build.mjs`.
+- **La clave de IndexNow está en `src/site.json`** y se publica como fichero de texto: es
+  pública por diseño.
+- **No he probado el workflow en GitHub**: solo se puede ejecutar tras fusionar. Las versiones
+  de las acciones son las últimas publicadas hoy (`checkout@v7`, `setup-node@v7`,
+  `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`).
+- **Los comentarios de los bloques de código siguen en inglés** en los cinco idiomas, como antes.
+
+Capturas: una selección en `docs/rediseno/fase2/`; las diez páginas completas en
+`.capturas/rediseno/` (sin versionar).

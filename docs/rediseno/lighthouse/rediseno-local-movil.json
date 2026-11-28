@@ -1,0 +1,67 @@
+{
+  "url": "http://localhost:8766/ (dist/ served locally, no compression)",
+  "fecha": "2026-11-28",
+  "runs": [
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "0.9 s",
+      "LCP": "0.9 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "peso": "Total size was 240 KiB"
+    },
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "0.9 s",
+      "LCP": "0.9 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "peso": "Total size was 240 KiB"
+    },
+    {
+      "pagina": "en",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "0.9 s",
+      "LCP": "0.9 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "peso": "Total size was 240 KiB"
+    },
+    {
+      "pagina": "de",
+      "categorias": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 96,
+        "seo": 100,
+        "agentic-browsing": 100
+      },
+      "FCP": "0.9 s",
+      "LCP": "0.9 s",
+      "TBT": "0 ms",
+      "CLS": "0",
+      "peso": "Total size was 241 KiB"
+    }
+  ],
+  "lighthouse": "13.6.0"
+}

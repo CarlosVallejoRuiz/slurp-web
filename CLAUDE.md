@@ -4,7 +4,7 @@
 
 Landing page estática para **slurp** — una herramienta CLI open source de token-budget-aware graph navigation para AI coding agents.
 
-La web debe tener el mismo estilo que la landing de DebugDuck y la de `npx autoskill` — minimalista, dark, con personalidad técnica pero accesible.
+Diseño actual: **«la barra de ramen»** (dirección C de `docs/rediseno.md`) — fondo oscuro, el bol grande, bandas naranjas y los totales como ticket de caja.
 
 **Autor:** Juank (Juan Carlos Vallejo Ruiz) — Full-Stack Developer & AI entrepreneur, Terrassa, Barcelona.
 **Repo slurp:** https://github.com/CarlosVallejoRuiz/slurp
@@ -113,97 +113,72 @@ antes de cada respuesta. El usuario no hace nada diferente.
 
 ---
 
-## Assets disponibles
+## Cómo está hecha
 
-- Logo: `assets/SlurpLogo_SinFondo.png` — círculo naranja con grafo de nodos
-- GIF demo: `assets/Slurp_Linkedin.gif`, grabación antigua del visualizador; sus cifras son de una versión vieja, no citarlas
-- Demo en vivo: `assets/demo-graph.html`, generado con `slurp "player stats" --budget 4000 --viz-output` sobre el grafo de graphify de PrismaStats. Lleva un bloque `@media (max-width: 700px)` añadido a mano: hay que reaplicarlo cada vez que se regenera
-- Capturas: tabla del benchmark en terminal, visualizador interactivo
+- **HTML, CSS y JS sin frameworks ni dependencias.** Una plantilla y un fichero de textos por
+  idioma; `node build.mjs` genera `dist/` con una página estática por idioma.
+- **Fuentes de verdad:**
+  - `src/template.html` — la estructura. `{{clave}}` inserta texto escapado, `{{{clave}}}`
+    HTML; las cifras de las tablas van escritas en la plantilla.
+  - `src/i18n/{en,es,it,fr,de}.json` — todos los textos. Los cinco deben tener las mismas
+    claves y las mismas cifras: `node build.mjs --check` lo comprueba y el build falla si no.
+  - `src/styles.css` y `src/app.js` — se incrustan en cada página.
+  - `src/site.json` — versión, URLs, idiomas y la clave de IndexNow. **La versión se cambia
+    aquí** (pie y JSON-LD) y en los textos `hero.badge`, `v1.label`, `v1.h2` y `v1.p`.
+- **`dist/` no se versiona** y es lo único que se publica: `CLAUDE.md`, `docs/` y `src/` no.
+- **La página funciona sin JavaScript.** El JS solo añade los botones de copiar, las estrellas
+  de GitHub y la carga del visualizador dentro de la página.
+- **`index.html` de la raíz** es la web anterior. Se conserva solo hasta que GitHub Pages
+  publique desde GitHub Actions; después se borra.
 
----
+## URLs
 
-## Stack técnico de la web
+- Canónica: `https://imjuank.dev/slurp-web/` (inglés) y `/es/`, `/it/`, `/fr/`, `/de/`.
+  `carlosvallejoruiz.github.io/slurp-web` redirige ahí.
+- `sitemap.xml`, `llms.txt` y el fichero de la clave de IndexNow se generan en `dist/`.
+- `robots.txt` no se puede servir desde aquí: va en la raíz del dominio, que es el repositorio
+  de la web personal.
 
-- **HTML + CSS + JS vanilla** — sin frameworks, archivo único
-- **Sin dependencias externas** — máximo un CDN para fuentes
-- **Dark theme** — fondo #0d1117 (GitHub dark), acentos en naranja (#f97316) que es el color del logo
-- **Responsive** — funciona en móvil y desktop
-- **Desplegada en GitHub Pages** del repo `slurp-web`
+## Diseño
 
----
+- **Colores:** fondo `#16110c`, texto crema `#f4ead8`, secundario `#bdb19c`, naranja `#f97316`,
+  tinta `#1a120a`. Sobre naranja y sobre crema el texto es siempre tinta. Todo cumple AA.
+- **Tipografía:** Bricolage Grotesque (titulares y texto) y DM Mono (datos y código),
+  autoalojadas en `assets/fonts/`.
+- **Las cifras mandan sobre la decoración.** Las tablas y los bloques medidos son planos, con
+  los números a la derecha y sus límites al lado. Lo inclinado y lo festivo (el ticket) se
+  reserva para los totales del hero.
+- **Antes y después se muestran igual, suba o baje.** Nunca se tacha el valor antiguo. Las
+  ganancias llevan ▲, las pérdidas ▼ y lo que no cambia =, con leyenda.
+- **Sin animaciones** y sin nada que oculte contenido hasta que se ejecute un script.
 
-## Estructura de la página (en orden)
+## Assets
 
-### 1. Hero
-- Logo de slurp centrado (usar el PNG del logo)
-- Título: **slurp**
-- Tagline en cursiva: *graphify builds the bowl. slurp serves exactly the noodles your LLM needs.* 🍜
-- Comando de instalación grande con botón de copiar: `pip install slurp-graph`
-- Dos botones: [GitHub →] [PyPI →]
-
-### 2. El problema
-- Título: "Your LLM doesn't need the whole bowl"
-- 2-3 líneas explicando el problema de los tokens
-- Número grande destacado: **117,828 tokens** → **4,000 tokens**
-
-### 3. Benchmark
-- Tabla con los números reales
-- Summary: Mean savings 96.1% · Best case 98.3%
-- Bloques de recall: el orden de la v1.4, las 31 preguntas etiquetadas (con sus pérdidas) y la guía de presupuesto
-
-### 4. Demo visual
-- El GIF de la demo (visualizador abriéndose)
-- Caption: "slurp --viz opens an interactive subgraph explorer"
-
-### 5. Cómo funciona
-- 3 pasos con iconos simples
-- Modo automático (MCP) explicado en 2 líneas
-- Snippet del .mcp.json
-
-### 6. Features
-- Lista de 6 features principales con iconos
-- --viz, --inject-code, slurp diff, slurp benchmark, slurp export, MCP server
-
-### 7. Footer
-- Links: GitHub · PyPI · MIT License
-- "Built by Juank · Terrassa, Barcelona"
-
----
-
-## Principios de diseño
-
-- **Minimalista** — mucho espacio en blanco (negro), sin elementos decorativos innecesarios
-- **Código como protagonista** — los snippets de código deben verse bien, con syntax highlighting simple
-- **Números grandes** — el 96.1% y el 98.3% deben ser visualmente prominentes
-- **Una sola acción principal** — el comando `pip install slurp-graph` es el CTA más importante
-- **Sin animaciones pesadas** — máximo fade-in suave al hacer scroll
-
----
+- `assets/SlurpLogo_SinFondo.png` es el original (2048 px, 2,7 MB): **no se enlaza nunca**.
+  Se usan `logo-460.webp` / `logo-920.webp` y los favicons.
+- `assets/demo-graph.html` — el visualizador. Si se regenera, hay que reaplicar su bloque
+  `@media (max-width: 700px)` **y rehacer las carátulas** `demo-poster.webp`,
+  `demo-poster-m.webp` y `demo-poster.png`, que son capturas suyas.
+- `assets/og.png` — imagen para compartir (1200 × 630), hecha desde `src/og/og.html`. Lleva
+  cifras: si cambian, se rehace.
 
 ## Lo que NO hacer
 
-- ❌ No usar frameworks (React, Vue, etc.)
-- ❌ No usar colores brillantes excepto el naranja del logo (#f97316)
-- ❌ No añadir más secciones de las especificadas
+- ❌ No cambiar una cifra sin leerla en el README de slurp
+- ❌ No añadir texto en un idioma sin añadirlo en los cinco
+- ❌ No usar frameworks ni dependencias de build
 - ❌ No poner formularios de email o capturas de leads
-- ❌ No usar imágenes de stock
-- ❌ No hacer animaciones complejas que ralenticen la página
-
----
+- ❌ No esconder contenido detrás de JavaScript
+- ❌ No enlazar el logo original ni cargar el visualizador al entrar
 
 ## Despliegue
 
-GitHub Pages desde el repo `slurp-web`.
-El archivo principal es `index.html` en la raíz.
-URL final: `https://carlosvallejoruiz.github.io/slurp-web`
+`.github/workflows/deploy.yml`: en cada push a `main` construye `dist/`, lo publica en GitHub
+Pages y avisa a IndexNow de las páginas cuyo HTML ha cambiado (`scripts/changed-urls.mjs`,
+`scripts/indexnow.mjs`). Requiere *Settings → Pages → Source: GitHub Actions*.
 
----
+## Al empezar una sesión
 
-## Primera sesión con Claude Code
-
-Al inicio de cada sesión:
 1. Leer este CLAUDE.md completo
-2. El objetivo es un único archivo `index.html` autocontenido
-3. CSS y JS van dentro del mismo HTML
-4. Construir sección por sección, empezando por Hero
-5. Verificar que se ve bien en móvil antes de dar por terminada cada sección
+2. `node build.mjs` y abrir `dist/index.html`
+3. Comprobar los cinco idiomas a 375 px y en escritorio antes de dar nada por terminado

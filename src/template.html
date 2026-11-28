@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="%LANG%">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.description}}" />
+<link rel="canonical" href="%CANONICAL%" />
+%HREFLANGS%
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="slurp" />
+<meta property="og:title" content="{{meta.title}}" />
+<meta property="og:description" content="{{meta.description}}" />
+<meta property="og:url" content="%CANONICAL%" />
+<meta property="og:locale" content="%OGLOCALE%" />
+%OGALTS%
+<meta property="og:image" content="%OGIMAGE%" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="{{meta.title}}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{meta.title}}" />
+<meta name="twitter:description" content="{{meta.description}}" />
+<meta name="twitter:image" content="%OGIMAGE%" />
+<meta name="theme-color" content="#16110c" />
+<link rel="icon" type="image/png" sizes="32x32" href="%ROOT%assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="%ROOT%assets/favicon-192.png" />
+<link rel="apple-touch-icon" href="%ROOT%assets/apple-touch-icon.png" />
+<link rel="describedby" type="text/plain" href="%ROOT%llms.txt" />
+<link rel="preload" href="%ROOT%assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin />
+<style>%CSS%</style>
+<script type="application/ld+json">%JSONLD%</script>
+</head>
+<body>
+<a class="skip" href="#main">{{ui.skip}}</a>
+
+<header class="top">
+  <div class="w">
+    <nav aria-label="{{ui.sections}}">
+      <a href="#install">{{nav.install}}</a>
+      <a href="#problem">{{nav.problem}}</a>
+      <a href="#benchmark">{{nav.benchmark}}</a>
+      <a href="#demo">{{nav.demo}}</a>
+      <a href="#architecture">{{nav.architecture}}</a>
+      <a href="#performance">{{nav.performance}}</a>
+      <a href="#how">{{nav.how}}</a>
+      <a href="#features">{{nav.features}}</a>
+    </nav>
+    <nav class="langs" aria-label="{{ui.lang}}">%LANGNAV%</nav>
+    <a class="cta" href="https://github.com/CarlosVallejoRuiz/slurp" rel="noopener">GitHub →</a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="hero">
+  <div class="w">
+    <picture>
+      <source type="image/webp" srcset="%ROOT%assets/logo-460.webp 460w, %ROOT%assets/logo-920.webp 920w" sizes="(max-width: 560px) 190px, 34vw" />
+      <img class="bowl" src="%ROOT%assets/logo-460.png" alt="" width="460" height="460" fetchpriority="high" />
+    </picture>
+    <h1 class="word">slurp</h1>
+    <div class="hrow">
+      <div>
+        <p class="k">{{hero.badge}}</p>
+        <p class="tag">{{{hero.tagline}}}</p>
+        <p class="hsub">{{hero.subtagline}}</p>
+        <div class="btns">
+          <a class="btn pri" href="https://github.com/CarlosVallejoRuiz/slurp" rel="noopener">GitHub →<span class="stars" id="gh-stars"></span></a>
+          <a class="btn" href="https://pypi.org/project/slurp-graph/" rel="noopener">PyPI →</a>
+        </div>
+      </div>
+      <div class="ticket">
+        <p class="th">{{problem.benchmark}}</p>
+        <dl>
+          <dt>{{problem.before.label}}</dt><dd>117,828</dd>
+          <dt>{{problem.after.label}}</dt><dd>4,000</dd>
+          <dt>{{benchmark.stat.llm}}</dt><dd>0</dd>
+        </dl>
+        <p class="tot">{{problem.saving}}</p>
+        <div class="cmd" data-copy="pip install slurp-graph"><code><b>$</b>pip install slurp-graph</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="install">
+  <div class="w split">
+    <div>
+      <p class="k">{{install.label}}</p>
+      <h2>{{install.h2}}</h2>
+    </div>
+    <div>
+      <table class="tbl" style="margin-top:0">
+        <thead><tr><th scope="col">{{install.th.case}}</th><th scope="col">{{install.th.cmd}}</th></tr></thead>
+        <tbody>
+          <tr><td class="name">{{{install.row1.case}}}</td><td><code>uv tool install slurp-graph</code></td></tr>
+          <tr><td class="name">{{install.row2.case}}</td><td><code>uv add slurp-graph</code></td></tr>
+          <tr><td class="name">{{install.row3.case}}</td><td><code>pip install slurp-graph</code></td></tr>
+        </tbody>
+      </table>
+      <p class="fine">{{{install.note}}}</p>
+      <p class="fine">{{{install.explain.note}}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="problem">
+  <div class="w split">
+    <div>
+      <p class="k">{{problem.label}}</p>
+      <h2>{{problem.h2}}</h2>
+    </div>
+    <div>
+      <p class="txt" style="margin-top:0">{{{problem.p1}}}</p>
+      <p class="txt">{{problem.p2}}</p>
+      <div class="scale">
+        <div class="row"><span class="lab">{{problem.before.label}}</span><span class="num">117,828</span><div class="trk"></div></div>
+        <div class="row"><span class="lab">{{problem.after.label}}</span><span class="num o">4,000</span><div class="trk b"><i></i></div></div>
+      </div>
+      <p class="mono-note"><strong>{{problem.saving}}</strong> · {{problem.benchmark}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="benchmark">
+  <div class="w">
+    <div class="split">
+      <div>
+        <p class="k">{{benchmark.label}}</p>
+        <h2>{{benchmark.h2}}</h2>
+        <p class="lede">{{benchmark.p}}</p>
+      </div>
+      <div>
+        <table class="tbl" style="margin-top:0">
+          <thead><tr>
+            <th scope="col">{{benchmark.th.budget}}</th>
+            <th scope="col" class="n">{{benchmark.th.tokens}}</th>
+            <th scope="col" class="n opt">{{benchmark.th.graph}}</th>
+            <th scope="col" class="n">{{benchmark.th.saved}}</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="name">2,000</td><td class="n">1,964–1,968</td><td class="n opt was">117,828</td><td class="n hi">98.3%</td></tr>
+            <tr><td class="name">4,000</td><td class="n">3,926–3,928</td><td class="n opt was">117,828</td><td class="n hi">96.7%</td></tr>
+            <tr><td class="name">8,000</td><td class="n">7,841–7,847</td><td class="n opt was">117,828</td><td class="n hi">93.3%</td></tr>
+          </tbody>
+        </table>
+        <p class="mono-note">{{benchmark.note}}</p>
+        <div class="totals">
+          <div><span class="v">96.1%</span><span class="l">{{benchmark.stat.mean}}</span></div>
+          <div><span class="v">98.3%</span><span class="l">{{benchmark.stat.best}}</span></div>
+          <div><span class="v">0</span><span class="l">{{benchmark.stat.llm}}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub split">
+      <div>
+        <h3>{{benchmark.rank.title}}</h3>
+        <p class="txt">{{{benchmark.rank.intro}}}</p>
+      </div>
+      <div>
+        <table class="tbl" style="margin-top:0">
+          <thead><tr>
+            <th scope="col">{{benchmark.rank.th.project}}</th>
+            <th scope="col" class="n">v1.3</th>
+            <th scope="col" class="n">v1.4.0</th>
+            <th scope="col" class="barcell" aria-hidden="true"></th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="name">gin</td><td class="n was">0.779</td><td class="n now">0.824 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.779;--b:.824"><i></i><u></u></div></td></tr>
+            <tr><td class="name">click</td><td class="n was">0.610</td><td class="n now">0.775 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.610;--b:.775"><i></i><u></u></div></td></tr>
+            <tr><td class="name">ripgrep</td><td class="n was">0.421</td><td class="n now">0.587 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.421;--b:.587"><i></i><u></u></div></td></tr>
+            <tr><td class="name">excalidraw</td><td class="n was">0.428</td><td class="n now">0.583 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.428;--b:.583"><i></i><u></u></div></td></tr>
+            <tr><td class="name">commons-lang</td><td class="n was">0.678</td><td class="n now">0.740 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.678;--b:.740"><i></i><u></u></div></td></tr>
+            <tr><td class="name">prometheus</td><td class="n was">0.344</td><td class="n now">0.535 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.344;--b:.535"><i></i><u></u></div></td></tr>
+            <tr class="mean"><td class="name">{{benchmark.rank.mean}}</td><td class="n was">0.543</td><td class="n now">0.674 <span class="d up">▲<span class="vh"> {{ui.better}}</span></span></td><td class="barcell" aria-hidden="true"><div class="bar" style="--a:.543;--b:.674"><i></i><u></u></div></td></tr>
+          </tbody>
+        </table>
+        <p class="fine">{{{benchmark.rank.fine}}}</p>
+      </div>
+    </div>
+
+    <div class="sub split">
+      <div>
+        <h3>{{benchmark.recall.title}}</h3>
+        <p class="txt">{{{benchmark.recall.intro}}}</p>
+      </div>
+      <div>
+        <table class="tbl" style="margin-top:0">
+          <caption>v1.3 → v1.4.0</caption>
+          <thead><tr>
+            <th scope="col">{{benchmark.recall.th.graph}}</th>
+            <th scope="col" class="n">Markdown 4000</th>
+            <th scope="col" class="n">JSON 4000</th>
+            <th scope="col" class="n">Markdown 16000</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="name">PrismaStats</td>
+              <td class="n"><span class="ba"><span class="was">0.967</span><span class="arrow">→</span><span class="now">0.967</span><span class="d eq">=<span class="vh"> {{ui.same}}</span></span></span></td>
+              <td class="n"><span class="ba"><span class="was">0.900</span><span class="arrow">→</span><span class="now">0.867</span><span class="d dn">▼<span class="vh"> {{ui.worse}}</span></span></span></td>
+              <td class="n"><span class="ba"><span class="was">0.967</span><span class="arrow">→</span><span class="now">0.967</span><span class="d eq">=<span class="vh"> {{ui.same}}</span></span></span></td>
+            </tr>
+            <tr>
+              <td class="name">slurp</td>
+              <td class="n"><span class="ba"><span class="was">0.875</span><span class="arrow">→</span><span class="now">0.938</span><span class="d up">▲<span class="vh"> {{ui.better}}</span></span></span></td>
+              <td class="n"><span class="ba"><span class="was">0.812</span><span class="arrow">→</span><span class="now">0.750</span><span class="d dn">▼<span class="vh"> {{ui.worse}}</span></span></span></td>
+              <td class="n"><span class="ba"><span class="was">1.000</span><span class="arrow">→</span><span class="now">0.938</span><span class="d dn">▼<span class="vh"> {{ui.worse}}</span></span></span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="legend" aria-hidden="true"><span><span class="d up">▲</span>{{ui.better}}</span><span><span class="d dn">▼</span>{{ui.worse}}</span><span><span class="d eq">=</span>{{ui.same}}</span></p>
+        <p class="txt">{{{benchmark.recall.why}}}</p>
+        <p class="fine">{{{benchmark.recall.holdout}}}</p>
+      </div>
+    </div>
+
+    <div class="sub split">
+      <div>
+        <h3>{{benchmark.budget.title}}</h3>
+      </div>
+      <div>
+        <p class="txt" style="margin-top:0">{{{benchmark.budget.p1}}}</p>
+        <div class="ranges" aria-hidden="true">
+          <div class="row"><span>4000</span><span class="trk" style="--a:34;--b:68"><i></i></span><span class="r">34–68%</span></div>
+          <div class="row"><span>16000</span><span class="trk" style="--a:52;--b:75"><i></i></span><span class="r">52–75%</span></div>
+          <div class="row"><span>32000</span><span class="trk" style="--a:59;--b:81"><i></i></span><span class="r">59–81%</span></div>
+          <div class="row"><span></span><span class="ax"><span>0%</span><span>100%</span></span><span></span></div>
+        </div>
+        <p class="txt">{{{benchmark.budget.p2}}}</p>
+        <p class="fine">{{{benchmark.budget.link}}}</p>
+        <p class="mono-note">{{benchmark.quality.callgraph}}<br />{{{benchmark.quality.edges}}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="zero-deps">
+  <div class="w split">
+    <div>
+      <p class="k">{{zerodeps.label}}</p>
+      <h2>{{zerodeps.h2}}</h2>
+    </div>
+    <div>
+      <p class="txt" style="margin-top:0">{{zerodeps.p1}}</p>
+      <p class="txt">{{zerodeps.p2}}</p>
+      <div class="code" data-copy="slurp index ."><pre tabindex="0"><span class="c"># Index your project locally</span>
+slurp index .
+<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span>
+<span class="c"># Next: slurp 'your query' --graph graphify-out/graph.json</span></pre></div>
+      <p class="fine">{{{zerodeps.speed}}}</p>
+      <p class="fine">{{zerodeps.extras.label}} <code>uv sync --extra java</code> · <code>uv sync --extra rust</code> · <code>uv sync --extra all-languages</code></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="demo">
+  <div class="w">
+    <p class="k">{{demo.label}}</p>
+    <h2>{{demo.h2}}</h2>
+    <p class="lede">{{demo.p}}</p>
+    <p class="mono-note">{{demo.note}}</p>
+    <div class="demo">
+      <div class="bar2"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">slurp — player stats</span></div>
+      <a class="stage" id="demo-stage" href="%ROOT%assets/demo-graph.html">
+        <picture>
+          <source media="(max-width: 860px)" type="image/webp" srcset="%ROOT%assets/demo-poster-m.webp" />
+          <source type="image/webp" srcset="%ROOT%assets/demo-poster.webp" />
+          <img src="%ROOT%assets/demo-poster.png" alt="" width="1100" height="620" loading="lazy" decoding="async" />
+        </picture>
+        <span class="open">{{ui.demo.open}}</span>
+      </a>
+      <div class="st"><span>{{demo.status.left}}</span><span>{{demo.status.hint}}</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="architecture">
+  <div class="w split">
+    <div>
+      <p class="k">{{arch.label}}</p>
+      <h2>{{arch.h2}}</h2>
+    </div>
+    <dl class="board">
+      <div><dt>{{arch.callgraph.title}}</dt><dd>{{arch.callgraph.line}}<span class="snip">recalcularPlayerStats()<br />→ 3 production callers<br /><b>RISK: MEDIUM</b></span></dd></div>
+      <div><dt class="cli">slurp explain</dt><dd>{{arch.explain.line}}</dd></div>
+      <div><dt class="cli">slurp eval</dt><dd>{{arch.eval.line}}</dd></div>
+      <div><dt>{{arch.mcp.title}}</dt><dd>{{{arch.mcp.line}}}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="sec" id="performance">
+  <div class="w">
+    <div class="split">
+      <div>
+        <p class="k">{{perf.label}}</p>
+        <h2>{{perf.h2}}</h2>
+        <p class="lede">{{perf.p}}</p>
+      </div>
+      <div>
+        <table class="tbl" style="margin-top:0">
+          <thead><tr>
+            <th scope="col">{{perf.th.version}}</th>
+            <th scope="col" class="n">{{perf.th.mean}}</th>
+            <th scope="col" class="n">{{perf.th.published}}</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="name">v0.6.5<small>{{perf.row.v065}}</small></td><td class="n">73–86 ms</td><td class="n was">86.41 ms</td></tr>
+            <tr><td class="name">v0.7.0</td><td class="n">9.9–10.1 ms</td><td class="n was">10.69 ms</td></tr>
+            <tr><td class="name">v1.1.0</td><td class="n hi">11.4–11.6 ms</td><td class="n was">—</td></tr>
+          </tbody>
+        </table>
+        <p class="mono-note">{{perf.slower}}</p>
+      </div>
+    </div>
+    <div class="sub split">
+      <div>
+        <h3>{{perf.v14.title}}</h3>
+      </div>
+      <div>
+        <p class="txt" style="margin-top:0">{{{perf.v14.p}}}</p>
+        <p class="fine">{{{perf.v14.link}}}</p>
+        <p class="mono-note">{{perf.note}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="how">
+  <div class="w">
+    <p class="k">{{how.label}}</p>
+    <h2>{{how.h2}}</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="no" aria-hidden="true">0</div>
+        <div>
+          <h3>{{how.step0.h3}} <span class="tagx rec2">{{how.step0.tag}}</span></h3>
+          <p class="txt">{{{how.step0.p}}}</p>
+          <div class="code" data-copy="slurp init"><pre tabindex="0"><span class="c"># guided one-command setup</span>
+slurp init</pre></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="no" aria-hidden="true">1</div>
+        <div>
+          <h3>{{how.step1.h3}}</h3>
+          <p class="txt">{{how.step1.p}}</p>
+          <div class="code" data-copy="pip install slurp-graph"><pre tabindex="0"><span class="c"># install</span>
+pip install slurp-graph</pre></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="no" aria-hidden="true">2</div>
+        <div>
+          <h3>{{how.step2.h3}} <span class="tagx">{{how.manual.tag}}</span></h3>
+          <p class="txt">{{how.step2.p}}</p>
+          <div class="code" data-copy="slurp index ."><pre tabindex="0"><span class="c"># generates the graph locally</span>
+slurp index .
+<span class="c"># Output on PrismaStats: 1582 nodes · 1852 edges · 185 files</span></pre></div>
+          <p class="note">{{{how.update.note}}}</p>
+          <p class="note">{{{how.smart.note}}}</p>
+          <p class="note">{{{how.explain2.note}}}</p>
+          <p class="note">{{{how.impact.note}}}</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="no" aria-hidden="true">3</div>
+        <div>
+          <h3>{{how.step3.h3}} <span class="tagx">{{how.manual.tag}}</span></h3>
+          <p class="txt">{{{how.step3.p}}}</p>
+          <p class="lab">{{how.mcp.global}}</p>
+          <div class="code" data-copy-pre><pre tabindex="0">{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"slurp"</span>: {
+      <span class="key">"command"</span>: <span class="str">"slurp"</span>,
+      <span class="key">"args"</span>: [<span class="str">"serve"</span>, <span class="str">"--graph"</span>, <span class="str">"/absolute/path/to/graphify-out/graph.json"</span>]
+    }
+  }
+}</pre></div>
+          <p class="lab">{{how.mcp.uv}}</p>
+          <div class="code" data-copy-pre><pre tabindex="0">{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"slurp"</span>: {
+      <span class="key">"command"</span>: <span class="str">"uv"</span>,
+      <span class="key">"args"</span>: [<span class="str">"run"</span>, <span class="str">"slurp"</span>, <span class="str">"serve"</span>, <span class="str">"--graph"</span>, <span class="str">"graphify-out/graph.json"</span>]
+    }
+  }
+}</pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">{{{how.mcp}}}</div>
+    <p class="mono-note">{{how.graphify.note}}</p>
+  </div>
+</section>
+
+<section class="sec band" id="agents">
+  <div class="w agents">
+    <div>
+      <h2>{{agents.title}}</h2>
+      <p class="txt">{{{agents.intro}}}</p>
+      <div class="totals">
+        <div><span class="v">9/10</span><span class="l">{{agents.stat.used}}<span class="marks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i></span></span></div>
+        <div><span class="v">0</span><span class="l">{{agents.stat.approvals}}</span></div>
+        <div><span class="v">10/10</span><span class="l">{{agents.stat.done}}<span class="marks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span></div>
+      </div>
+    </div>
+    <div class="lim">
+      <p class="k">{{agents.limits.title}}</p>
+      <ul>
+        <li>{{{agents.l1}}}</li>
+        <li>{{{agents.l2}}}</li>
+        <li>{{{agents.l3}}}</li>
+        <li>{{{agents.l4}}}</li>
+      </ul>
+      <p class="fine">{{{agents.link}}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="features">
+  <div class="w split">
+    <div>
+      <p class="k">{{features.label}}</p>
+      <h2>{{features.h2}}</h2>
+    </div>
+    <dl class="board">
+      <div><dt class="cli">slurp explain</dt><dd>{{features.explain.sub}}</dd></div>
+      <div><dt class="cli">slurp eval</dt><dd>{{features.eval.sub}}</dd></div>
+      <div><dt class="cli">slurp index --smart</dt><dd>{{features.smart.line}}</dd></div>
+      <div><dt class="cli">slurp advisor</dt><dd>{{features.advisor.line}}</dd></div>
+      <div><dt>{{features.federation.title}}</dt><dd>{{features.federation.line}}</dd></div>
+      <div><dt>{{features.callgraph.title}}</dt><dd>{{features.callgraph.line}}</dd></div>
+      <div><dt class="cli">slurp impact</dt><dd>{{features.impact.line}}</dd></div>
+      <div><dt class="cli">--suggest</dt><dd>{{features.suggest.line}}</dd></div>
+      <div><dt class="cli">--viz</dt><dd>{{features.viz.line}}</dd></div>
+      <div><dt class="cli">slurp diff</dt><dd>{{features.diff.line}}</dd></div>
+      <div><dt class="cli">slurp benchmark</dt><dd>{{features.benchmark.line}}</dd></div>
+      <div><dt class="cli">--inject-code</dt><dd>{{features.inject.line}}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="sec band" id="milestone">
+  <div class="w split">
+    <div>
+      <p class="k">{{v1.label}}</p>
+      <h2>{{v1.h2}}</h2>
+    </div>
+    <div>
+      <p class="txt" style="margin-top:0">{{{v1.p}}}</p>
+      <div class="totals">
+        <div><span class="v">3,082</span><span class="l">{{v1.stat.tests}}</span></div>
+        <div><span class="v">5</span><span class="l">{{v1.stat.langs}}</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="w">
+    <a href="https://github.com/CarlosVallejoRuiz/slurp" rel="noopener">GitHub</a>
+    <a href="https://pypi.org/project/slurp-graph/" rel="noopener">PyPI</a>
+    <a href="https://github.com/CarlosVallejoRuiz/slurp/blob/main/LICENSE" rel="noopener">MIT License</a>
+    <span>v%VERSION%</span>
+    <p class="cr">{{{footer.credit}}}</p>
+  </div>
+</footer>
+
+<script>window.SLURP_UI = { copy: "{{ui.copy}}", copied: "{{ui.copied}}" };%JS%</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "slurp",
+  "version": "1.4.0",
+  "origin": "https://imjuank.dev",
+  "base": "/slurp-web/",
+  "defaultLang": "en",
+  "langs": {
+    "en": { "name": "English", "ogLocale": "en_US" },
+    "es": { "name": "Español", "ogLocale": "es_ES" },
+    "it": { "name": "Italiano", "ogLocale": "it_IT" },
+    "fr": { "name": "Français", "ogLocale": "fr_FR" },
+    "de": { "name": "Deutsch", "ogLocale": "de_DE" }
+  },
+  "github": "https://github.com/CarlosVallejoRuiz/slurp",
+  "pypi": "https://pypi.org/project/slurp-graph/",
+  "usage": "https://github.com/CarlosVallejoRuiz/slurp/blob/main/USAGE.md",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": { "name": "Juan Carlos Vallejo Ruiz", "url": "https://github.com/CarlosVallejoRuiz" },
+  "indexNowKey": "cbde99cf3c26157b573583d78c44e3f3"
+}
