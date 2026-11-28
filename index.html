@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>slurp — token-budget-aware graph navigation for AI agents</title>
   <meta name="description" content="slurp selects only the relevant nodes from your knowledge graph within a token budget. 96.1% mean savings. No LLM calls. Pure math." />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -21,7 +24,7 @@
       --orange-glow: rgba(249, 115, 22, 0.25);
       --text: #e6edf3;
       --text-muted: #8b949e;
-      --text-dim: #4d5966;
+      --text-dim: #808a95;
       --nav-h: 60px;
       --font: 'Inter', system-ui, sans-serif;
       --mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -407,7 +410,7 @@
     .btn:hover { opacity: 0.85; transform: translateY(-1px); }
     .btn:active { transform: translateY(0); }
 
-    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-primary { background: var(--orange); color: #0d1117; }
     .btn-primary:hover { box-shadow: 0 4px 20px var(--orange-glow); }
 
     .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
@@ -1267,7 +1270,7 @@
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="#hero" class="nav-brand">
-        <img src="assets/SlurpLogo_SinFondo.png" alt="slurp" />
+        <picture><source type="image/webp" srcset="assets/logo-32.webp 1x, assets/logo-64.webp 2x, assets/logo-96.webp 3x" /><img src="assets/logo-64.png" alt="slurp" width="32" height="32" /></picture>
         <span>slurp</span>
       </a>
 
@@ -1322,11 +1325,13 @@
     </div>
   </div>
 
+
+  <main>
   <!-- ══════════════════════════════
        HERO
   ══════════════════════════════ -->
   <section id="hero">
-    <img src="assets/SlurpLogo_SinFondo.png" alt="" class="hero-bg-logo" aria-hidden="true" />
+    <img src="assets/logo-460.webp" srcset="assets/logo-460.webp 460w, assets/logo-920.webp 920w" sizes="(max-width: 700px) 280px, 460px" width="460" height="460" alt="" class="hero-bg-logo" aria-hidden="true" decoding="async" />
     <div class="container hero-content">
       <h1 class="hero-title">slurp</h1>
       <p class="hero-tagline" data-i18n-html="hero.tagline">
@@ -1996,6 +2001,8 @@ slurp index .
     </div>
   </section>
 
+
+  </main>
   <!-- ══════════════════════════════
        FOOTER
   ══════════════════════════════ -->
